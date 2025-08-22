@@ -686,32 +686,56 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           }
         }
         
-        // Extract author name - be more specific about author selectors
+        // Enhanced author name extraction with Hebrew support
         let authorName = 'Anonymous';
-        const nameElements = container.querySelectorAll('a[data-href*="contrib"], button[data-href*="contrib"], .d4r55, .TSUbDb');
-        for (const nameEl of nameElements) {
-          const name = nameEl.textContent?.trim() || '';
-          if (name.length > 0 && name.length < 50 && 
-              !name.includes('כוכב') && !name.includes('star') &&
-              !name.includes('Google') && !name.includes('מדיניות') &&
-              !name.includes('policy') && !name.includes('תמונה')) {
+        
+        // Step 1: Look for contributor links first (most reliable)
+        const contributorElements = container.querySelectorAll('a[data-href*="contrib"], button[data-href*="contrib"], [href*="contrib"]');
+        for (const contrib of contributorElements) {
+          const name = this.extractCleanAuthorName(contrib.textContent?.trim() || '');
+          if (name && name !== 'Anonymous') {
             authorName = name;
             break;
           }
         }
         
-        // Fallback: look for short text near the star that looks like a name
+        // Step 2: Look for common author selectors
         if (authorName === 'Anonymous') {
-          const shortTexts = container.querySelectorAll('span, div');
-          for (const el of shortTexts) {
+          const authorSelectors = ['.d4r55', '.TSUbDb', '.fontBodyMedium', '[data-value]', '.fontBodySmall'];
+          for (const selector of authorSelectors) {
+            const elements = container.querySelectorAll(selector);
+            for (const el of elements) {
+              const name = this.extractCleanAuthorName(el.textContent?.trim() || '');
+              if (name && name !== 'Anonymous') {
+                // Verify it's not part of review content
+                const parent = el.closest('a, button');
+                if (!parent || !parent.getAttribute('data-href')?.includes('contrib')) {
+                  // Check if this element is positioned like an author name (typically above review text)
+                  const rect = (el as HTMLElement).getBoundingClientRect();
+                  const starRect = starEl.getBoundingClientRect();
+                  if (Math.abs(rect.top - starRect.top) < 50) { // Within 50px of star rating
+                    authorName = name;
+                    break;
+                  }
+                }
+              }
+            }
+            if (authorName !== 'Anonymous') break;
+          }
+        }
+        
+        // Step 3: Pattern-based search for names in Hebrew and English
+        if (authorName === 'Anonymous') {
+          const allTextElements = container.querySelectorAll('span, div');
+          for (const el of allTextElements) {
             const text = el.textContent?.trim() || '';
-            if (text.length > 2 && text.length < 30 && 
-                !text.includes('כוכב') && !text.includes('star') &&
-                !text.includes('לפני') && !text.includes('ago') &&
-                !text.includes('Google') && !text.includes('מדיניות')) {
-              const parent = el.closest('a, button');
-              if (parent && parent.getAttribute('data-href')?.includes('contrib')) {
-                authorName = text;
+            const name = this.extractCleanAuthorName(text);
+            if (name && name !== 'Anonymous') {
+              // Additional validation: check position relative to star
+              const rect = (el as HTMLElement).getBoundingClientRect();
+              const starRect = starEl.getBoundingClientRect();
+              if (Math.abs(rect.top - starRect.top) < 100) {
+                authorName = name;
                 break;
               }
             }
@@ -745,7 +769,14 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           }
         }
         
-        if (reviewText.length > 10) {
+        // Add reviews with proper author names, or high-quality anonymous reviews
+        const isHighQualityAnonymous = authorName === 'Anonymous' && 
+                                       reviewText.length > 50 && 
+                                       !reviewText.includes('...') &&
+                                       reviewText.split(' ').length > 10;
+        
+        if (reviewText.length > 10 && 
+            ((authorName && authorName !== 'Anonymous') || isHighQualityAnonymous)) {
           // Convert Hebrew/relative dates to actual Date objects
           let actualDate = new Date();
           if (reviewDate !== 'Recent') {
@@ -789,15 +820,18 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             }
           }
           
-          // Create more stable ID based on content
-          const contentStr = `${authorName}_${reviewText}_${rating}`.substring(0, 100);
+          // Create deterministic ID based on content (for better duplicate detection)
+          const normalizedAuthor = authorName.replace(/\s+/g, ' ').trim().toLowerCase();
+          const normalizedText = reviewText.replace(/\s+/g, ' ').trim().toLowerCase();
+          const contentStr = `${normalizedAuthor}_${normalizedText}_${rating}`;
+          
           let hash = 0;
           for (let i = 0; i < contentStr.length; i++) {
             const char = contentStr.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash; // Convert to 32bit integer
           }
-          const stableId = `review_${Math.abs(hash)}_${Date.now()}`;
+          const stableId = `review_${Math.abs(hash)}`;
           
           reviews.push({
             id: stableId,
@@ -820,10 +854,61 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       return reviews;
     });
+  }
+
+  /**
+   * Extract and clean author name from text, handling Hebrew and English patterns
+   */
+  private extractCleanAuthorName(text: string): string | null {
+    if (!text || text.length === 0) return null;
     
-    // Add backend logging to see the actual results
-    console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
-    return result;
+    // Remove common unwanted patterns
+    const cleanText = text
+      .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
+      .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
+      .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
+      .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
+      .replace(/\s*·.*$/g, '') // Remove everything after middle dot
+      .replace(/\s*\|.*$/g, '') // Remove everything after pipe
+      .trim();
+    
+    // Skip if contains unwanted patterns
+    const unwantedPatterns = [
+      /^(Anonymous|אלמוני)$/i,
+      /כוכב|star/i,
+      /לפני|ago/i,
+      /Google|מדיניות|policy/i,
+      /ביקורת|reviews?/i,
+      /תמונה|photos?/i,
+      /^\d+$/,  // Just numbers
+      /^[.,:;!?\s]+$/, // Just punctuation
+      /^(a|an|the|את|של|על|עם)\s/i // Articles and prepositions
+    ];
+    
+    for (const pattern of unwantedPatterns) {
+      if (pattern.test(cleanText)) {
+        return null;
+      }
+    }
+    
+    // Length validation
+    if (cleanText.length < 2 || cleanText.length > 50) {
+      return null;
+    }
+    
+    // Must contain at least one letter (Hebrew or Latin)
+    if (!/[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(cleanText)) {
+      return null;
+    }
+    
+    // Additional validation for reasonable names
+    // Skip if it's mostly numbers or symbols
+    const letterCount = (cleanText.match(/[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/g) || []).length;
+    if (letterCount < cleanText.length * 0.5) {
+      return null;
+    }
+    
+    return cleanText;
   }
 
   /**

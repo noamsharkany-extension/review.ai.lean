@@ -72,20 +72,30 @@ export class ReviewDeduplicationService {
   }
 
   /**
-   * Find near-duplicate reviews using fuzzy matching
+   * Find near-duplicate reviews using fuzzy matching with multiple criteria
    */
   private findNearDuplicate(review: RawReview, existingReviews: RawReview[]): boolean {
     const threshold = 0.85; // 85% similarity threshold
     
     for (const existing of existingReviews) {
-      // Quick filters first
-      if (existing.author !== review.author) continue;
-      if (existing.rating !== review.rating) continue;
+      // Check for exact duplicates first (same author, same text)
+      if (existing.author === review.author && existing.text.trim() === review.text.trim()) {
+        this.debugLog(`Exact duplicate found: ${review.author} - "${review.text.substring(0, 50)}..."`);
+        return true;
+      }
       
-      // Calculate text similarity
-      const similarity = this.calculateSimilarity(review.text, existing.text);
-      if (similarity >= threshold) {
-        this.debugLog(`High similarity (${(similarity * 100).toFixed(1)}%) between reviews`);
+      // Check for near-duplicates with same author and rating
+      if (existing.author === review.author && existing.rating === review.rating) {
+        const similarity = this.calculateSimilarity(review.text, existing.text);
+        if (similarity >= threshold) {
+          this.debugLog(`High similarity (${(similarity * 100).toFixed(1)}%) between reviews from ${review.author}`);
+          return true;
+        }
+      }
+      
+      // Check for duplicates with different author names but identical text (author extraction issues)
+      if (review.text.trim() === existing.text.trim() && review.text.length > 50) {
+        this.debugLog(`Same text with different authors: "${review.author}" vs "${existing.author}" - likely extraction issue`);
         return true;
       }
     }
@@ -94,7 +104,7 @@ export class ReviewDeduplicationService {
   }
 
   /**
-   * Calculate text similarity using Jaccard similarity
+   * Calculate text similarity using multiple methods
    */
   private calculateSimilarity(text1: string, text2: string): number {
     // Normalize texts
@@ -109,12 +119,17 @@ export class ReviewDeduplicationService {
     const normalized1 = normalize(text1);
     const normalized2 = normalize(text2);
     
-    // If texts are very similar after normalization, they're likely duplicates
+    // Exact match after normalization
     if (normalized1 === normalized2) {
       return 1.0;
     }
     
-    // Create word sets for Jaccard similarity
+    // Very short texts - use exact matching
+    if (normalized1.length < 20 || normalized2.length < 20) {
+      return normalized1 === normalized2 ? 1.0 : 0.0;
+    }
+    
+    // Calculate Jaccard similarity for longer texts
     const words1 = new Set(normalized1.split(' ').filter(w => w.length > 1));
     const words2 = new Set(normalized2.split(' ').filter(w => w.length > 1));
     
@@ -130,7 +145,15 @@ export class ReviewDeduplicationService {
     const intersection = new Set([...words1].filter(word => words2.has(word)));
     const union = new Set([...words1, ...words2]);
     
-    return intersection.size / union.size;
+    const jaccardSimilarity = intersection.size / union.size;
+    
+    // Additional check: if texts have very similar length and high word overlap, likely duplicate
+    const lengthSimilarity = 1 - Math.abs(normalized1.length - normalized2.length) / Math.max(normalized1.length, normalized2.length);
+    if (jaccardSimilarity > 0.7 && lengthSimilarity > 0.8) {
+      return Math.max(jaccardSimilarity, 0.9); // Boost similarity for likely duplicates
+    }
+    
+    return jaccardSimilarity;
   }
 
   /**
