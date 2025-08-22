@@ -252,7 +252,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     let previousCount = 0;
     let stagnantRounds = 0;
     const maxStagnantRounds = 3;
-    const maxScrollAttempts = 50; // Increased for thoroughness
+    const maxScrollAttempts = 20; // Reasonable limit to prevent infinite scrolling
     
     // Start with newest sort to ensure we get reviews in a good order
     await this.applySortFilter(page, 'newest');
@@ -266,8 +266,9 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       // Extract all currently visible reviews
       const currentReviews = await this.extractBasicReviews(page);
       
-      // Deduplicate as we go
-      const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(currentReviews);
+      // Merge with existing reviews and deduplicate
+      const combinedReviews = [...allReviews, ...currentReviews];
+      const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
       allReviews = deduplicationResult.uniqueReviews;
       
       this.log(`📊 Scroll ${attempt + 1}: Found ${allReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed)`);
@@ -287,8 +288,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       }
       
       // Safety check - if we somehow got way more than expected, stop
-      if (allReviews.length > 500) {
-        this.log('⚠️ Extracted more reviews than expected, stopping to prevent infinite scroll');
+      if (allReviews.length > 350) {
+        this.log('⚠️ Reached maximum review limit (350), stopping extraction');
         break;
       }
     }
@@ -854,6 +855,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       return reviews;
     });
+    
+    // Add backend logging to see the actual results
+    console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
+    return result;
   }
 
   /**
