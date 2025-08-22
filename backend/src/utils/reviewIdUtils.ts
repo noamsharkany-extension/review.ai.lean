@@ -29,5 +29,5 @@ export function createReviewId(author: string | null, text: string | null, ratin
  * Validates that a review ID is properly formatted
  */
 export function isValidReviewId(id: string): boolean {
-  return id && id.length > 0 && id.length <= 200 && !id.includes('\n') && !id.includes('\r');
+  return Boolean(id) && id.length > 0 && id.length <= 200 && !id.includes('\n') && !id.includes('\r');
 }

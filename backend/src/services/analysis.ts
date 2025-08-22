@@ -471,7 +471,7 @@ Be very conservative - flag only obviously fake reviews. Avoid flagging reviews 
       confidence = Math.max(0.1, confidence - 0.15); // Reduce confidence for Hebrew text
       if (confidence < 0.2) {
         isFake = false; // Don't flag Hebrew reviews with low confidence
-        reasons = [];
+        reasons.length = 0; // Clear the reasons array
       }
     }
 

@@ -147,10 +147,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Main scraping method using our successful multi-lingual approach
+   * Main scraping method with adaptive strategy based on total review count
    */
   async scrapeReviews(googleUrl: string): Promise<RawReview[]> {
-    this.log('🎯 Starting comprehensive review extraction: 100 newest + 100 lowest + 100 highest = 300 unique reviews');
+    this.log('🎯 Starting adaptive review extraction...');
     
     let page: Page | null = null;
     try {
@@ -160,52 +160,29 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       await this.navigateStreamlined(page, googleUrl);
       await page.waitForTimeout(2000);
       
-      const reviewCollections = {
-        newest: [] as any[],
-        lowest: [] as any[],
-        highest: [] as any[]
-      };
-      
       // Step 1: Click on Reviews tab to access all reviews
       this.log('📋 Step 1: Accessing Reviews tab...');
       await this.clickReviewsTab(page);
       await page.waitForTimeout(2000);
       
-      // Step 2: Collect 100 NEWEST reviews
-      this.log('🕐 Step 2: Collecting 100 NEWEST reviews...');
-      reviewCollections.newest = await this.collectReviewsBySort(page, 'newest', 100);
-      this.log(`✅ Collected ${reviewCollections.newest.length} newest reviews`);
+      // Step 2: Detect total number of reviews available
+      this.log('🔢 Step 2: Detecting total review count...');
+      const totalReviewCount = await this.detectTotalReviewCount(page);
+      this.log(`📊 Detected approximately ${totalReviewCount} total reviews`);
       
-      // Step 3: Collect 100 LOWEST rated reviews  
-      this.log('⭐ Step 3: Collecting 100 LOWEST rated reviews...');
-      reviewCollections.lowest = await this.collectReviewsBySort(page, 'lowest', 100);
-      this.log(`✅ Collected ${reviewCollections.lowest.length} lowest rated reviews`);
+      let allUniqueReviews: any[];
       
-      // Step 4: Collect 100 HIGHEST rated reviews
-      this.log('🌟 Step 4: Collecting 100 HIGHEST rated reviews...');
-      reviewCollections.highest = await this.collectReviewsBySort(page, 'highest', 100);
-      this.log(`✅ Collected ${reviewCollections.highest.length} highest rated reviews`);
+      if (totalReviewCount <= 300) {
+        // Strategy A: Extract ALL reviews (no filters, just scroll through everything)
+        this.log('📜 Using Strategy A: Extracting ALL available reviews (≤300 total)');
+        allUniqueReviews = await this.extractAllAvailableReviews(page);
+      } else {
+        // Strategy B: Use selective filtering (original approach)
+        this.log('🎯 Using Strategy B: Selective filtering (>300 total) - 100 newest + 100 lowest + 100 highest');
+        allUniqueReviews = await this.extractWithSelectiveFiltering(page);
+      }
       
-      // Step 5: Deduplicate reviews across collections
-      this.log('🔍 Step 5: Deduplicating reviews across collections...');
-      const deduplicatedCollections = this.reviewDeduplicationService.mergeAndDeduplicate(reviewCollections);
-      
-      // Step 5b: Fill gaps if needed
-      this.log('📈 Step 5b: Checking if we need to fill gaps...');
-      const finalCollections = await this.fillGapsIfNeeded(page, deduplicatedCollections);
-      
-      // Step 6: Combine all unique reviews
-      const allUniqueReviews = [
-        ...finalCollections.newest.map(r => ({ ...r, sortType: 'newest' })),
-        ...finalCollections.lowest.map(r => ({ ...r, sortType: 'lowest' })),
-        ...finalCollections.highest.map(r => ({ ...r, sortType: 'highest' }))
-      ];
-      
-      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews`);
-      this.log(`   - Newest: ${finalCollections.newest.length}`);
-      this.log(`   - Lowest: ${finalCollections.lowest.length}`);
-      this.log(`   - Highest: ${finalCollections.highest.length}`);
-      
+      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using ${totalReviewCount <= 300 ? 'Strategy A (extract all)' : 'Strategy B (selective)'}`);      
       return allUniqueReviews;
       
     } catch (error) {
@@ -216,6 +193,158 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         await page.close();
       }
     }
+  }
+
+  /**
+   * Detect the total number of reviews available on the page
+   */
+  private async detectTotalReviewCount(page: Page): Promise<number> {
+    const reviewCount = await page.evaluate(() => {
+      // Try multiple selectors to find the review count
+      const selectors = [
+        // Look for text patterns like "1,863 reviews" or "1863 ביקורות"
+        'button[jsaction*="moreReviews"]',
+        'button:contains("reviews")',
+        'button:contains("ביקורות")',
+        '[aria-label*="reviews"]',
+        '[aria-label*="ביקורות"]'
+      ];
+      
+      for (const selector of selectors) {
+        const elements = document.querySelectorAll('button');
+        for (const element of elements) {
+          const text = element.textContent || '';
+          const ariaLabel = element.getAttribute('aria-label') || '';
+          const jsaction = element.getAttribute('jsaction') || '';
+          
+          // Check if this looks like a reviews button with count
+          if ((text.includes('reviews') || text.includes('ביקורת') || jsaction.includes('moreReviews')) &&
+              (text.match(/[\d,]+/) || ariaLabel.match(/[\d,]+/))) {
+            
+            const fullText = text + ' ' + ariaLabel;
+            const numberMatch = fullText.match(/([\d,]+)/);
+            
+            if (numberMatch) {
+              const count = parseInt(numberMatch[1].replace(/,/g, ''));
+              console.log(`[DETECT] Found review count: ${count} from text: "${fullText}"`);
+              if (count > 0 && count < 100000) { // Sanity check
+                return count;
+              }
+            }
+          }
+        }
+      }
+      
+      console.log('[DETECT] Could not find review count, defaulting to 999');
+      return 999; // Default to "many" if we can't detect
+    });
+    
+    return reviewCount;
+  }
+
+  /**
+   * Strategy A: Extract ALL available reviews (for businesses with ≤300 reviews)
+   */
+  private async extractAllAvailableReviews(page: Page): Promise<any[]> {
+    this.log('📜 Extracting ALL available reviews...');
+    
+    let allReviews: any[] = [];
+    let previousCount = 0;
+    let stagnantRounds = 0;
+    const maxStagnantRounds = 3;
+    const maxScrollAttempts = 50; // Increased for thoroughness
+    
+    // Start with newest sort to ensure we get reviews in a good order
+    await this.applySortFilter(page, 'newest');
+    await page.waitForTimeout(2000);
+    
+    for (let attempt = 0; attempt < maxScrollAttempts; attempt++) {
+      // Scroll to load more reviews
+      await this.performAggressiveScrolling(page);
+      await page.waitForTimeout(1000);
+      
+      // Extract all currently visible reviews
+      const currentReviews = await this.extractBasicReviews(page);
+      
+      // Deduplicate as we go
+      const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(currentReviews);
+      allReviews = deduplicationResult.uniqueReviews;
+      
+      this.log(`📊 Scroll ${attempt + 1}: Found ${allReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed)`);
+      
+      // Check if we're getting new reviews
+      if (allReviews.length === previousCount) {
+        stagnantRounds++;
+        this.log(`⚠️ No new reviews found (stagnant round ${stagnantRounds}/${maxStagnantRounds})`);
+        
+        if (stagnantRounds >= maxStagnantRounds) {
+          this.log('✅ Reached end of reviews - no new reviews found in multiple attempts');
+          break;
+        }
+      } else {
+        stagnantRounds = 0; // Reset stagnant counter
+        previousCount = allReviews.length;
+      }
+      
+      // Safety check - if we somehow got way more than expected, stop
+      if (allReviews.length > 500) {
+        this.log('⚠️ Extracted more reviews than expected, stopping to prevent infinite scroll');
+        break;
+      }
+    }
+    
+    this.log(`✅ Strategy A complete: Extracted ${allReviews.length} unique reviews`);
+    return allReviews.map(r => ({ ...r, sortType: 'all' }));
+  }
+
+  /**
+   * Strategy B: Selective filtering approach (original logic)
+   */
+  private async extractWithSelectiveFiltering(page: Page): Promise<any[]> {
+    this.log('🎯 Using selective filtering strategy...');
+    
+    const reviewCollections = {
+      newest: [] as any[],
+      lowest: [] as any[],
+      highest: [] as any[]
+    };
+    
+    // Step 2: Collect 100 NEWEST reviews
+    this.log('🕐 Step 2: Collecting 100 NEWEST reviews...');
+    reviewCollections.newest = await this.collectReviewsBySort(page, 'newest', 100);
+    this.log(`✅ Collected ${reviewCollections.newest.length} newest reviews`);
+    
+    // Step 3: Collect 100 LOWEST rated reviews  
+    this.log('⭐ Step 3: Collecting 100 LOWEST rated reviews...');
+    reviewCollections.lowest = await this.collectReviewsBySort(page, 'lowest', 100);
+    this.log(`✅ Collected ${reviewCollections.lowest.length} lowest rated reviews`);
+    
+    // Step 4: Collect 100 HIGHEST rated reviews
+    this.log('🌟 Step 4: Collecting 100 HIGHEST rated reviews...');
+    reviewCollections.highest = await this.collectReviewsBySort(page, 'highest', 100);
+    this.log(`✅ Collected ${reviewCollections.highest.length} highest rated reviews`);
+    
+    // Step 5: Deduplicate reviews across collections
+    this.log('🔍 Step 5: Deduplicating reviews across collections...');
+    const deduplicatedCollections = this.reviewDeduplicationService.mergeAndDeduplicate(reviewCollections);
+    
+    // Step 6: Fill gaps if needed
+    this.log('📈 Step 6: Checking if we need to fill gaps...');
+    const finalCollections = await this.fillGapsIfNeeded(page, deduplicatedCollections);
+    
+    // Step 7: Combine all unique reviews
+    const allUniqueReviews = [
+      ...finalCollections.newest.map(r => ({ ...r, sortType: 'newest' })),
+      ...finalCollections.lowest.map(r => ({ ...r, sortType: 'lowest' })),
+      ...finalCollections.highest.map(r => ({ ...r, sortType: 'highest' }))
+    ];
+    
+    this.log(`✅ Strategy B complete:`);
+    this.log(`   - Newest: ${finalCollections.newest.length}`);
+    this.log(`   - Lowest: ${finalCollections.lowest.length}`);
+    this.log(`   - Highest: ${finalCollections.highest.length}`);
+    
+    return allUniqueReviews;
   }
 
   /**
@@ -427,7 +556,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           
           for (const searchText of searchTexts) {
             if (text === searchText || (text.includes(searchText) && text.length < searchText.length + 20)) {
-              if (element.offsetParent !== null) { // Element is visible
+              if ((element as HTMLElement).offsetParent !== null) { // Element is visible
                 console.log(`[DEBUG] Clicking ${sortType} option via fxNQSd: "${text}"`);
                 (element as HTMLElement).click();
                 return true;
@@ -755,15 +884,22 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   /**
    * Fill gaps if we don't have enough unique reviews
    */
-  private async fillGapsIfNeeded(page: Page, collections: { newest: any[], lowest: any[], highest: any[] }): Promise<{ newest: any[], lowest: any[], highest: any[] }> {
-    const currentTotal = collections.newest.length + collections.lowest.length + collections.highest.length;
+  private async fillGapsIfNeeded(page: Page, collections: { [key: string]: RawReview[] }): Promise<{ newest: any[], lowest: any[], highest: any[] }> {
+    // Ensure we have the expected structure
+    const structuredCollections = {
+      newest: collections.newest || [],
+      lowest: collections.lowest || [],
+      highest: collections.highest || []
+    };
+    
+    const currentTotal = structuredCollections.newest.length + structuredCollections.lowest.length + structuredCollections.highest.length;
     const targetTotal = 200; // Reduced target for better performance
     
     this.log(`Current total: ${currentTotal}, Target: ${targetTotal}`);
     
     if (currentTotal >= targetTotal) {
       this.log(`✅ Already have enough reviews (${currentTotal}), no gap filling needed`);
-      return collections;
+      return structuredCollections;
     }
     
     const needed = targetTotal - currentTotal;
@@ -771,7 +907,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     
     // Create set of existing review IDs for duplicate checking
     const existingIds = new Set<string>();
-    [...collections.newest, ...collections.lowest, ...collections.highest].forEach(review => {
+    [...structuredCollections.newest, ...structuredCollections.lowest, ...structuredCollections.highest].forEach(review => {
       existingIds.add(createReviewId(review.author, review.text, review.rating));
     });
     
@@ -780,11 +916,11 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     await page.waitForTimeout(1500);
     
     const additionalReviews = await this.collectAdditionalReviews(page, needed, existingIds);
-    collections.newest.push(...additionalReviews);
+    structuredCollections.newest.push(...additionalReviews);
     
-    this.log(`✅ Added ${additionalReviews.length} additional reviews. New total: ${collections.newest.length + collections.lowest.length + collections.highest.length}`);
+    this.log(`✅ Added ${additionalReviews.length} additional reviews. New total: ${structuredCollections.newest.length + structuredCollections.lowest.length + structuredCollections.highest.length}`);
     
-    return collections;
+    return structuredCollections;
   }
 
   /**
