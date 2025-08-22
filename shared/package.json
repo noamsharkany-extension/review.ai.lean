@@ -1,0 +1,13 @@
+{
+  "name": "review-analyzer-shared",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "types/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
