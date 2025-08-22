@@ -135,7 +135,7 @@ const ReviewCitationCard: React.FC<ReviewCitationCardProps> = ({
           </div>
         </div>
 
-        <p className="text-gray-700 line-clamp-2">{citation.text}</p>
+        <p className="text-gray-700 line-clamp-2" dir="auto">{citation.text}</p>
       </div>
 
       {isExpanded && (
@@ -144,7 +144,7 @@ const ReviewCitationCard: React.FC<ReviewCitationCardProps> = ({
             {/* Full review text */}
             <div>
               <h5 className="font-medium text-gray-900 mb-2">Full Review</h5>
-              <p className="text-gray-700">{citation.text}</p>
+              <p className="text-gray-700" dir="auto">{citation.text}</p>
             </div>
 
             {/* Analysis details */}

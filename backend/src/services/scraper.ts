@@ -6,6 +6,7 @@ import { LanguageDetectionService, LanguageDetectionResult, SelectorSet, Multili
 import { ComprehensiveCollectionOrchestrator, ComprehensiveCollectionConfig, ComprehensiveCollectionResult } from './comprehensiveCollectionOrchestrator.js';
 import { ReviewSortNavigationService } from './reviewSortNavigationService.js';
 import { EnhancedPaginationEngine } from './enhancedPaginationEngine.js';
+import { ReviewDeduplicationService } from './reviewDeduplicationService.js';
 
 export class GoogleReviewScraperService implements ReviewScraperService {
   private browser: Browser | null = null;
@@ -50,7 +51,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     );
     this.reviewSortNavigationService = new ReviewSortNavigationService(progressCallback, debugMode);
     this.enhancedPaginationEngine = new EnhancedPaginationEngine(debugMode, progressCallback);
-    // this.reviewDeduplicationService = new ReviewDeduplicationService(debugMode);
+    this.reviewDeduplicationService = new ReviewDeduplicationService(debugMode);
   }
 
   protected log(message: string): void {
@@ -185,9 +186,13 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       reviewCollections.highest = await this.collectReviewsBySort(page, 'highest', 100);
       this.log(`✅ Collected ${reviewCollections.highest.length} highest rated reviews`);
       
-      // Step 5: Check for duplicates and fill gaps
-      this.log('🔍 Step 5: Checking for duplicates and filling gaps...');
-      const finalCollections = await this.deduplicateAndFillGaps(page, reviewCollections);
+      // Step 5: Deduplicate reviews across collections
+      this.log('🔍 Step 5: Deduplicating reviews across collections...');
+      const deduplicatedCollections = this.reviewDeduplicationService.mergeAndDeduplicate(reviewCollections);
+      
+      // Step 5b: Fill gaps if needed
+      this.log('📈 Step 5b: Checking if we need to fill gaps...');
+      const finalCollections = await this.fillGapsIfNeeded(page, deduplicatedCollections);
       
       // Step 6: Combine all unique reviews
       const allUniqueReviews = [
@@ -748,64 +753,38 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Deduplicate and fill gaps to ensure 100 reviews in each category
+   * Fill gaps if we don't have enough unique reviews
    */
-  private async deduplicateAndFillGaps(page: Page, collections: { newest: any[], lowest: any[], highest: any[] }): Promise<{ newest: any[], lowest: any[], highest: any[] }> {
-    this.log('🔍 Deduplicating and filling gaps...');
+  private async fillGapsIfNeeded(page: Page, collections: { newest: any[], lowest: any[], highest: any[] }): Promise<{ newest: any[], lowest: any[], highest: any[] }> {
+    const currentTotal = collections.newest.length + collections.lowest.length + collections.highest.length;
+    const targetTotal = 200; // Reduced target for better performance
     
-    // Create global set of all reviews to check for duplicates
-    const allReviewsSet = new Set<string>();
-    const result = {
-      newest: [] as any[],
-      lowest: [] as any[],
-      highest: [] as any[]
-    };
+    this.log(`Current total: ${currentTotal}, Target: ${targetTotal}`);
     
-    // Process newest first (highest priority)
-    for (const review of collections.newest) {
-      const key = createReviewId(review.author, review.text, review.rating);
-      if (!allReviewsSet.has(key)) {
-        allReviewsSet.add(key);
-        result.newest.push(review);
-      }
+    if (currentTotal >= targetTotal) {
+      this.log(`✅ Already have enough reviews (${currentTotal}), no gap filling needed`);
+      return collections;
     }
     
-    // Process lowest, excluding duplicates
-    for (const review of collections.lowest) {
-      const key = createReviewId(review.author, review.text, review.rating);
-      if (!allReviewsSet.has(key)) {
-        allReviewsSet.add(key);
-        result.lowest.push(review);
-      }
-    }
+    const needed = targetTotal - currentTotal;
+    this.log(`🔄 Need ${needed} more reviews, collecting additional newest reviews...`);
     
-    // Process highest, excluding duplicates
-    for (const review of collections.highest) {
-      const key = createReviewId(review.author, review.text, review.rating);
-      if (!allReviewsSet.has(key)) {
-        allReviewsSet.add(key);
-        result.highest.push(review);
-      }
-    }
+    // Create set of existing review IDs for duplicate checking
+    const existingIds = new Set<string>();
+    [...collections.newest, ...collections.lowest, ...collections.highest].forEach(review => {
+      existingIds.add(createReviewId(review.author, review.text, review.rating));
+    });
     
-    this.log(`After deduplication: Newest: ${result.newest.length}, Lowest: ${result.lowest.length}, Highest: ${result.highest.length}`);
+    // Switch back to newest sort and collect more
+    await this.applySortFilter(page, 'newest');
+    await page.waitForTimeout(1500);
     
-    // Fill gaps by collecting more newest reviews (priority)
-    const totalNeeded = 300 - (result.newest.length + result.lowest.length + result.highest.length);
-    if (totalNeeded > 0) {
-      this.log(`🔄 Need ${totalNeeded} more reviews, collecting additional newest reviews...`);
-      
-      // Switch back to newest sort and collect more
-      await this.applySortFilter(page, 'newest');
-      await page.waitForTimeout(1500);
-      
-      const additionalReviews = await this.collectAdditionalReviews(page, totalNeeded, allReviewsSet);
-      result.newest.push(...additionalReviews);
-      
-      this.log(`Added ${additionalReviews.length} additional newest reviews`);
-    }
+    const additionalReviews = await this.collectAdditionalReviews(page, needed, existingIds);
+    collections.newest.push(...additionalReviews);
     
-    return result;
+    this.log(`✅ Added ${additionalReviews.length} additional reviews. New total: ${collections.newest.length + collections.lowest.length + collections.highest.length}`);
+    
+    return collections;
   }
 
   /**

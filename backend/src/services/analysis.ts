@@ -138,7 +138,7 @@ ${reviewsText}
 
 Return JSON: [{"reviewId":"id","sentiment":"positive|negative|neutral","confidence":0.85,"mismatchDetected":false}]
 
-Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.`;
+Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 4-5★ with clearly negative text. Be conservative with Hebrew text analysis.`;
   }
 
   private parseSentimentResponse(content: string, reviews: RawReview[]): SentimentAnalysis[] {
@@ -192,15 +192,25 @@ Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.
   }
 
   private createFallbackSentimentAnalysis(review: RawReview): SentimentAnalysis {
-    // Enhanced rule-based fallback with keyword analysis
+    // Enhanced rule-based fallback with Hebrew and English keyword analysis
     const text = review.text.toLowerCase();
     let sentiment: 'positive' | 'negative' | 'neutral' = 'neutral';
     let confidence = 0.5; // Base confidence for fallback
     let mismatchDetected = false;
 
-    // Positive and negative keywords for better sentiment detection
-    const positiveWords = ['excellent', 'amazing', 'great', 'good', 'fantastic', 'wonderful', 'perfect', 'love', 'best', 'awesome', 'outstanding', 'superb', 'delicious', 'friendly', 'helpful', 'recommend'];
-    const negativeWords = ['terrible', 'awful', 'bad', 'horrible', 'worst', 'hate', 'disgusting', 'rude', 'poor', 'disappointing', 'waste', 'never', 'avoid', 'pathetic', 'useless'];
+    // Positive and negative keywords for better sentiment detection (English + Hebrew)
+    const positiveWords = [
+      // English
+      'excellent', 'amazing', 'great', 'good', 'fantastic', 'wonderful', 'perfect', 'love', 'best', 'awesome', 'outstanding', 'superb', 'delicious', 'friendly', 'helpful', 'recommend',
+      // Hebrew (lowercase equivalents)
+      'מעולה', 'נהדר', 'טוב', 'מושלם', 'אוהב', 'הכי טוב', 'ממליץ', 'נחמד', 'יפה', 'טעים', 'מדהים', 'חמוד', 'מקסים'
+    ];
+    const negativeWords = [
+      // English
+      'terrible', 'awful', 'bad', 'horrible', 'worst', 'hate', 'disgusting', 'rude', 'poor', 'disappointing', 'waste', 'never', 'avoid', 'pathetic', 'useless',
+      // Hebrew (lowercase equivalents)
+      'גרוע', 'נורא', 'איום', 'רע', 'מאכזב', 'שונא', 'לא טוב', 'בזבוז', 'אל תבואו', 'חבל על הזמן', 'יבש'
+    ];
 
     // Count positive and negative words
     const positiveCount = positiveWords.filter(word => text.includes(word)).length;
@@ -222,11 +232,12 @@ Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.
       }
     }
 
-    // Enhanced mismatch detection
-    if ((review.rating <= 2 && sentiment === 'positive') || 
-        (review.rating >= 4 && sentiment === 'negative')) {
+    // Enhanced mismatch detection with Hebrew consideration
+    // Only flag clear mismatches - be more conservative
+    if ((review.rating <= 2 && sentiment === 'positive' && positiveCount >= 2) || 
+        (review.rating >= 4 && sentiment === 'negative' && negativeCount >= 2)) {
       mismatchDetected = true;
-      confidence = Math.min(confidence, 0.6);
+      confidence = Math.min(confidence, 0.7); // Increased confidence threshold
     }
 
     return {
@@ -358,10 +369,11 @@ Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.
 ${reviewsText}
 
 Check: Generic language, no specifics, promotional tone, unnatural patterns, extreme sentiment.
+Be especially careful with non-English text - different languages may have different natural patterns.
 
 Return JSON: [{"reviewId":"id","isFake":false,"confidence":0.7,"reasons":[]}]
 
-Be conservative - flag only obvious fakes.`;
+Be very conservative - flag only obviously fake reviews. Avoid flagging reviews just for being brief or in different languages.`;
   }
 
   private parseFakeDetectionResponse(content: string, reviews: RawReview[]): FakeReviewAnalysis[] {
@@ -411,45 +423,56 @@ Be conservative - flag only obvious fakes.`;
   }
 
   private createFallbackFakeAnalysis(review: RawReview): FakeReviewAnalysis {
-    // Simple rule-based fallback for fake detection
+    // More conservative rule-based fallback for fake detection
     const reasons: string[] = [];
     let isFake = false;
-    let confidence = 0.2; // Low confidence for fallback
+    let confidence = 0.15; // Lower base confidence - be more conservative
 
     // Basic heuristics for fake detection
     const text = review.text.toLowerCase();
     const wordCount = review.text.split(/\s+/).length;
 
-    // Check for overly generic language
+    // Check for overly generic language - be more restrictive
     const genericPhrases = [
-      'highly recommend', 'amazing service', 'great experience', 
-      'excellent quality', 'outstanding service', 'perfect place',
-      'terrible service', 'worst experience', 'never again'
+      'highly recommend this place', 'amazing service and food', 'great experience overall', 
+      'excellent quality and service', 'outstanding service perfect', 'perfect place to eat',
+      'terrible service never coming back', 'worst experience of my life', 'never again waste of money'
     ];
     
     const genericCount = genericPhrases.filter(phrase => text.includes(phrase)).length;
     
-    if (genericCount >= 2 && wordCount < 20) {
-      reasons.push('Generic language with minimal detail');
+    // Only flag if multiple generic phrases AND very short
+    if (genericCount >= 2 && wordCount < 15) {
+      reasons.push('Multiple generic phrases with minimal detail');
       isFake = true;
-      confidence = 0.4;
+      confidence = 0.35;
     }
 
-    // Check for extremely short reviews with extreme ratings
-    if (wordCount < 5 && (review.rating === 1 || review.rating === 5)) {
+    // Check for extremely short reviews with extreme ratings - be more lenient
+    if (wordCount < 3 && (review.rating === 1 || review.rating === 5)) {
       reasons.push('Extremely brief with extreme rating');
+      isFake = true;
+      confidence = 0.25;
+    }
+
+    // Check for promotional language patterns - require more evidence
+    const promotionalWords = ['best ever', 'perfect amazing', 'incredible outstanding', 'absolutely perfect'];
+    const promotionalCount = promotionalWords.filter(word => text.includes(word)).length;
+    
+    if (promotionalCount >= 2 && wordCount < 10) {
+      reasons.push('Excessive promotional language in brief review');
       isFake = true;
       confidence = 0.3;
     }
 
-    // Check for promotional language patterns
-    const promotionalWords = ['best', 'perfect', 'amazing', 'incredible', 'outstanding'];
-    const promotionalCount = promotionalWords.filter(word => text.includes(word)).length;
-    
-    if (promotionalCount >= 3) {
-      reasons.push('Excessive promotional language');
-      isFake = true;
-      confidence = 0.35;
+    // Don't flag Hebrew reviews as easily - they may seem different due to language patterns
+    const hasHebrew = /[\u0590-\u05FF]/.test(review.text);
+    if (hasHebrew && isFake) {
+      confidence = Math.max(0.1, confidence - 0.15); // Reduce confidence for Hebrew text
+      if (confidence < 0.2) {
+        isFake = false; // Don't flag Hebrew reviews with low confidence
+        reasons = [];
+      }
     }
 
     return {
