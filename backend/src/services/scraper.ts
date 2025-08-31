@@ -88,7 +88,12 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             '--disable-default-apps',
             '--no-first-run',
             '--no-default-browser-check',
-            '--disable-background-networking'
+            '--disable-background-networking',
+            '--lang=en-US',
+            '--accept-lang=en-US,en',
+            `--user-data-dir=/tmp/chrome-english-profile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            '--disable-translate',
+            '--disable-features=Translate'
           ],
           defaultViewport: {
             width: 1366,
@@ -103,6 +108,13 @@ export class GoogleReviewScraperService implements ReviewScraperService {
 
         this.browser = await Promise.race([browserPromise, timeoutPromise]);
         this.log('Browser launched successfully');
+        
+        // Set browser to English language
+        const page = await this.browser.newPage();
+        await page.setExtraHTTPHeaders({
+          'Accept-Language': 'en-US,en;q=0.9'
+        });
+        await page.close();
 
         this.browser.on('disconnected', () => {
           this.log('Browser disconnected unexpectedly');
@@ -118,9 +130,95 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   private async setupPageStreamlined(page: Page): Promise<void> {
-    this.log('Setting up streamlined page configuration...');
+    this.log('Setting up streamlined page configuration with English locale...');
     
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
+    // Set comprehensive language preferences for English
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'en-US,en;q=0.9,en-GB;q=0.8',
+      'Accept-Charset': 'utf-8',
+      'Cache-Control': 'no-cache'
+    });
+    
+    // Set viewport locale and timezone to US/English + prevent new tabs
+    await page.evaluateOnNewDocument(() => {
+      // Override navigator language properties
+      Object.defineProperty(navigator, 'language', {
+        get: function() { return 'en-US'; }
+      });
+      Object.defineProperty(navigator, 'languages', {
+        get: function() { return ['en-US', 'en']; }
+      });
+      
+      // Set locale formatting
+      if (typeof Intl !== 'undefined') {
+        const originalDateTimeFormat = Intl.DateTimeFormat;
+        Intl.DateTimeFormat = function(locale, options) {
+          return new originalDateTimeFormat('en-US', options);
+        } as any;
+      }
+      
+      // Comprehensive navigation protection - block ALL new tabs/windows during scraping
+      const originalWindowOpen = window.open;
+      window.open = function(url, target, features) {
+        console.log(`[SCRAPER] BLOCKED window.open attempt to: ${url}`);
+        return null; // Block ALL new window attempts during scraping
+      };
+      
+      // Override location changes that could cause navigation
+      const originalSetLocation = Object.getOwnPropertyDescriptor(Location.prototype, 'href') || {};
+      Object.defineProperty(location, 'href', {
+        get: originalSetLocation.get,
+        set: function(value) {
+          if (value && value.includes('/contrib/')) {
+            console.log(`[SCRAPER] BLOCKED location.href change to contributor profile: ${value}`);
+            return;
+          }
+          if (originalSetLocation.set) {
+            originalSetLocation.set.call(this, value);
+          }
+        }
+      });
+      
+      // Block ALL clicks that might cause navigation
+      document.addEventListener('click', function(e) {
+        const target = e.target as HTMLElement;
+        const href = target.getAttribute('href') || target.getAttribute('data-href') || '';
+        
+        // Block contributor profile links
+        if (href && href.includes('/contrib/')) {
+          console.log(`[SCRAPER] BLOCKED click on contributor link: ${href}`);
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return false;
+        }
+        
+        // Block any clicks that might open new tabs/windows
+        if (e.ctrlKey || e.metaKey || e.button === 1) {
+          console.log(`[SCRAPER] BLOCKED new tab click attempt`);
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return false;
+        }
+      }, true);
+      
+      // Block programmatic navigation attempts
+      const originalAssign = location.assign;
+      location.assign = function(url) {
+        console.log(`[SCRAPER] BLOCKED location.assign to: ${url}`);
+        return;
+      };
+      
+      const originalReplace = location.replace;
+      location.replace = function(url) {
+        console.log(`[SCRAPER] BLOCKED location.replace to: ${url}`);
+        return;
+      };
+      
+    });
     
     page.setDefaultTimeout(30000);
     page.setDefaultNavigationTimeout(30000);
@@ -131,10 +229,20 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   private async navigateStreamlined(page: Page, url: string): Promise<void> {
-    this.log('Using streamlined navigation...');
+    this.log('Using streamlined navigation with English locale...');
     
     try {
-      await page.goto(url, { 
+      // Force English language by adding hl=en parameter to Google Maps URLs
+      let navigateUrl = url;
+      if (url.includes('google.com/maps')) {
+        const urlObj = new URL(url);
+        urlObj.searchParams.set('hl', 'en'); // Force English language
+        urlObj.searchParams.set('gl', 'US'); // Force US country/region
+        navigateUrl = urlObj.toString();
+        this.log(`Modified URL for English locale: ${navigateUrl}`);
+      }
+      
+      await page.goto(navigateUrl, { 
         waitUntil: 'domcontentloaded',
         timeout: 30000 
       });
@@ -172,17 +280,12 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       let allUniqueReviews: any[];
       
-      if (totalReviewCount <= 300) {
-        // Strategy A: Extract ALL reviews (no filters, just scroll through everything)
-        this.log('📜 Using Strategy A: Extracting ALL available reviews (≤300 total)');
-        allUniqueReviews = await this.extractAllAvailableReviews(page);
-      } else {
-        // Strategy B: Use selective filtering (original approach)
-        this.log('🎯 Using Strategy B: Selective filtering (>300 total) - 100 newest + 100 lowest + 100 highest');
-        allUniqueReviews = await this.extractWithSelectiveFiltering(page);
-      }
+      // Always use Strategy B: Selective filtering (100 newest + 100 lowest + 100 highest)
+      // This ensures we get a balanced sample regardless of total review count
+      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest');
+      allUniqueReviews = await this.extractWithSelectiveFiltering(page);
       
-      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using ${totalReviewCount <= 300 ? 'Strategy A (extract all)' : 'Strategy B (selective)'}`);      
+      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);      
       return allUniqueReviews;
       
     } catch (error) {
@@ -251,17 +354,19 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     let allReviews: any[] = [];
     let previousCount = 0;
     let stagnantRounds = 0;
-    const maxStagnantRounds = 3;
-    const maxScrollAttempts = 20; // Reasonable limit to prevent infinite scrolling
+    const maxStagnantRounds = 5; // Increased for more thorough extraction
+    const maxScrollAttempts = 50; // Increased to handle larger volumes
     
     // Start with newest sort to ensure we get reviews in a good order
     await this.applySortFilter(page, 'newest');
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     
     for (let attempt = 0; attempt < maxScrollAttempts; attempt++) {
-      // Scroll to load more reviews
-      await this.performAggressiveScrolling(page);
-      await page.waitForTimeout(1000);
+      // Multiple scroll attempts to ensure we load everything
+      for (let i = 0; i < 3; i++) {
+        await this.performAggressiveScrolling(page);
+        await page.waitForTimeout(800);
+      }
       
       // Extract all currently visible reviews
       const currentReviews = await this.extractBasicReviews(page);
@@ -287,9 +392,9 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         previousCount = allReviews.length;
       }
       
-      // Safety check - if we somehow got way more than expected, stop
-      if (allReviews.length > 350) {
-        this.log('⚠️ Reached maximum review limit (350), stopping extraction');
+      // Safety check for reasonable limits
+      if (allReviews.length > 500) {
+        this.log('⚠️ Reached maximum safety limit (500), stopping extraction');
         break;
       }
     }
@@ -299,10 +404,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Strategy B: Selective filtering approach (original logic)
+   * Strategy B: Selective filtering approach (100 newest + 100 lowest + 100 highest, then deduplicate)
    */
   private async extractWithSelectiveFiltering(page: Page): Promise<any[]> {
-    this.log('🎯 Using selective filtering strategy...');
+    this.log('🎯 Using selective filtering strategy: 100 newest + 100 lowest + 100 highest');
     
     const reviewCollections = {
       newest: [] as any[],
@@ -310,42 +415,40 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       highest: [] as any[]
     };
     
-    // Step 2: Collect 100 NEWEST reviews
-    this.log('🕐 Step 2: Collecting 100 NEWEST reviews...');
+    // Step 1: Collect 100 NEWEST reviews
+    this.log('🕐 Collecting 100 NEWEST reviews...');
     reviewCollections.newest = await this.collectReviewsBySort(page, 'newest', 100);
     this.log(`✅ Collected ${reviewCollections.newest.length} newest reviews`);
     
-    // Step 3: Collect 100 LOWEST rated reviews  
-    this.log('⭐ Step 3: Collecting 100 LOWEST rated reviews...');
+    // Step 2: Collect 100 LOWEST rated reviews  
+    this.log('⭐ Collecting 100 LOWEST rated reviews...');
     reviewCollections.lowest = await this.collectReviewsBySort(page, 'lowest', 100);
     this.log(`✅ Collected ${reviewCollections.lowest.length} lowest rated reviews`);
     
-    // Step 4: Collect 100 HIGHEST rated reviews
-    this.log('🌟 Step 4: Collecting 100 HIGHEST rated reviews...');
+    // Step 3: Collect 100 HIGHEST rated reviews
+    this.log('🌟 Collecting 100 HIGHEST rated reviews...');
     reviewCollections.highest = await this.collectReviewsBySort(page, 'highest', 100);
     this.log(`✅ Collected ${reviewCollections.highest.length} highest rated reviews`);
     
-    // Step 5: Deduplicate reviews across collections
-    this.log('🔍 Step 5: Deduplicating reviews across collections...');
-    const deduplicatedCollections = this.reviewDeduplicationService.mergeAndDeduplicate(reviewCollections);
-    
-    // Step 6: Fill gaps if needed
-    this.log('📈 Step 6: Checking if we need to fill gaps...');
-    const finalCollections = await this.fillGapsIfNeeded(page, deduplicatedCollections);
-    
-    // Step 7: Combine all unique reviews
-    const allUniqueReviews = [
-      ...finalCollections.newest.map(r => ({ ...r, sortType: 'newest' })),
-      ...finalCollections.lowest.map(r => ({ ...r, sortType: 'lowest' })),
-      ...finalCollections.highest.map(r => ({ ...r, sortType: 'highest' }))
+    // Step 4: Combine all reviews and deduplicate
+    this.log('🔍 Combining and deduplicating all reviews...');
+    const allCombinedReviews = [
+      ...reviewCollections.newest.map(r => ({ ...r, sortType: 'newest' })),
+      ...reviewCollections.lowest.map(r => ({ ...r, sortType: 'lowest' })),
+      ...reviewCollections.highest.map(r => ({ ...r, sortType: 'highest' }))
     ];
     
-    this.log(`✅ Strategy B complete:`);
-    this.log(`   - Newest: ${finalCollections.newest.length}`);
-    this.log(`   - Lowest: ${finalCollections.lowest.length}`);
-    this.log(`   - Highest: ${finalCollections.highest.length}`);
+    // Use the deduplication service to remove duplicates
+    const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(allCombinedReviews);
+    const uniqueReviews = deduplicationResult.uniqueReviews;
     
-    return allUniqueReviews;
+    this.log(`✅ Strategy B complete:`);
+    this.log(`   - Total collected: ${allCombinedReviews.length} reviews`);
+    this.log(`   - Duplicates removed: ${deduplicationResult.duplicateCount}`);
+    this.log(`   - Final unique reviews: ${uniqueReviews.length}`);
+    this.log(`   - Newest: ${reviewCollections.newest.length}, Lowest: ${reviewCollections.lowest.length}, Highest: ${reviewCollections.highest.length}`);
+    
+    return uniqueReviews;
   }
 
   /**
@@ -403,37 +506,89 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       }
       
       // Wait for sort to take effect
-      await page.waitForTimeout(3000);
+      await page.waitForTimeout(4000);
       
       let collectedReviews: any[] = [];
+      let previousCount = 0;
+      let stagnantRounds = 0;
+      const maxStagnantRounds = 5; // Increased patience for difficult collections
+      const maxScrollAttempts = 40; // Much more aggressive scrolling
       
-      // Immediately scroll down aggressively to load reviews for this sort
-      this.log(`📜 Scrolling down to load ${sortType} reviews...`);
-      for (let i = 0; i < 10; i++) {
-        await this.performAggressiveScrolling(page);
-        await page.waitForTimeout(800); // Wait for reviews to load
+      this.log(`📜 Aggressively scrolling to load ${sortType} reviews (target: ${target})...`);
+      for (let i = 0; i < maxScrollAttempts; i++) {
+        // Multiple aggressive scroll attempts per round with more variety
+        for (let j = 0; j < 5; j++) {
+          await this.performAggressiveScrolling(page);
+          await page.waitForTimeout(500);
+        }
         
-        // Try to extract reviews after each scroll
+        // Additional wait for content to load
+        await page.waitForTimeout(1000);
+        
+        // Extract reviews after scrolling
         const currentReviews = await this.extractBasicReviews(page);
-        if (currentReviews.length > collectedReviews.length) {
-          collectedReviews = currentReviews;
-          this.log(`${sortType} - Scroll ${i + 1}: Found ${collectedReviews.length} reviews`);
+        
+        // Use deduplication to ensure we have unique reviews
+        const combinedReviews = [...collectedReviews, ...currentReviews];
+        const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
+        collectedReviews = deduplicationResult.uniqueReviews;
+        
+        this.log(`${sortType} - Scroll ${i + 1}: Found ${collectedReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed, raw: ${currentReviews.length})`);
+        
+        // Check if we're getting new reviews
+        if (collectedReviews.length === previousCount) {
+          stagnantRounds++;
+          if (stagnantRounds >= maxStagnantRounds) {
+            this.log(`⚠️ ${sortType} - No new reviews found in ${stagnantRounds} attempts, stopping at ${collectedReviews.length} reviews`);
+            break;
+          }
+        } else {
+          stagnantRounds = 0;
+          previousCount = collectedReviews.length;
         }
         
         // If we have enough reviews, stop scrolling
         if (collectedReviews.length >= target) {
+          this.log(`✅ ${sortType} - Reached target of ${target} reviews`);
           break;
+        }
+        
+        // Show progress every 5 attempts when we're struggling
+        if (i % 5 === 0 && i > 0) {
+          this.log(`📊 ${sortType} progress: ${collectedReviews.length}/${target} reviews after ${i + 1} scroll attempts`);
         }
       }
       
-      // Final extraction attempt
-      const finalReviews = await this.extractBasicReviews(page);
-      if (finalReviews.length > collectedReviews.length) {
-        collectedReviews = finalReviews;
+      this.log(`📊 ${sortType} collection completed: ${collectedReviews.length} reviews (target was ${target})`);
+      
+      // Special handling for lowest rated - if we got very few, it might be because there aren't many negative reviews
+      if (sortType === 'lowest' && collectedReviews.length < 10) {
+        this.log(`ℹ️ Very few lowest rated reviews found (${collectedReviews.length}). This might indicate a business with mostly positive reviews.`);
+        
+        // Try collecting some medium-rated reviews instead by expanding our collection
+        this.log(`🔄 Attempting to collect additional lower-rated reviews...`);
+        
+        // Try a different approach - scroll more aggressively
+        for (let extraAttempt = 0; extraAttempt < 15; extraAttempt++) {
+          await this.performAggressiveScrolling(page);
+          await page.waitForTimeout(800);
+          
+          const moreReviews = await this.extractBasicReviews(page);
+          const combinedReviews = [...collectedReviews, ...moreReviews];
+          const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
+          
+          if (deduplicationResult.uniqueReviews.length > collectedReviews.length) {
+            collectedReviews = deduplicationResult.uniqueReviews;
+            this.log(`${sortType} - Extra attempt ${extraAttempt + 1}: Found ${collectedReviews.length} total reviews`);
+            
+            if (collectedReviews.length >= 20) { // Reasonable minimum
+              break;
+            }
+          }
+        }
       }
       
-      this.log(`📊 ${sortType} collection completed: ${collectedReviews.length} reviews`);
-      return collectedReviews.slice(0, target); // Limit to target
+      return collectedReviews.slice(0, target); // Limit to target but return what we have
       
     } catch (error) {
       this.log(`❌ Error collecting ${sortType} reviews: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -466,19 +621,22 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Apply sorting filter using our proven multi-lingual method
+   * Apply sorting filter using our proven multi-lingual method with enhanced reliability
    */
   private async applySortFilter(page: Page, sortType: 'newest' | 'lowest' | 'highest'): Promise<boolean> {
     try {
       // First scroll to top to access sort dropdown
       await this.scrollToTopOfReviews(page);
       
-      this.log(`🔄 Applying ${sortType} sort filter...`);
+      // Wait a bit more for UI to settle
+      await page.waitForTimeout(2000);
+      
+      this.log(`🔄 Applying ${sortType} sort filter with enhanced detection...`);
       
       const sortApplied = await page.evaluate(async (sortType) => {
-        console.log('[DEBUG] Looking for sort dropdown button...');
+        console.log(`[DEBUG] Looking for sort dropdown button for ${sortType}...`);
         
-        // Step 1: Find sort dropdown button - multilingual approach
+        // Step 1: Enhanced sort button detection with more patterns
         let sortButton = null;
         
         // Look for all possible button elements
@@ -608,13 +766,28 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       }, sortType);
       
       if (sortApplied) {
-        // Wait for sorting to take effect
-        await page.waitForTimeout(4000);
+        // Wait longer for sorting to take effect and content to reload
+        this.log(`⏳ Waiting for ${sortType} sort to take effect...`);
+        await page.waitForTimeout(6000); // Increased wait time
+        
+        // Additional verification - scroll a bit to trigger any lazy loading after sort
+        await page.evaluate(() => {
+          const reviewContainer = document.querySelector('.m6QErb') || document.querySelector('[role="main"]');
+          if (reviewContainer) {
+            reviewContainer.scrollTop = 100; // Small scroll to trigger loading
+          }
+        });
+        await page.waitForTimeout(1000);
+        
         this.log(`✅ Successfully applied ${sortType} sort filter`);
         return true;
       } else {
         this.log(`❌ Could not apply ${sortType} sort filter`);
-        return false;
+        
+        // Try fallback approach - sometimes sort is already applied
+        this.log(`🔄 Attempting fallback verification for ${sortType}...`);
+        await page.waitForTimeout(2000);
+        return false; // Still return false but at least wait a bit
       }
       
     } catch (error) {
@@ -624,9 +797,138 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
+   * Robust More button clicking with JavaScript executor and anti-bot evasion
+   */
+  private async clickMoreButtonsOnPage(page: Page): Promise<void> {
+    this.log('🔄 Starting robust More button clicking...');
+    
+    try {
+      const clicked = await page.evaluate(() => {
+        let totalClicked = 0;
+        
+        console.log('[MORE_BUTTON] Starting More button detection...');
+        
+        // Find all potential More buttons using text content
+        const allButtons = document.querySelectorAll('button, [role="button"]');
+        console.log(`[MORE_BUTTON] Found ${allButtons.length} total buttons`);
+        
+        const moreButtons = [];
+        
+        for (let i = 0; i < allButtons.length; i++) {
+          const btn = allButtons[i];
+          const text = (btn.textContent || '').toLowerCase().trim();
+          const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+          
+          // Check for More button patterns
+          if (text === 'more' || text === 'עוד' || text === 'show more' || text === 'read more' ||
+              ariaLabel.includes('more') || ariaLabel.includes('עוד')) {
+            
+            // Verify it's visible and not disabled
+            const rect = btn.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0 && !btn.hasAttribute('disabled')) {
+              moreButtons.push(btn);
+              console.log(`[MORE_BUTTON] Found candidate: "${text}" (aria: "${ariaLabel}")`);
+            }
+          }
+        }
+        
+        console.log(`[MORE_BUTTON] Found ${moreButtons.length} More button candidates`);
+        
+        // Click the buttons synchronously (simplified approach)
+        for (let i = 0; i < Math.min(moreButtons.length, 10); i++) {
+          const button = moreButtons[i];
+          try {
+            console.log(`[MORE_BUTTON] Clicking button ${i + 1}: "${button.textContent?.trim()}"`);
+            
+            // Skip if already expanded
+            if (button.getAttribute('aria-expanded') === 'true') {
+              console.log(`[MORE_BUTTON] Button already expanded, skipping`);
+              continue;
+            }
+            
+            // Scroll into view
+            button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Click the button
+            button.click();
+            totalClicked++;
+            
+            console.log(`[MORE_BUTTON] Successfully clicked button ${i + 1}`);
+            
+          } catch (clickError) {
+            console.log(`[MORE_BUTTON] Click failed:`, clickError.message);
+          }
+        }
+        
+        console.log(`[MORE_BUTTON] Total buttons clicked: ${totalClicked}`);
+        return totalClicked;
+      });
+      
+      // Add a delay after clicking to allow content to load
+      if (clicked > 0) {
+        this.log(`✅ More button clicking completed: ${clicked} buttons clicked, waiting for content to load...`);
+        await page.waitForTimeout(3000); // Wait for content to load
+      } else {
+        this.log(`ℹ️ No More buttons found to click`);
+      }
+    } catch (error) {
+      this.log(`❌ More button clicking failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
    * Extract basic reviews - simple working version
    */
   private async extractBasicReviews(page: Page): Promise<any[]> {
+    // Comprehensive navigation protection - disable ALL contributor links immediately
+    await page.evaluate(() => {
+      console.log('[SCRAPER] Disabling all contributor links to prevent navigation');
+      
+      // Find and disable ALL contributor links on the page
+      const contributorLinks = document.querySelectorAll([
+        'a[href*="/contrib/"]',
+        'a[data-href*="/contrib/"]', 
+        'button[data-href*="/contrib/"]',
+        '[href*="contrib"]',
+        '[data-href*="contrib"]'
+      ].join(', '));
+      
+      console.log(`[SCRAPER] Found ${contributorLinks.length} contributor links to disable`);
+      
+      contributorLinks.forEach((link, index) => {
+        try {
+          const element = link as HTMLElement;
+          const originalHref = element.getAttribute('href') || element.getAttribute('data-href');
+          console.log(`[SCRAPER] Disabling contributor link ${index + 1}: ${originalHref}`);
+          
+          // Multiple methods to prevent navigation
+          element.style.pointerEvents = 'none';
+          element.removeAttribute('href');
+          element.removeAttribute('data-href');
+          element.setAttribute('disabled', 'true');
+          element.setAttribute('data-original-href', originalHref || '');
+          
+          // Override click events
+          element.addEventListener('click', function(e) {
+            console.log('[SCRAPER] Blocked click on disabled contributor link');
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+          }, true);
+          
+        } catch (e) {
+          console.log(`[SCRAPER] Failed to disable link ${index + 1}:`, e);
+        }
+      });
+      
+      // Activate general navigation protection
+      window.postMessage('START_SCRAPING', '*');
+    });
+    
+    // First, handle More button clicking robustly with proper async handling
+    await this.clickMoreButtonsOnPage(page);
+    
     const result = await page.evaluate(() => {
       const reviews = [];
       console.log('[SCRAPER] Simple review extraction starting...');
@@ -659,8 +961,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         // Extract actual review text - find the review content specifically
         let reviewText = '';
         
+        // More buttons are now handled before review extraction
+        
         // Try specific review text selectors first
-        const reviewSelectors = ['.wiI7pd', '.MyEned', '[data-expandable-section]', 'span[jsname="bN97Pc"]'];
+        const reviewSelectors = ['.wiI7pd', '.MyEned', '[data-expandable-section]', 'span[jsname="bN97Pc"]', '.review-full-text'];
         for (const selector of reviewSelectors) {
           const reviewEl = container.querySelector(selector);
           if (reviewEl) {
@@ -672,52 +976,100 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           }
         }
         
-        // Fallback: look for the longest meaningful text but be more selective
+        // Enhanced fallback: look for the longest meaningful text but be more selective
         if (!reviewText) {
+          let bestText = '';
           const textElements = container.querySelectorAll('span, div, p');
           for (const el of textElements) {
             const text = el.textContent?.trim() || '';
-            if (text.length > reviewText.length && text.length > 30 && text.length < 1000 && 
+            if (text.length > bestText.length && text.length > 30 && text.length < 2000 && 
                 !text.includes('כוכב') && !text.includes('star') &&
                 !text.includes('ago') && !text.includes('לפני') &&
                 !text.includes('Google') && !text.includes('מדיניות') &&
+                !text.includes('ביקורת') && !text.includes('review') &&
                 !text.match(/^\d+\s*(month|week|day|year|hours?|minutes?)/)) {
-              reviewText = text;
+              bestText = text;
+            }
+          }
+          reviewText = bestText;
+        }
+        
+        // Enhanced author name extraction 
+        let authorName = 'Anonymous';
+        
+        // Step 1: Look for contributor links first (most reliable) - but DON'T interact with them AT ALL
+        const contributorElements = container.querySelectorAll('a[data-href*="contrib"], button[data-href*="contrib"], [href*="contrib"], a[href*="contrib"]');
+        for (const contrib of contributorElements) {
+          if (contrib.textContent && contrib.textContent.trim().length > 0) {
+            // ABSOLUTELY NO CLICKING OR INTERACTION - just extract text content
+            let name = contrib.textContent.trim();
+            console.log(`[SCRAPER] Found contributor element (NO CLICK): "${name}"`);
+            
+            // Disable the link to prevent any accidental navigation
+            try {
+              (contrib as HTMLElement).style.pointerEvents = 'none';
+              contrib.removeAttribute('href');
+              contrib.removeAttribute('data-href');
+              contrib.setAttribute('disabled', 'true');
+            } catch (e) {
+              // Continue if disabling fails
+            }
+            // Clean the name thoroughly
+            name = name
+              .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
+              .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
+              .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
+              .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
+              .replace(/\s*·.*$/g, '') // Remove everything after middle dot
+              .replace(/\s*\|.*$/g, '') // Remove everything after pipe
+              .trim();
+            
+            // Validate it's a proper name
+            if (name.length > 1 && name.length < 50 && 
+                !name.includes('כוכב') && !name.includes('star') &&
+                !name.includes('Google') && !name.includes('מדיניות') &&
+                !name.includes('חדש') && !name.includes('עוד') && // Block UI elements
+                !name.includes('New') && !name.includes('More') &&
+                !/^\d+$/.test(name) && // Not just numbers
+                /[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(name)) { // Contains letters
+              authorName = name;
+              break;
             }
           }
         }
         
-        // Enhanced author name extraction with Hebrew support
-        let authorName = 'Anonymous';
-        
-        // Step 1: Look for contributor links first (most reliable)
-        const contributorElements = container.querySelectorAll('a[data-href*="contrib"], button[data-href*="contrib"], [href*="contrib"]');
-        for (const contrib of contributorElements) {
-          const name = this.extractCleanAuthorName(contrib.textContent?.trim() || '');
-          if (name && name !== 'Anonymous') {
-            authorName = name;
-            break;
-          }
-        }
-        
-        // Step 2: Look for common author selectors
+        // Step 2: Look for common author selectors if no contributor found
         if (authorName === 'Anonymous') {
           const authorSelectors = ['.d4r55', '.TSUbDb', '.fontBodyMedium', '[data-value]', '.fontBodySmall'];
           for (const selector of authorSelectors) {
             const elements = container.querySelectorAll(selector);
             for (const el of elements) {
-              const name = this.extractCleanAuthorName(el.textContent?.trim() || '');
-              if (name && name !== 'Anonymous') {
-                // Verify it's not part of review content
-                const parent = el.closest('a, button');
-                if (!parent || !parent.getAttribute('data-href')?.includes('contrib')) {
-                  // Check if this element is positioned like an author name (typically above review text)
-                  const rect = (el as HTMLElement).getBoundingClientRect();
-                  const starRect = starEl.getBoundingClientRect();
-                  if (Math.abs(rect.top - starRect.top) < 50) { // Within 50px of star rating
-                    authorName = name;
-                    break;
-                  }
+              let name = el.textContent?.trim() || '';
+              // Clean the name
+              name = name
+                .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
+                .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
+                .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
+                .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
+                .replace(/\s*·.*$/g, '') // Remove everything after middle dot
+                .trim();
+              
+              // Validate it's a proper name
+              if (name.length > 1 && name.length < 50 && 
+                  !name.includes('כוכב') && !name.includes('star') &&
+                  !name.includes('Google') && !name.includes('מדיניות') &&
+                  !name.includes('לפני') && !name.includes('ago') &&
+                  !name.includes('חדש') && !name.includes('עוד') && // Block UI elements
+                  !name.includes('New') && !name.includes('More') &&
+                  !name.includes('ביקורת') && !name.includes('review') &&
+                  !/^\d+$/.test(name) && // Not just numbers
+                  /[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(name)) { // Contains letters
+                // Additional validation: check if it's positioned like an author name
+                const rect = (el as HTMLElement).getBoundingClientRect();
+                const starRect = starEl.getBoundingClientRect();
+                if (Math.abs(rect.top - starRect.top) < 60) { // Within 60px of star rating
+                  authorName = name;
+                  break;
                 }
               }
             }
@@ -725,59 +1077,95 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           }
         }
         
-        // Step 3: Pattern-based search for names in Hebrew and English
+        // Step 3: Fallback - look for names in any span/div elements
         if (authorName === 'Anonymous') {
           const allTextElements = container.querySelectorAll('span, div');
           for (const el of allTextElements) {
-            const text = el.textContent?.trim() || '';
-            const name = this.extractCleanAuthorName(text);
-            if (name && name !== 'Anonymous') {
-              // Additional validation: check position relative to star
+            let text = el.textContent?.trim() || '';
+            
+            // Skip if it's clearly not a name
+            if (text.length < 2 || text.length > 40) continue;
+            
+            // Clean the text first
+            text = text
+              .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
+              .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
+              .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
+              .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
+              .replace(/\s*·.*$/g, '') // Remove everything after middle dot
+              .trim();
+            
+            // Comprehensive validation for a proper name
+            if (text.length > 2 && text.length < 40 && 
+                !text.includes('כוכב') && !text.includes('star') &&
+                !text.includes('לפני') && !text.includes('ago') &&
+                !text.includes('Google') && !text.includes('מדיניות') &&
+                !text.includes('ביקורת') && !text.includes('review') &&
+                !text.includes('תמונה') && !text.includes('photos') &&
+                !text.includes('חדש') && !text.includes('עוד') && // Block UI elements
+                !text.includes('New') && !text.includes('More') &&
+                !text.includes('Click') && !text.includes('לחץ') &&
+                !/^\d+$/.test(text) && // Not just numbers
+                !/^[.,:;!?\s]+$/.test(text) && // Not just punctuation
+                /[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(text) && // Contains letters
+                !/(https?:\/\/|www\.)/i.test(text)) { // Not a URL
+              
+              // Check position relative to star (names are usually near ratings)
               const rect = (el as HTMLElement).getBoundingClientRect();
               const starRect = starEl.getBoundingClientRect();
-              if (Math.abs(rect.top - starRect.top) < 100) {
-                authorName = name;
-                break;
+              if (Math.abs(rect.top - starRect.top) < 80) {
+                // Additional check: ensure it's not review text by checking length and content
+                if (!text.includes('טעים') && !text.includes('נהדר') && !text.includes('מקום') &&
+                    !text.includes('delicious') && !text.includes('great') && !text.includes('place')) {
+                  authorName = text;
+                  break;
+                }
               }
             }
           }
         }
         
-        // Extract date - handle Hebrew and English patterns
+        // Enhanced date extraction - handle Hebrew, English, and absolute dates
         let reviewDate = 'Recent';
-        const dateElements = container.querySelectorAll('span');
+        const dateElements = container.querySelectorAll('span, div, time, .date, [class*="time"], [class*="date"]');
+        
         for (const dateEl of dateElements) {
           const dateText = dateEl.textContent?.trim() || '';
-          // Hebrew patterns: לפני X שעות, לפני X ימים, לפני X חודשים
-          // English patterns: X hours ago, X days ago, etc.
-          if ((dateText.includes('לפני') && (dateText.includes('שעות') || dateText.includes('ימים') || dateText.includes('חודשים') || dateText.includes('שנים'))) ||
-              (dateText.includes('ago') && dateText.match(/\d+\s*(hour|day|week|month|year)/)) ||
-              dateText.match(/^\d+\s*(h|d|w|m|y)$/)) {
+          
+          // Hebrew relative patterns: לפני X שעות, לפני X ימים, לפני X חודשים
+          if (dateText.includes('לפני') && (dateText.includes('שעות') || dateText.includes('ימים') || dateText.includes('חודשים') || dateText.includes('שנים'))) {
+            reviewDate = dateText;
+            break;
+          }
+          
+          // English relative patterns: X hours ago, X days ago, etc.
+          if (dateText.includes('ago') && dateText.match(/\d+\s*(hour|day|week|month|year)/)) {
+            reviewDate = dateText;
+            break;
+          }
+          
+          // Short patterns: 2h, 5d, 3w, 1m, 2y
+          if (dateText.match(/^\d+\s*(h|d|w|m|y)$/)) {
+            reviewDate = dateText;
+            break;
+          }
+          
+          // Absolute date patterns: Month Year, DD/MM/YYYY, etc.
+          if (dateText.match(/\d{4}/) || // Contains year
+              dateText.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/) || // DD/MM/YY format
+              dateText.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|ינו|פבר|מרץ|אפר|מאי|יונ|יול|אוג|ספט|אוק|נוב|דצמ)/i)) {
+            reviewDate = dateText;
+            break;
+          }
+          
+          // Numeric dates that look like timestamps
+          if (dateText.match(/^\d{1,2}[\.\-/]\d{1,2}[\.\-/]\d{2,4}$/)) {
             reviewDate = dateText;
             break;
           }
         }
         
-        // Alternative date search - look for time-related classes
-        if (reviewDate === 'Recent') {
-          const timeElements = container.querySelectorAll('[class*="time"], [class*="date"], .fontBodySmall, .fontCaption');
-          for (const timeEl of timeElements) {
-            const timeText = timeEl.textContent?.trim() || '';
-            if (timeText.includes('לפני') || timeText.includes('ago') || timeText.match(/\d/)) {
-              reviewDate = timeText;
-              break;
-            }
-          }
-        }
-        
-        // Add reviews with proper author names, or high-quality anonymous reviews
-        const isHighQualityAnonymous = authorName === 'Anonymous' && 
-                                       reviewText.length > 50 && 
-                                       !reviewText.includes('...') &&
-                                       reviewText.split(' ').length > 10;
-        
-        if (reviewText.length > 10 && 
-            ((authorName && authorName !== 'Anonymous') || isHighQualityAnonymous)) {
+        if (reviewText.length > 10) {
           // Convert Hebrew/relative dates to actual Date objects
           let actualDate = new Date();
           if (reviewDate !== 'Recent') {
@@ -821,11 +1209,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             }
           }
           
-          // Create deterministic ID based on content (for better duplicate detection)
-          const normalizedAuthor = authorName.replace(/\s+/g, ' ').trim().toLowerCase();
-          const normalizedText = reviewText.replace(/\s+/g, ' ').trim().toLowerCase();
-          const contentStr = `${normalizedAuthor}_${normalizedText}_${rating}`;
-          
+          // Create more stable ID based on content
+          const contentStr = `${authorName}_${reviewText}_${rating}`.substring(0, 100);
           let hash = 0;
           for (let i = 0; i < contentStr.length; i++) {
             const char = contentStr.charCodeAt(i);
@@ -839,7 +1224,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             rating: rating,
             text: reviewText,
             author: authorName,
-            date: actualDate.toISOString(), // Convert to ISO string for frontend
+            date: actualDate, // Keep as Date object to match RawReview interface
             originalDate: reviewDate, // Keep original for debugging
             position: i + 1,
             extractedAt: new Date().toISOString()
@@ -847,7 +1232,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           
           console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - "${reviewText.substring(0, 50)}..."`);
           
-          if (reviews.length >= 50) break;
+          // Remove arbitrary limit - let the strategy decide how many reviews to collect
         }
       }
       
@@ -856,8 +1241,20 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       return reviews;
     });
     
+    // Check button click stats from the browser context
+    const buttonStats = await page.evaluate(() => {
+      return window.moreButtonStats || { total: 0, clicked: 0 };
+    });
+    
     // Add backend logging to see the actual results
     console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
+    this.log(`📋 More Button Stats: Found ${buttonStats.total} buttons, Clicked ${buttonStats.clicked} "more" buttons`);
+    
+    // Reset stats for next extraction
+    await page.evaluate(() => {
+      window.moreButtonStats = { total: 0, clicked: 0 };
+    });
+    
     return result;
   }
 
@@ -917,40 +1314,130 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Perform aggressive scrolling to load more reviews
+   * Perform aggressive scrolling to load more reviews with enhanced strategies
    */
   private async performAggressiveScrolling(page: Page): Promise<void> {
     try {
       await page.evaluate(async () => {
-        // Strategy 1: Scroll all potential containers
-        const containers = document.querySelectorAll('.m6QErb, [role="main"], [class*="scroll"]');
-        for (const container of containers) {
-          if (container.scrollHeight > container.clientHeight) {
-            container.scrollTop = container.scrollHeight;
-            await new Promise(resolve => setTimeout(resolve, 200));
+        // Strategy 1: Find and scroll the main reviews container more aggressively
+        const reviewContainers = document.querySelectorAll([
+          '.m6QErb',           // Main reviews container
+          '[role="main"]',     // Main content area
+          '[class*="scroll"]', // Any scrollable container
+          '[class*="review"]', // Review-related containers
+          '.section-scrollbox', // Google Maps scrollbox
+          '.section-listbox',  // Alternative listbox
+          '[data-value*="reviews"]' // Data attribute containers
+        ].join(', '));
+        
+        console.log(`[SCROLL] Found ${reviewContainers.length} potential review containers`);
+        
+        for (const container of reviewContainers) {
+          const element = container as HTMLElement;
+          if (element.scrollHeight > element.clientHeight) {
+            console.log(`[SCROLL] Scrolling container with scrollHeight: ${element.scrollHeight}, clientHeight: ${element.clientHeight}`);
+            
+            // Scroll to bottom
+            element.scrollTop = element.scrollHeight;
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Multiple small scrolls to trigger lazy loading
+            for (let i = 0; i < 5; i++) {
+              element.scrollTop += 500;
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
           }
         }
         
-        // Strategy 2: Window scrolling
-        window.scrollTo(0, document.body.scrollHeight);
+        // Strategy 2: Enhanced window scrolling with multiple approaches
+        const currentScroll = window.pageYOffset;
+        const documentHeight = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight
+        );
+        
+        console.log(`[SCROLL] Window scroll - current: ${currentScroll}, document height: ${documentHeight}`);
+        
+        // Scroll to absolute bottom
+        window.scrollTo(0, documentHeight);
+        await new Promise(resolve => setTimeout(resolve, 400));
+        
+        // Alternative scroll methods
+        document.documentElement.scrollTop = documentHeight;
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        // Strategy 3: Mouse wheel events
-        const wheelEvent = new WheelEvent('wheel', {
-          deltaY: 2000,
-          bubbles: true,
-          cancelable: true
-        });
-        document.body.dispatchEvent(wheelEvent);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Strategy 3: Enhanced mouse wheel events with variation
+        const wheelEvents = [
+          { deltaY: 3000, deltaX: 0 },
+          { deltaY: 2000, deltaX: 0 },
+          { deltaY: 5000, deltaX: 0 }
+        ];
         
-        // Strategy 4: Page Down key
-        const keyEvent = new KeyboardEvent('keydown', {
-          key: 'PageDown',
-          code: 'PageDown',
-          bubbles: true
-        });
-        document.body.dispatchEvent(keyEvent);
+        for (const wheelConfig of wheelEvents) {
+          const wheelEvent = new WheelEvent('wheel', {
+            ...wheelConfig,
+            bubbles: true,
+            cancelable: true
+          });
+          document.body.dispatchEvent(wheelEvent);
+          
+          // Also try on the main element
+          const main = document.querySelector('main') || document.body;
+          main.dispatchEvent(wheelEvent);
+          
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        // Strategy 4: Keyboard events variety
+        const keyEvents = [
+          { key: 'PageDown', code: 'PageDown' },
+          { key: 'End', code: 'End' },
+          { key: 'ArrowDown', code: 'ArrowDown' }
+        ];
+        
+        for (const keyConfig of keyEvents) {
+          const keyEvent = new KeyboardEvent('keydown', {
+            ...keyConfig,
+            bubbles: true,
+            cancelable: true
+          });
+          document.body.dispatchEvent(keyEvent);
+          document.documentElement.dispatchEvent(keyEvent);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        // Strategy 5: Try to find and click review-specific "Show more" buttons (be very selective)
+        try {
+          const buttons = document.querySelectorAll('button');
+          for (const button of buttons) {
+            const text = button.textContent?.toLowerCase() || '';
+            const ariaLabel = button.getAttribute('aria-label')?.toLowerCase() || '';
+            
+            // Only click buttons that are clearly for loading more reviews
+            // Exclude help, menu, navigation, share, and other non-review buttons
+            const hasLoadMoreText = text.includes('more reviews') || text.includes('show more reviews') || 
+                                   ariaLabel.includes('more reviews') || ariaLabel.includes('show more reviews');
+            
+            const forbiddenTerms = ['help', 'menu', 'navigation', 'settings', 'share', 'שיתוף', 'שתף', 
+                                   'עזרה', 'תפריט', 'profile', 'contributor', 'report', 'דווח'];
+            const hasForbiddenText = forbiddenTerms.some(term => 
+                text.includes(term) || ariaLabel.includes(term)
+            );
+            
+            if (hasLoadMoreText && !hasForbiddenText) {
+              
+              console.log(`[SCROLL] Found review load more button: "${button.textContent}" (aria: "${ariaLabel}")`);
+              (button as HTMLElement).click();
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              break; // Only click one button per scroll attempt
+            }
+          }
+        } catch (e) {
+          // Continue if click fails
+          console.log('[SCROLL] Error clicking load more button:', e);
+        }
       });
     } catch (error) {
       this.log(`Aggressive scrolling error: ${error instanceof Error ? error.message : 'Unknown error'}`);

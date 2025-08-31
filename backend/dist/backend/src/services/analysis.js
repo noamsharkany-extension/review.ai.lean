@@ -100,7 +100,7 @@ ${reviewsText}
 
 Return JSON: [{"reviewId":"id","sentiment":"positive|negative|neutral","confidence":0.85,"mismatchDetected":false}]
 
-Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.`;
+Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 4-5★ with clearly negative text. Be conservative with Hebrew text analysis.`;
     }
     parseSentimentResponse(content, reviews) {
         try {
@@ -148,8 +148,14 @@ Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.
         let sentiment = 'neutral';
         let confidence = 0.5;
         let mismatchDetected = false;
-        const positiveWords = ['excellent', 'amazing', 'great', 'good', 'fantastic', 'wonderful', 'perfect', 'love', 'best', 'awesome', 'outstanding', 'superb', 'delicious', 'friendly', 'helpful', 'recommend'];
-        const negativeWords = ['terrible', 'awful', 'bad', 'horrible', 'worst', 'hate', 'disgusting', 'rude', 'poor', 'disappointing', 'waste', 'never', 'avoid', 'pathetic', 'useless'];
+        const positiveWords = [
+            'excellent', 'amazing', 'great', 'good', 'fantastic', 'wonderful', 'perfect', 'love', 'best', 'awesome', 'outstanding', 'superb', 'delicious', 'friendly', 'helpful', 'recommend',
+            'מעולה', 'נהדר', 'טוב', 'מושלם', 'אוהב', 'הכי טוב', 'ממליץ', 'נחמד', 'יפה', 'טעים', 'מדהים', 'חמוד', 'מקסים'
+        ];
+        const negativeWords = [
+            'terrible', 'awful', 'bad', 'horrible', 'worst', 'hate', 'disgusting', 'rude', 'poor', 'disappointing', 'waste', 'never', 'avoid', 'pathetic', 'useless',
+            'גרוע', 'נורא', 'איום', 'רע', 'מאכזב', 'שונא', 'לא טוב', 'בזבוז', 'אל תבואו', 'חבל על הזמן', 'יבש'
+        ];
         const positiveCount = positiveWords.filter(word => text.includes(word)).length;
         const negativeCount = negativeWords.filter(word => text.includes(word)).length;
         if (positiveCount > negativeCount) {
@@ -168,10 +174,10 @@ Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.
                 sentiment = 'negative';
             }
         }
-        if ((review.rating <= 2 && sentiment === 'positive') ||
-            (review.rating >= 4 && sentiment === 'negative')) {
+        if ((review.rating <= 2 && sentiment === 'positive' && positiveCount >= 2) ||
+            (review.rating >= 4 && sentiment === 'negative' && negativeCount >= 2)) {
             mismatchDetected = true;
-            confidence = Math.min(confidence, 0.6);
+            confidence = Math.min(confidence, 0.7);
         }
         return {
             reviewId: review.id,
@@ -271,10 +277,11 @@ Mismatch rules: 1-2★ with positive text, 4-5★ with negative text = mismatch.
 ${reviewsText}
 
 Check: Generic language, no specifics, promotional tone, unnatural patterns, extreme sentiment.
+Be especially careful with non-English text - different languages may have different natural patterns.
 
 Return JSON: [{"reviewId":"id","isFake":false,"confidence":0.7,"reasons":[]}]
 
-Be conservative - flag only obvious fakes.`;
+Be very conservative - flag only obviously fake reviews. Avoid flagging reviews just for being brief or in different languages.`;
     }
     parseFakeDetectionResponse(content, reviews) {
         try {
@@ -316,31 +323,39 @@ Be conservative - flag only obvious fakes.`;
     createFallbackFakeAnalysis(review) {
         const reasons = [];
         let isFake = false;
-        let confidence = 0.2;
+        let confidence = 0.15;
         const text = review.text.toLowerCase();
         const wordCount = review.text.split(/\s+/).length;
         const genericPhrases = [
-            'highly recommend', 'amazing service', 'great experience',
-            'excellent quality', 'outstanding service', 'perfect place',
-            'terrible service', 'worst experience', 'never again'
+            'highly recommend this place', 'amazing service and food', 'great experience overall',
+            'excellent quality and service', 'outstanding service perfect', 'perfect place to eat',
+            'terrible service never coming back', 'worst experience of my life', 'never again waste of money'
         ];
         const genericCount = genericPhrases.filter(phrase => text.includes(phrase)).length;
-        if (genericCount >= 2 && wordCount < 20) {
-            reasons.push('Generic language with minimal detail');
+        if (genericCount >= 2 && wordCount < 15) {
+            reasons.push('Multiple generic phrases with minimal detail');
             isFake = true;
-            confidence = 0.4;
+            confidence = 0.35;
         }
-        if (wordCount < 5 && (review.rating === 1 || review.rating === 5)) {
+        if (wordCount < 3 && (review.rating === 1 || review.rating === 5)) {
             reasons.push('Extremely brief with extreme rating');
+            isFake = true;
+            confidence = 0.25;
+        }
+        const promotionalWords = ['best ever', 'perfect amazing', 'incredible outstanding', 'absolutely perfect'];
+        const promotionalCount = promotionalWords.filter(word => text.includes(word)).length;
+        if (promotionalCount >= 2 && wordCount < 10) {
+            reasons.push('Excessive promotional language in brief review');
             isFake = true;
             confidence = 0.3;
         }
-        const promotionalWords = ['best', 'perfect', 'amazing', 'incredible', 'outstanding'];
-        const promotionalCount = promotionalWords.filter(word => text.includes(word)).length;
-        if (promotionalCount >= 3) {
-            reasons.push('Excessive promotional language');
-            isFake = true;
-            confidence = 0.35;
+        const hasHebrew = /[\u0590-\u05FF]/.test(review.text);
+        if (hasHebrew && isFake) {
+            confidence = Math.max(0.1, confidence - 0.15);
+            if (confidence < 0.2) {
+                isFake = false;
+                reasons.length = 0;
+            }
         }
         return {
             reviewId: review.id,

@@ -14,7 +14,11 @@ export class IntelligentSamplingEngine {
                 samplingUsed: false,
             };
         }
-        const sortedByDate = [...reviews].sort((a, b) => b.date.getTime() - a.date.getTime());
+        const sortedByDate = [...reviews].sort((a, b) => {
+            const dateA = typeof a.date === 'string' ? new Date(a.date) : a.date;
+            const dateB = typeof b.date === 'string' ? new Date(b.date) : b.date;
+            return dateB.getTime() - dateA.getTime();
+        });
         const recentReviews = sortedByDate.slice(0, IntelligentSamplingEngine.SAMPLE_SIZE_PER_CATEGORY);
         const recentIds = new Set(recentReviews.map(r => r.id));
         const fiveStarReviews = reviews

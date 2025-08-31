@@ -13,6 +13,6 @@ export function createReviewId(author, text, rating) {
     return normalizeReviewId(rawId);
 }
 export function isValidReviewId(id) {
-    return id && id.length > 0 && id.length <= 200 && !id.includes('\n') && !id.includes('\r');
+    return Boolean(id) && id.length > 0 && id.length <= 200 && !id.includes('\n') && !id.includes('\r');
 }
 //# sourceMappingURL=reviewIdUtils.js.map

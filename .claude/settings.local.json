@@ -14,7 +14,15 @@
       "Bash(kill:*)",
       "Bash(git init:*)",
       "Bash(gh:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)",
+      "Bash(cat:*)",
+      "Bash(PORT=5174 npm run dev)",
+      "Bash(VITE_PORT=5174 npm run dev)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []
