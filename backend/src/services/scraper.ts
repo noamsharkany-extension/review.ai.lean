@@ -280,12 +280,17 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       let allUniqueReviews: any[];
       
-      // Always use Strategy B: Selective filtering (100 newest + 100 lowest + 100 highest)
-      // This ensures we get a balanced sample regardless of total review count
-      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest');
-      allUniqueReviews = await this.extractWithSelectiveFiltering(page);
+      // Choose strategy based on total review count
+      if (totalReviewCount <= 300) {
+        this.log('🎯 Using Strategy A: Extract all available reviews (≤300 total)');
+        allUniqueReviews = await this.extractAllAvailableReviews(page);
+        this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy A (extract all)`);
+      } else {
+        this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest');
+        allUniqueReviews = await this.extractWithSelectiveFiltering(page);
+        this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);
+      }
       
-      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);      
       return allUniqueReviews;
       
     } catch (error) {
