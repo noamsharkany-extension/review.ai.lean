@@ -352,67 +352,48 @@ export class GoogleReviewScraperService implements ReviewScraperService {
 
   /**
    * Strategy A: Extract ALL available reviews (for businesses with ≤300 reviews)
+   * Using efficient single-scroll approach as requested by user
    */
   private async extractAllAvailableReviews(page: Page): Promise<any[]> {
-    this.log('📜 Extracting ALL available reviews...');
+    this.log('📜 Extracting ALL available reviews using efficient single-scroll approach...');
     
-    let allReviews: any[] = [];
-    let previousCount = 0;
-    let stagnantRounds = 0;
-    const maxStagnantRounds = 5; // Increased for more thorough extraction
-    const maxScrollAttempts = 50; // Increased to handle larger volumes
-    
-    // Start with newest sort to ensure we get reviews in a good order
-    await this.applySortFilter(page, 'newest');
-    await page.waitForTimeout(3000);
-    
-    for (let attempt = 0; attempt < maxScrollAttempts; attempt++) {
-      // Multiple scroll attempts to ensure we load everything
-      for (let i = 0; i < 3; i++) {
-        await this.performAggressiveScrolling(page);
-        await page.waitForTimeout(800);
-      }
-      
-      // Extract all currently visible reviews
-      const currentReviews = await this.extractBasicReviews(page);
-      
-      // Merge with existing reviews and deduplicate
-      const combinedReviews = [...allReviews, ...currentReviews];
-      const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
-      allReviews = deduplicationResult.uniqueReviews;
-      
-      this.log(`📊 Scroll ${attempt + 1}: Found ${allReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed)`);
-      
-      // Check if we're getting new reviews
-      if (allReviews.length === previousCount) {
-        stagnantRounds++;
-        this.log(`⚠️ No new reviews found (stagnant round ${stagnantRounds}/${maxStagnantRounds})`);
-        
-        if (stagnantRounds >= maxStagnantRounds) {
-          this.log('✅ Reached end of reviews - no new reviews found in multiple attempts');
-          break;
-        }
-      } else {
-        stagnantRounds = 0; // Reset stagnant counter
-        previousCount = allReviews.length;
-      }
-      
-      // Safety check for reasonable limits
-      if (allReviews.length > 500) {
-        this.log('⚠️ Reached maximum safety limit (500), stopping extraction');
-        break;
-      }
+    // Step 1: Apply newest sort to ensure we get reviews in a good order
+    const sortApplied = await this.applySortFilter(page, 'newest');
+    if (!sortApplied) {
+      this.log('⚠️ Could not apply newest sort, using current order');
     }
     
-    this.log(`✅ Strategy A complete: Extracted ${allReviews.length} unique reviews`);
-    return allReviews.map(r => ({ ...r, sortType: 'all' }));
+    // Step 2: Wait for sort to take effect
+    this.log('⏳ Waiting for newest sort to load content...');
+    await page.waitForTimeout(3000);
+    
+    // Step 3: Single efficient scroll to load all available content
+    this.log('📜 Single efficient scroll to load all available reviews...');
+    await this.performSingleEfficientScroll(page);
+    
+    // Step 4: Wait for all content to fully load
+    this.log('⏳ Waiting for all content to load...');
+    await page.waitForTimeout(3000);
+    
+    // Step 5: Extract all visible reviews at once
+    this.log('📊 Extracting all visible reviews...');
+    const allReviews = await this.extractBasicReviews(page);
+    
+    // Step 6: Deduplicate
+    const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(allReviews);
+    const uniqueReviews = deduplicationResult.uniqueReviews;
+    
+    this.log(`📊 Found ${uniqueReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed)`);
+    this.log(`✅ Strategy A complete: Efficient single-scroll approach extracted ${uniqueReviews.length} unique reviews`);
+    
+    return uniqueReviews.map(r => ({ ...r, sortType: 'all' }));
   }
 
   /**
-   * Strategy B: Selective filtering approach (100 newest + 100 lowest + 100 highest, then deduplicate)
+   * Strategy B: Efficient selective filtering (newest → lowest → highest, then fill gaps)
    */
   private async extractWithSelectiveFiltering(page: Page): Promise<any[]> {
-    this.log('🎯 Using selective filtering strategy: 100 newest + 100 lowest + 100 highest');
+    this.log('🎯 Using efficient selective filtering strategy: newest → lowest → highest → fill gaps');
     
     const reviewCollections = {
       newest: [] as any[],
@@ -420,38 +401,55 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       highest: [] as any[]
     };
     
-    // Step 1: Collect 100 NEWEST reviews
-    this.log('🕐 Collecting 100 NEWEST reviews...');
+    // Step 1: Collect NEWEST reviews (single scroll, extract, move on)
+    this.log('🕐 Step 1: Collecting NEWEST reviews with single scroll...');
     reviewCollections.newest = await this.collectReviewsBySort(page, 'newest', 100);
     this.log(`✅ Collected ${reviewCollections.newest.length} newest reviews`);
     
-    // Step 2: Collect 100 LOWEST rated reviews  
-    this.log('⭐ Collecting 100 LOWEST rated reviews...');
+    // Step 2: Collect LOWEST rated reviews (scroll up, change sort, single scroll, extract)
+    this.log('⭐ Step 2: Collecting LOWEST rated reviews with single scroll...');
     reviewCollections.lowest = await this.collectReviewsBySort(page, 'lowest', 100);
     this.log(`✅ Collected ${reviewCollections.lowest.length} lowest rated reviews`);
     
-    // Step 3: Collect 100 HIGHEST rated reviews
-    this.log('🌟 Collecting 100 HIGHEST rated reviews...');
+    // Step 3: Collect HIGHEST rated reviews (scroll up, change sort, single scroll, extract)
+    this.log('🌟 Step 3: Collecting HIGHEST rated reviews with single scroll...');
     reviewCollections.highest = await this.collectReviewsBySort(page, 'highest', 100);
     this.log(`✅ Collected ${reviewCollections.highest.length} highest rated reviews`);
     
-    // Step 4: Combine all reviews and deduplicate
-    this.log('🔍 Combining and deduplicating all reviews...');
+    // Step 4: Combine and deduplicate
+    this.log('🔍 Step 4: Combining and deduplicating all reviews...');
     const allCombinedReviews = [
       ...reviewCollections.newest.map(r => ({ ...r, sortType: 'newest' })),
       ...reviewCollections.lowest.map(r => ({ ...r, sortType: 'lowest' })),
       ...reviewCollections.highest.map(r => ({ ...r, sortType: 'highest' }))
     ];
     
-    // Use the deduplication service to remove duplicates
     const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(allCombinedReviews);
-    const uniqueReviews = deduplicationResult.uniqueReviews;
+    let uniqueReviews = deduplicationResult.uniqueReviews;
     
-    this.log(`✅ Strategy B complete:`);
-    this.log(`   - Total collected: ${allCombinedReviews.length} reviews`);
+    this.log(`📊 After deduplication: ${uniqueReviews.length} unique reviews from ${allCombinedReviews.length} total`);
+    
+    // Step 5: Fill gaps if needed (target ~200-250 reviews for large sites)
+    const targetTotal = 200;
+    if (uniqueReviews.length < targetTotal) {
+      const needed = targetTotal - uniqueReviews.length;
+      this.log(`📈 Step 5: Need ${needed} more reviews, collecting additional newest reviews...`);
+      
+      // Go back to newest and collect more to fill the gap
+      const additionalReviews = await this.collectReviewsBySort(page, 'newest', needed + 50); // Get extra to account for duplicates
+      const combinedWithAdditional = [...uniqueReviews, ...additionalReviews.map(r => ({ ...r, sortType: 'newest-fill' }))];
+      const finalDeduplication = this.reviewDeduplicationService.deduplicateReviews(combinedWithAdditional);
+      uniqueReviews = finalDeduplication.uniqueReviews.slice(0, targetTotal);
+      
+      this.log(`✅ After filling gaps: ${uniqueReviews.length} total reviews`);
+    }
+    
+    this.log(`✅ Strategy B complete - Efficient approach:`);
+    this.log(`   - Newest: ${reviewCollections.newest.length}`);
+    this.log(`   - Lowest: ${reviewCollections.lowest.length}`);
+    this.log(`   - Highest: ${reviewCollections.highest.length}`);
+    this.log(`   - Final unique: ${uniqueReviews.length} reviews`);
     this.log(`   - Duplicates removed: ${deduplicationResult.duplicateCount}`);
-    this.log(`   - Final unique reviews: ${uniqueReviews.length}`);
-    this.log(`   - Newest: ${reviewCollections.newest.length}, Lowest: ${reviewCollections.lowest.length}, Highest: ${reviewCollections.highest.length}`);
     
     return uniqueReviews;
   }
@@ -498,102 +496,38 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Collect reviews by specific sort type with aggressive pagination
+   * Efficient single-scroll collection by sort type
    */
   private async collectReviewsBySort(page: Page, sortType: 'newest' | 'lowest' | 'highest', target: number): Promise<any[]> {
-    this.log(`🔄 Collecting ${target} ${sortType} reviews with aggressive pagination...`);
+    this.log(`🎯 Collecting ${target} ${sortType} reviews with efficient single-scroll approach...`);
     
     try {
-      // Apply the sort filter
+      // Step 1: Apply the sort filter
       const sortApplied = await this.applySortFilter(page, sortType);
       if (!sortApplied) {
         this.log(`⚠️ Could not apply ${sortType} sort, using current order`);
       }
       
-      // Wait for sort to take effect
-      await page.waitForTimeout(4000);
+      // Step 2: Wait for sort to take effect
+      this.log(`⏳ Waiting for ${sortType} sort to load content...`);
+      await page.waitForTimeout(3000);
       
-      let collectedReviews: any[] = [];
-      let previousCount = 0;
-      let stagnantRounds = 0;
-      const maxStagnantRounds = 5; // Increased patience for difficult collections
-      const maxScrollAttempts = 40; // Much more aggressive scrolling
+      // Step 3: Scroll once to bottom to load all available reviews
+      this.log(`📜 Single efficient scroll to load ${sortType} reviews...`);
+      await this.performSingleEfficientScroll(page);
       
-      this.log(`📜 Aggressively scrolling to load ${sortType} reviews (target: ${target})...`);
-      for (let i = 0; i < maxScrollAttempts; i++) {
-        // Multiple aggressive scroll attempts per round with more variety
-        for (let j = 0; j < 5; j++) {
-          await this.performAggressiveScrolling(page);
-          await page.waitForTimeout(500);
-        }
-        
-        // Additional wait for content to load
-        await page.waitForTimeout(1000);
-        
-        // Extract reviews after scrolling
-        const currentReviews = await this.extractBasicReviews(page);
-        
-        // Use deduplication to ensure we have unique reviews
-        const combinedReviews = [...collectedReviews, ...currentReviews];
-        const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
-        collectedReviews = deduplicationResult.uniqueReviews;
-        
-        this.log(`${sortType} - Scroll ${i + 1}: Found ${collectedReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed, raw: ${currentReviews.length})`);
-        
-        // Check if we're getting new reviews
-        if (collectedReviews.length === previousCount) {
-          stagnantRounds++;
-          if (stagnantRounds >= maxStagnantRounds) {
-            this.log(`⚠️ ${sortType} - No new reviews found in ${stagnantRounds} attempts, stopping at ${collectedReviews.length} reviews`);
-            break;
-          }
-        } else {
-          stagnantRounds = 0;
-          previousCount = collectedReviews.length;
-        }
-        
-        // If we have enough reviews, stop scrolling
-        if (collectedReviews.length >= target) {
-          this.log(`✅ ${sortType} - Reached target of ${target} reviews`);
-          break;
-        }
-        
-        // Show progress every 5 attempts when we're struggling
-        if (i % 5 === 0 && i > 0) {
-          this.log(`📊 ${sortType} progress: ${collectedReviews.length}/${target} reviews after ${i + 1} scroll attempts`);
-        }
-      }
+      // Step 4: Wait for all content to fully load
+      this.log(`⏳ Waiting for all ${sortType} content to load...`);
+      await page.waitForTimeout(3000);
       
-      this.log(`📊 ${sortType} collection completed: ${collectedReviews.length} reviews (target was ${target})`);
+      // Step 5: Extract all available reviews at once
+      this.log(`📊 Extracting all available ${sortType} reviews...`);
+      const allReviews = await this.extractBasicReviews(page);
       
-      // Special handling for lowest rated - if we got very few, it might be because there aren't many negative reviews
-      if (sortType === 'lowest' && collectedReviews.length < 10) {
-        this.log(`ℹ️ Very few lowest rated reviews found (${collectedReviews.length}). This might indicate a business with mostly positive reviews.`);
-        
-        // Try collecting some medium-rated reviews instead by expanding our collection
-        this.log(`🔄 Attempting to collect additional lower-rated reviews...`);
-        
-        // Try a different approach - scroll more aggressively
-        for (let extraAttempt = 0; extraAttempt < 15; extraAttempt++) {
-          await this.performAggressiveScrolling(page);
-          await page.waitForTimeout(800);
-          
-          const moreReviews = await this.extractBasicReviews(page);
-          const combinedReviews = [...collectedReviews, ...moreReviews];
-          const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
-          
-          if (deduplicationResult.uniqueReviews.length > collectedReviews.length) {
-            collectedReviews = deduplicationResult.uniqueReviews;
-            this.log(`${sortType} - Extra attempt ${extraAttempt + 1}: Found ${collectedReviews.length} total reviews`);
-            
-            if (collectedReviews.length >= 20) { // Reasonable minimum
-              break;
-            }
-          }
-        }
-      }
+      this.log(`✅ ${sortType} collection completed: Found ${allReviews.length} reviews (target was ${target})`);
       
-      return collectedReviews.slice(0, target); // Limit to target but return what we have
+      // Return up to target number of reviews
+      return allReviews.slice(0, target);
       
     } catch (error) {
       this.log(`❌ Error collecting ${sortType} reviews: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -605,6 +539,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
    * Scroll to top of reviews section before applying new sort
    */
   private async scrollToTopOfReviews(page: Page): Promise<void> {
+    this.log('📜 Scrolling to top of reviews for sort change...');
+    
     await page.evaluate(() => {
       // Try to scroll the reviews container to top
       const reviewsContainer = document.querySelector('.m6QErb') ||
@@ -622,7 +558,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       console.log('[DEBUG] Scrolled window to top');
     });
     
-    await page.waitForTimeout(1000); // Wait for scroll to complete
+    await page.waitForTimeout(1500); // Increased wait for UI to settle
   }
 
   /**
@@ -1319,7 +1255,122 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Perform aggressive scrolling to load more reviews with enhanced strategies
+   * Perform single efficient scroll to load all reviews
+   * User requirement: "start scrolling and whenever there's more button click on it -> extract the reviews on the first scroll"
+   */
+  private async performSingleEfficientScroll(page: Page): Promise<void> {
+    this.log('📜 Performing single efficient scroll with More button clicking...');
+    
+    try {
+      await page.evaluate(async () => {
+        console.log('[SCROLL] Starting single efficient scroll');
+        
+        // Step 1: Find the main reviews container
+        const reviewContainer = document.querySelector('.m6QErb') || 
+                               document.querySelector('[role="main"]') ||
+                               document.querySelector('.section-scrollbox');
+        
+        if (reviewContainer) {
+          console.log('[SCROLL] Found review container, scrolling with More button clicking');
+          
+          let previousScrollHeight = reviewContainer.scrollHeight;
+          let scrollPosition = 0;
+          const scrollStep = reviewContainer.clientHeight * 0.8; // 80% of viewport height
+          
+          while (scrollPosition < reviewContainer.scrollHeight) {
+            // Scroll down by one step
+            scrollPosition += scrollStep;
+            reviewContainer.scrollTop = scrollPosition;
+            
+            console.log(`[SCROLL] Scrolled to position ${scrollPosition} of ${reviewContainer.scrollHeight}`);
+            
+            // Wait for content to load
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Look for More buttons to click immediately
+            const moreButtons = document.querySelectorAll('button');
+            let buttonsClicked = 0;
+            
+            for (const btn of moreButtons) {
+              const text = (btn.textContent || '').toLowerCase().trim();
+              if (text === 'more' || text === 'עוד' || text === 'show more' || text === 'read more') {
+                const rect = btn.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0 && !btn.hasAttribute('aria-expanded')) {
+                  console.log('[SCROLL] Clicking More button during scroll:', text);
+                  btn.click();
+                  buttonsClicked++;
+                  await new Promise(resolve => setTimeout(resolve, 800)); // Wait for content expansion
+                }
+              }
+            }
+            
+            if (buttonsClicked > 0) {
+              console.log(`[SCROLL] Clicked ${buttonsClicked} More buttons, updating scroll height`);
+              // Update scroll height after More button clicks
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+            
+            // Check if new content was loaded
+            const newScrollHeight = reviewContainer.scrollHeight;
+            if (newScrollHeight > previousScrollHeight) {
+              console.log(`[SCROLL] New content loaded, height increased from ${previousScrollHeight} to ${newScrollHeight}`);
+              previousScrollHeight = newScrollHeight;
+            }
+            
+            // If we've reached the bottom and no new content is loading, break
+            if (scrollPosition >= reviewContainer.scrollHeight - reviewContainer.clientHeight) {
+              console.log('[SCROLL] Reached bottom of container');
+              break;
+            }
+          }
+          
+          console.log('[SCROLL] Single efficient scroll completed');
+          
+        } else {
+          console.log('[SCROLL] No review container found, using window scroll with More button handling');
+          
+          let previousHeight = document.documentElement.scrollHeight;
+          let scrollPosition = 0;
+          const scrollStep = window.innerHeight * 0.8;
+          
+          while (scrollPosition < document.documentElement.scrollHeight) {
+            scrollPosition += scrollStep;
+            window.scrollTo(0, scrollPosition);
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Click More buttons during window scroll
+            const moreButtons = document.querySelectorAll('button');
+            for (const btn of moreButtons) {
+              const text = (btn.textContent || '').toLowerCase().trim();
+              if (text === 'more' || text === 'עוד' || text === 'show more' || text === 'read more') {
+                const rect = btn.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                  btn.click();
+                  await new Promise(resolve => setTimeout(resolve, 800));
+                }
+              }
+            }
+            
+            const newHeight = document.documentElement.scrollHeight;
+            if (newHeight > previousHeight) {
+              previousHeight = newHeight;
+            } else if (scrollPosition >= document.documentElement.scrollHeight - window.innerHeight) {
+              break;
+            }
+          }
+        }
+        
+        console.log('[SCROLL] Single efficient scroll with More buttons completed');
+      });
+      
+    } catch (error) {
+      this.log(`Single scroll error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Legacy aggressive scrolling method (kept for compatibility)
    */
   private async performAggressiveScrolling(page: Page): Promise<void> {
     try {

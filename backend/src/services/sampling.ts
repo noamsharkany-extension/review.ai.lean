@@ -21,8 +21,12 @@ export class IntelligentSamplingEngine implements SamplingEngine {
       };
     }
 
-    // Sort reviews by date (most recent first)
-    const sortedByDate = [...reviews].sort((a, b) => b.date.getTime() - a.date.getTime());
+    // Sort reviews by date (most recent first) - handle both Date objects and strings
+    const sortedByDate = [...reviews].sort((a, b) => {
+      const dateA = a.date instanceof Date ? a.date : new Date(a.date);
+      const dateB = b.date instanceof Date ? b.date : new Date(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
     
     // Get 100 most recent reviews
     const recentReviews = sortedByDate.slice(0, IntelligentSamplingEngine.SAMPLE_SIZE_PER_CATEGORY);
