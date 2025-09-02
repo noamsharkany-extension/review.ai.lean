@@ -1125,6 +1125,12 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             break;
           }
           
+          // "Visited in [Month]" patterns that appear in the results
+          if (dateText.match(/visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i)) {
+            reviewDate = dateText;
+            break;
+          }
+          
           // Short patterns: 2h, 5d, 3w, 1m, 2y
           if (dateText.match(/^\d+\s*(h|d|w|m|y)$/)) {
             reviewDate = dateText;
@@ -1185,9 +1191,49 @@ export class GoogleReviewScraperService implements ReviewScraperService {
                   }
                 }
               }
+              // Enhanced date parsing for month names and temporal references
+              else {
+                // Try to parse month names - estimate current year and appropriate month
+                const monthMatch = reviewDate.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
+                if (monthMatch) {
+                  const now = new Date();
+                  const currentMonth = now.getMonth();
+                  const currentYear = now.getFullYear();
+                  
+                  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                   'July', 'August', 'September', 'October', 'November', 'December'];
+                  const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  
+                  let monthIndex = monthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
+                  if (monthIndex === -1) {
+                    monthIndex = shortMonthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
+                  }
+                  
+                  if (monthIndex !== -1) {
+                    // If the month is in the future, assume it's from last year
+                    const targetYear = monthIndex > currentMonth ? currentYear - 1 : currentYear;
+                    actualDate = new Date(targetYear, monthIndex, 15); // Use middle of month as approximation
+                  }
+                } else {
+                  // Fallback: try native Date parsing for any other format
+                  const parsedDate = new Date(reviewDate);
+                  if (!isNaN(parsedDate.getTime())) {
+                    actualDate = parsedDate;
+                  }
+                }
+              }
             } catch (error) {
               console.log(`Error parsing date "${reviewDate}":`, error);
             }
+          }
+          
+          // Final validation - ensure we never have Invalid Date objects
+          if (isNaN(actualDate.getTime())) {
+            console.log(`[SCRAPER] Warning: Could not parse date "${reviewDate}" for author "${authorName}", using current date as fallback`);
+            actualDate = new Date(); // Use current date as safe fallback
+          } else {
+            console.log(`[SCRAPER] Successfully parsed date "${reviewDate}" -> ${actualDate.toISOString()} for author "${authorName}"`);
           }
           
           // Create more stable ID based on content
