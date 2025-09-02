@@ -22,7 +22,10 @@
       "Bash(cat:*)",
       "Bash(PORT=5174 npm run dev)",
       "Bash(VITE_PORT=5174 npm run dev)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(git log:*)",
+      "Bash(npm run scrape-single:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []

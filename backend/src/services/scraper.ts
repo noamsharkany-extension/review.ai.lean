@@ -1110,8 +1110,13 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         let reviewDate = 'Recent';
         const dateElements = container.querySelectorAll('span, div, time, .date, [class*="time"], [class*="date"]');
         
+        console.log(`[SCRAPER] Looking for date in ${dateElements.length} potential date elements for author "${authorName}"`);
+        
         for (const dateEl of dateElements) {
           const dateText = dateEl.textContent?.trim() || '';
+          if (dateText.length > 0) {
+            console.log(`[SCRAPER] Checking date text: "${dateText}"`);
+          }
           
           // Hebrew relative patterns: לפני X שעות, לפני X ימים, לפני X חודשים
           if (dateText.includes('לפני') && (dateText.includes('שעות') || dateText.includes('ימים') || dateText.includes('חודשים') || dateText.includes('שנים'))) {
@@ -1128,6 +1133,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           // "Visited in [Month]" patterns that appear in the results
           if (dateText.match(/visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i)) {
             reviewDate = dateText;
+            console.log(`[SCRAPER] Found "Visited in Month" pattern: "${dateText}"`);
             break;
           }
           
@@ -1193,33 +1199,55 @@ export class GoogleReviewScraperService implements ReviewScraperService {
               }
               // Enhanced date parsing for month names and temporal references
               else {
-                // Try to parse month names - estimate current year and appropriate month
-                const monthMatch = reviewDate.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
-                if (monthMatch) {
+                // Handle "Visited in [Month]" patterns specifically
+                const visitedMatch = reviewDate.match(/visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i);
+                if (visitedMatch) {
+                  console.log(`[SCRAPER] Parsing "Visited in Month" pattern: "${reviewDate}"`);
                   const now = new Date();
                   const currentMonth = now.getMonth();
                   const currentYear = now.getFullYear();
                   
                   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                                    'July', 'August', 'September', 'October', 'November', 'December'];
-                  const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                   
-                  let monthIndex = monthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
-                  if (monthIndex === -1) {
-                    monthIndex = shortMonthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
-                  }
+                  const monthIndex = monthNames.findIndex(m => m.toLowerCase() === visitedMatch[1].toLowerCase());
                   
                   if (monthIndex !== -1) {
                     // If the month is in the future, assume it's from last year
                     const targetYear = monthIndex > currentMonth ? currentYear - 1 : currentYear;
                     actualDate = new Date(targetYear, monthIndex, 15); // Use middle of month as approximation
+                    console.log(`[SCRAPER] Converted "${reviewDate}" to date: ${actualDate.toISOString()}`);
                   }
-                } else {
-                  // Fallback: try native Date parsing for any other format
-                  const parsedDate = new Date(reviewDate);
-                  if (!isNaN(parsedDate.getTime())) {
-                    actualDate = parsedDate;
+                }
+                // Try to parse other month names - estimate current year and appropriate month
+                else {
+                  const monthMatch = reviewDate.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
+                  if (monthMatch) {
+                    const now = new Date();
+                    const currentMonth = now.getMonth();
+                    const currentYear = now.getFullYear();
+                    
+                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                     'July', 'August', 'September', 'October', 'November', 'December'];
+                    const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    
+                    let monthIndex = monthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
+                    if (monthIndex === -1) {
+                      monthIndex = shortMonthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
+                    }
+                    
+                    if (monthIndex !== -1) {
+                      // If the month is in the future, assume it's from last year
+                      const targetYear = monthIndex > currentMonth ? currentYear - 1 : currentYear;
+                      actualDate = new Date(targetYear, monthIndex, 15); // Use middle of month as approximation
+                    }
+                  } else {
+                    // Fallback: try native Date parsing for any other format
+                    const parsedDate = new Date(reviewDate);
+                    if (!isNaN(parsedDate.getTime())) {
+                      actualDate = parsedDate;
+                    }
                   }
                 }
               }
@@ -1246,7 +1274,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           }
           const stableId = `review_${Math.abs(hash)}`;
           
-          reviews.push({
+          const reviewObject = {
             id: stableId,
             rating: rating,
             text: reviewText,
@@ -1255,9 +1283,12 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             originalDate: reviewDate, // Keep original for debugging
             position: i + 1,
             extractedAt: new Date().toISOString()
-          });
+          };
           
-          console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - "${reviewText.substring(0, 50)}..."`);
+          reviews.push(reviewObject);
+          
+          console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - Date: ${actualDate.toISOString()} (original: "${reviewDate}") - "${reviewText.substring(0, 50)}..."`);
+          console.log(`[SCRAPER] Review object date type: ${typeof reviewObject.date}, isValid: ${!isNaN(reviewObject.date.getTime())}, value: ${reviewObject.date}`);
           
           // Remove arbitrary limit - let the strategy decide how many reviews to collect
         }
