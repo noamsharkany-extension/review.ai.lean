@@ -904,7 +904,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     
     const result = await page.evaluate(() => {
       const reviews = [];
-      console.log('[SCRAPER] Simple review extraction starting...');
+      console.log('[SCRAPER] Simple review extraction starting... - TESTING IF CHANGES WORK!!!');
       
       // Find all elements with star ratings
       const starElements = document.querySelectorAll('[role="img"][aria-label*="star"], [role="img"][aria-label*="כוכב"], [aria-label*="stars"], [aria-label*="כוכבים"]');
@@ -998,7 +998,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
                 /^\d+\s*(day|week|month|year|hour|min)/i.test(text) ||
                 text.includes('more') || text.includes('עוד') ||
                 text.includes('Local Guide') || text.includes('ממליץ מקומי') ||
-                /\d+\s*(review|ביקורת)/.test(text)) continue;
+                /\d+\s*(review|ביקורת)/.test(text) ||
+                /^visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i.test(text)) continue;
             
             // Clean the text
             text = text
@@ -1034,7 +1035,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
                 text.includes('ago') || text.includes('לפני') ||
                 /more|less|show|hide|click|menu|button/i.test(text) ||
                 /^\d+$/.test(text) || // Just numbers
-                /^(review|ביקורת|photo|תמונה|video|וידיאו)$/i.test(text)) continue;
+                /^(review|ביקורת|photo|תמונה|video|וידיאו)$/i.test(text) ||
+                /^visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i.test(text)) continue;
             
             // Clean and validate
             const originalText = text;
@@ -1078,6 +1080,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
                 text.includes('Google') || text.includes('Map') ||
                 /^\d+$/.test(text) ||  // Just numbers
                 /^(a|an|the|this|that|with|and|or|but|if|then|when|where|why|how)$/i.test(text) ||
+                /^visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i.test(text) ||
                 text.length > 50) continue;
             
             // Check if it's positioned near the star rating (author names usually are)
@@ -1306,6 +1309,17 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     
     // Add backend logging to see the actual results
     console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
+    
+    // Debug first few reviews to understand the data structure
+    if (result.length > 0) {
+      console.log('[Scraper-Backend] Sample of first review:');
+      const firstReview = result[0];
+      console.log(`- Author: "${firstReview.author}"`);
+      console.log(`- Date: ${firstReview.date} (type: ${typeof firstReview.date})`);
+      console.log(`- Original Date: "${firstReview.originalDate}"`);
+      console.log(`- Date valid: ${firstReview.date instanceof Date ? !isNaN(firstReview.date.getTime()) : 'Not a Date object'}`);
+    }
+    
     this.log(`📋 More Button Stats: Found ${buttonStats.total} buttons, Clicked ${buttonStats.clicked} "more" buttons`);
     
     // Reset stats for next extraction
