@@ -1109,54 +1109,33 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           }
         }
         
-        // Enhanced date extraction - handle Hebrew, English, and absolute dates
+        // Enhanced date extraction using regex pattern matching from container text
         let reviewDate = 'Recent';
-        const dateElements = container.querySelectorAll('span, div, time, .date, [class*="time"], [class*="date"]');
+        const containerText = container.textContent || '';
         
-        console.log(`[SCRAPER] Looking for date in ${dateElements.length} potential date elements for author "${authorName}"`);
+        console.log(`[SCRAPER] Extracting date from container text (${containerText.length} chars) for author "${authorName}"`);
         
-        for (const dateEl of dateElements) {
-          const dateText = dateEl.textContent?.trim() || '';
-          if (dateText.length > 0) {
-            console.log(`[SCRAPER] Checking date text: "${dateText}"`);
-          }
-          
-          // Hebrew relative patterns: לפני X שעות, לפני X ימים, לפני X חודשים
-          if (dateText.includes('לפני') && (dateText.includes('שעות') || dateText.includes('ימים') || dateText.includes('חודשים') || dateText.includes('שנים'))) {
-            reviewDate = dateText;
-            break;
-          }
-          
-          // English relative patterns: X hours ago, X days ago, etc.
-          if (dateText.includes('ago') && dateText.match(/\d+\s*(hour|day|week|month|year)/)) {
-            reviewDate = dateText;
-            break;
-          }
-          
+        // Try to find date patterns in the container text directly using regex
+        const datePatterns = [
           // "Visited in [Month]" patterns that appear in the results
-          if (dateText.match(/visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i)) {
-            reviewDate = dateText;
-            console.log(`[SCRAPER] Found "Visited in Month" pattern: "${dateText}"`);
-            break;
-          }
-          
-          // Short patterns: 2h, 5d, 3w, 1m, 2y
-          if (dateText.match(/^\d+\s*(h|d|w|m|y)$/)) {
-            reviewDate = dateText;
-            break;
-          }
-          
-          // Absolute date patterns: Month Year, DD/MM/YYYY, etc.
-          if (dateText.match(/\d{4}/) || // Contains year
-              dateText.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/) || // DD/MM/YY format
-              dateText.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|ינו|פבר|מרץ|אפר|מאי|יונ|יול|אוג|ספט|אוק|נוב|דצמ)/i)) {
-            reviewDate = dateText;
-            break;
-          }
-          
-          // Numeric dates that look like timestamps
-          if (dateText.match(/^\d{1,2}[\.\-/]\d{1,2}[\.\-/]\d{2,4}$/)) {
-            reviewDate = dateText;
+          /visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i,
+          // Hebrew relative patterns: לפני X שעות, לפני X ימים, לפני X חודשים  
+          /לפני\s+\d+\s*(שעות?|ימים?|חודשים?|שנים?)/,
+          // English relative patterns: X hours ago, X days ago, etc.
+          /\d+\s*(hour|day|week|month|year)s?\s+ago/i,
+          // Short relative patterns: 2h, 5d, 3w, 1m, 2y
+          /\b\d+\s*(h|d|w|m|y)\b/,
+          // Absolute dates with year
+          /\b\d{1,2}\/\d{1,2}\/\d{4}\b/,
+          // Month names with potential year
+          /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}/i
+        ];
+        
+        for (const pattern of datePatterns) {
+          const match = containerText.match(pattern);
+          if (match) {
+            reviewDate = match[0].trim();
+            console.log(`[SCRAPER] Found date pattern: "${reviewDate}"`);
             break;
           }
         }
