@@ -71,11 +71,11 @@ export class ComprehensiveCollectionService {
       
       // Convert to the expected result format
       const comprehensiveResult: ComprehensiveCollectionResult = {
-        uniqueReviews: result.reviews,
+        uniqueReviews: reviews,
         reviewsByCategory: {
-          recent: result.reviews.filter((r: any) => r.sortType === 'newest'),
-          worst: result.reviews.filter((r: any) => r.sortType === 'lowest'),
-          best: result.reviews.filter((r: any) => r.sortType === 'highest')
+          recent: reviews.filter((r: any) => r.sortType === 'newest'),
+          worst: reviews.filter((r: any) => r.sortType === 'lowest'),
+          best: reviews.filter((r: any) => r.sortType === 'highest')
         },
         metadata: {
           sessionId: result.metadata.sessionId,

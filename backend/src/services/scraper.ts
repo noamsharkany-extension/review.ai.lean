@@ -280,16 +280,11 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       let allUniqueReviews: any[];
       
-      // Choose strategy based on total review count
-      if (totalReviewCount <= 300) {
-        this.log('🎯 Using Strategy A: Extract all available reviews (≤300 total)');
-        allUniqueReviews = await this.extractAllAvailableReviews(page);
-        this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy A (extract all)`);
-      } else {
-        this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest');
-        allUniqueReviews = await this.extractWithSelectiveFiltering(page);
-        this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);
-      }
+      // Always use Strategy B: Selective filtering (like successful commit 4801237)
+      // This ensures we get comprehensive coverage regardless of total review count
+      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest (matching commit 4801237)');
+      allUniqueReviews = await this.extractWithSelectiveFiltering(page);
+      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);      
       
       return allUniqueReviews;
       
@@ -496,38 +491,75 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Efficient single-scroll collection by sort type
+   * Collect reviews by specific sort type with smart aggressive pagination (matching commit 4801237 approach)
    */
   private async collectReviewsBySort(page: Page, sortType: 'newest' | 'lowest' | 'highest', target: number): Promise<any[]> {
-    this.log(`🎯 Collecting ${target} ${sortType} reviews with efficient single-scroll approach...`);
+    this.log(`🔄 Collecting ${target} ${sortType} reviews with smart aggressive pagination...`);
     
     try {
-      // Step 1: Apply the sort filter
+      // Apply the sort filter
       const sortApplied = await this.applySortFilter(page, sortType);
       if (!sortApplied) {
         this.log(`⚠️ Could not apply ${sortType} sort, using current order`);
       }
       
-      // Step 2: Wait for sort to take effect
-      this.log(`⏳ Waiting for ${sortType} sort to load content...`);
-      await page.waitForTimeout(3000);
+      // Wait for sort to take effect
+      await page.waitForTimeout(4000);
       
-      // Step 3: Scroll once to bottom to load all available reviews
-      this.log(`📜 Single efficient scroll to load ${sortType} reviews...`);
-      await this.performSingleEfficientScroll(page);
+      let collectedReviews: any[] = [];
+      let previousCount = 0;
+      let stagnantRounds = 0;
+      const maxStagnantRounds = 5; // Match 4801237 patience level
+      const maxScrollAttempts = 25; // Reduced from 40 to 25 for better efficiency while maintaining effectiveness
       
-      // Step 4: Wait for all content to fully load
-      this.log(`⏳ Waiting for all ${sortType} content to load...`);
-      await page.waitForTimeout(3000);
+      this.log(`📜 Smart aggressive scrolling to load ${sortType} reviews (target: ${target})...`);
+      for (let i = 0; i < maxScrollAttempts; i++) {
+        // Smart multi-scroll approach: fewer but more effective scrolls
+        for (let j = 0; j < 3; j++) { // Reduced from 5 to 3 scrolls per round
+          await this.performAggressiveScrolling(page);
+          await page.waitForTimeout(800); // Slightly longer wait for content to load
+        }
+        
+        // Additional wait for content to load
+        await page.waitForTimeout(1500); // Increased wait time for better content loading
+        
+        // Extract reviews after scrolling
+        const currentReviews = await this.extractBasicReviews(page);
+        
+        // Use deduplication to ensure we have unique reviews
+        const combinedReviews = [...collectedReviews, ...currentReviews];
+        const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
+        collectedReviews = deduplicationResult.uniqueReviews;
+        
+        this.log(`${sortType} - Scroll ${i + 1}: Found ${collectedReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed, raw: ${currentReviews.length})`);
+        
+        // Check if we're getting new reviews
+        if (collectedReviews.length === previousCount) {
+          stagnantRounds++;
+          if (stagnantRounds >= maxStagnantRounds) {
+            this.log(`⚠️ ${sortType} - No new reviews found in ${stagnantRounds} attempts, stopping at ${collectedReviews.length} reviews`);
+            break;
+          }
+        } else {
+          stagnantRounds = 0;
+          previousCount = collectedReviews.length;
+        }
+        
+        // If we have enough reviews, stop scrolling
+        if (collectedReviews.length >= target) {
+          this.log(`✅ ${sortType} - Reached target of ${target} reviews`);
+          break;
+        }
+        
+        // Show progress every 5 attempts when we're struggling
+        if (i % 5 === 0 && i > 0) {
+          this.log(`📊 ${sortType} progress: ${collectedReviews.length}/${target} reviews after ${i + 1} scroll attempts`);
+        }
+      }
       
-      // Step 5: Extract all available reviews at once
-      this.log(`📊 Extracting all available ${sortType} reviews...`);
-      const allReviews = await this.extractBasicReviews(page);
+      this.log(`📊 ${sortType} collection completed: ${collectedReviews.length} reviews (target was ${target})`);
       
-      this.log(`✅ ${sortType} collection completed: Found ${allReviews.length} reviews (target was ${target})`);
-      
-      // Return up to target number of reviews
-      return allReviews.slice(0, target);
+      return collectedReviews.slice(0, target); // Limit to target but return what we have
       
     } catch (error) {
       this.log(`❌ Error collecting ${sortType} reviews: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -935,133 +967,141 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           reviewText = bestText;
         }
         
-        // Enhanced author name extraction 
+        // Aggressive Google Maps author extraction - multiple strategies
         let authorName = 'Anonymous';
         
-        // Step 1: Look for contributor links first (most reliable) - but DON'T interact with them AT ALL
-        const contributorElements = container.querySelectorAll('a[data-href*="contrib"], button[data-href*="contrib"], [href*="contrib"], a[href*="contrib"]');
-        for (const contrib of contributorElements) {
-          if (contrib.textContent && contrib.textContent.trim().length > 0) {
-            // ABSOLUTELY NO CLICKING OR INTERACTION - just extract text content
-            let name = contrib.textContent.trim();
-            console.log(`[SCRAPER] Found contributor element (NO CLICK): "${name}"`);
+        // Strategy 1: Common Google Maps author class patterns (most likely)
+        const authorSelectors = [
+          'div[data-review-id] .d4r55',           // Specific to review containers
+          'div[data-review-id] .TSUbDb',          // Alternative author class
+          'div[data-review-id] span[jsname]',     // JS component spans
+          'div[data-review-id] [data-value]',     // Data value attributes
+          '.jftiEf',                              // Common author class
+          '.fontBodyMedium',                      // Font styling classes
+          '.fontBodySmall',
+          '.fontHeaderMedium',
+          'span[class*="font"]',                  // Any font-related class
+          'div[class*="font"]'
+        ];
+        
+        for (const selector of authorSelectors) {
+          const elements = container.querySelectorAll(selector);
+          for (const element of elements) {
+            let text = element.textContent?.trim() || '';
             
-            // Disable the link to prevent any accidental navigation
-            try {
-              (contrib as HTMLElement).style.pointerEvents = 'none';
-              contrib.removeAttribute('href');
-              contrib.removeAttribute('data-href');
-              contrib.setAttribute('disabled', 'true');
-            } catch (e) {
-              // Continue if disabling fails
-            }
-            // Clean the name thoroughly
-            name = name
-              .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
-              .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
-              .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
-              .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
-              .replace(/\s*·.*$/g, '') // Remove everything after middle dot
-              .replace(/\s*\|.*$/g, '') // Remove everything after pipe
+            // Skip empty or very short/long text
+            if (!text || text.length < 2 || text.length > 50) continue;
+            
+            // Skip obvious non-name patterns
+            if (text.includes('★') || text.includes('star') || text.includes('כוכב') ||
+                text.includes('ago') || text.includes('לפני') ||
+                /^\d+\s*(day|week|month|year|hour|min)/i.test(text) ||
+                text.includes('more') || text.includes('עוד') ||
+                text.includes('Local Guide') || text.includes('ממליץ מקומי') ||
+                /\d+\s*(review|ביקורת)/.test(text)) continue;
+            
+            // Clean the text
+            text = text
+              .replace(/\s*ממליץ מקומי.*$/gi, '')
+              .replace(/\s*Local Guide.*$/gi, '')
+              .replace(/\s*\d+.*$/g, '') // Remove anything after numbers
+              .replace(/\s*·.*$/g, '')
+              .replace(/\s*\|.*$/g, '')
               .trim();
             
-            // Validate it's a proper name
-            if (name.length > 1 && name.length < 50 && 
-                !name.includes('כוכב') && !name.includes('star') &&
-                !name.includes('Google') && !name.includes('מדיניות') &&
-                !name.includes('חדש') && !name.includes('עוד') && // Block UI elements
-                !name.includes('New') && !name.includes('More') &&
-                !/^\d+$/.test(name) && // Not just numbers
-                /[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(name)) { // Contains letters
-              authorName = name;
+            // Validate it looks like a proper name
+            if (text.length >= 2 && text.length <= 40 && 
+                /^[a-zA-Z\u0590-\u05FF][a-zA-Z\u0590-\u05FF\s.'-]*$/.test(text) &&
+                !/^(more|less|show|hide|click|the|and|or|of|in|at|to|for|with|by)$/i.test(text)) {
+              
+              authorName = text;
+              console.log(`[SCRAPER] Found author via selector "${selector}": "${authorName}"`);
+              break;
+            }
+          }
+          if (authorName !== 'Anonymous') break;
+        }
+        
+        // Strategy 2: Look for clickable author elements (profile links, buttons)
+        if (authorName === 'Anonymous') {
+          const clickableElements = container.querySelectorAll('a, button, [role="button"], [data-href], [tabindex]');
+          for (const element of clickableElements) {
+            let text = element.textContent?.trim() || '';
+            
+            // Skip obvious non-names
+            if (!text || text.length < 2 || text.length > 40 ||
+                text.includes('★') || text.includes('star') || text.includes('כוכב') ||
+                text.includes('ago') || text.includes('לפני') ||
+                /more|less|show|hide|click|menu|button/i.test(text) ||
+                /^\d+$/.test(text) || // Just numbers
+                /^(review|ביקורת|photo|תמונה|video|וידיאו)$/i.test(text)) continue;
+            
+            // Clean and validate
+            const originalText = text;
+            text = text
+              .replace(/\s*ממליץ מקומי.*$/gi, '')
+              .replace(/\s*Local Guide.*$/gi, '')
+              .replace(/\s*\d+.*$/g, '') // Remove anything after numbers
+              .replace(/\s*·.*$/g, '')
+              .replace(/\s*\|.*$/g, '')
+              .trim();
+            
+            if (text.length >= 2 && text.length <= 40 &&
+                /^[a-zA-Z\u0590-\u05FF][a-zA-Z\u0590-\u05FF\s.'-]*$/.test(text)) {
+              
+              authorName = text;
+              console.log(`[SCRAPER] Found author via clickable element: "${authorName}" (original: "${originalText}")`);
               break;
             }
           }
         }
         
-        // Step 2: Look for common author selectors if no contributor found
+        // Strategy 3: Aggressive text search within reasonable positioning
         if (authorName === 'Anonymous') {
-          const authorSelectors = ['.d4r55', '.TSUbDb', '.fontBodyMedium', '[data-value]', '.fontBodySmall'];
-          for (const selector of authorSelectors) {
-            const elements = container.querySelectorAll(selector);
-            for (const el of elements) {
-              let name = el.textContent?.trim() || '';
-              // Clean the name
-              name = name
-                .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
-                .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
-                .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
-                .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
-                .replace(/\s*·.*$/g, '') // Remove everything after middle dot
-                .trim();
-              
-              // Validate it's a proper name
-              if (name.length > 1 && name.length < 50 && 
-                  !name.includes('כוכב') && !name.includes('star') &&
-                  !name.includes('Google') && !name.includes('מדיניות') &&
-                  !name.includes('לפני') && !name.includes('ago') &&
-                  !name.includes('חדש') && !name.includes('עוד') && // Block UI elements
-                  !name.includes('New') && !name.includes('More') &&
-                  !name.includes('ביקורת') && !name.includes('review') &&
-                  !/^\d+$/.test(name) && // Not just numbers
-                  /[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(name)) { // Contains letters
-                // Additional validation: check if it's positioned like an author name
-                const rect = (el as HTMLElement).getBoundingClientRect();
-                const starRect = starEl.getBoundingClientRect();
-                if (Math.abs(rect.top - starRect.top) < 60) { // Within 60px of star rating
-                  authorName = name;
-                  break;
-                }
-              }
-            }
-            if (authorName !== 'Anonymous') break;
-          }
-        }
-        
-        // Step 3: Fallback - look for names in any span/div elements
-        if (authorName === 'Anonymous') {
-          const allTextElements = container.querySelectorAll('span, div');
+          console.log(`[SCRAPER] Using aggressive text search for author`);
+          
+          // Look for any text that could be an author name (positioned near rating)
+          const allTextElements = container.querySelectorAll('span, div, p, h1, h2, h3, h4, h5, h6');
+          const starRect = starEl.getBoundingClientRect();
+          
           for (const el of allTextElements) {
-            let text = el.textContent?.trim() || '';
+            const text = el.textContent?.trim() || '';
             
-            // Skip if it's clearly not a name
+            // Must be reasonable name length and pattern
             if (text.length < 2 || text.length > 40) continue;
             
-            // Clean the text first
-            text = text
-              .replace(/\s*ממליץ מקומי.*$/g, '') // Remove Hebrew "local guide" text
-              .replace(/\s*Local Guide.*$/gi, '') // Remove English "local guide" text  
-              .replace(/\s*\d+\s*(ביקורת|ביקורות|reviews?).*$/gi, '') // Remove review count
-              .replace(/\s*\d+\s*(תמונה|תמונות|photos?).*$/gi, '') // Remove photo count
-              .replace(/\s*·.*$/g, '') // Remove everything after middle dot
-              .trim();
+            // Skip obviously non-name content
+            if (text.includes('★') || text.includes('star') || text.includes('כוכב') ||
+                text.includes('ago') || text.includes('לפני') ||
+                text.includes('review') || text.includes('ביקורת') ||
+                text.includes('more') || text.includes('עוד') ||
+                text.includes('Google') || text.includes('Map') ||
+                /^\d+$/.test(text) ||  // Just numbers
+                /^(a|an|the|this|that|with|and|or|but|if|then|when|where|why|how)$/i.test(text) ||
+                text.length > 50) continue;
             
-            // Comprehensive validation for a proper name
-            if (text.length > 2 && text.length < 40 && 
-                !text.includes('כוכב') && !text.includes('star') &&
-                !text.includes('לפני') && !text.includes('ago') &&
-                !text.includes('Google') && !text.includes('מדיניות') &&
-                !text.includes('ביקורת') && !text.includes('review') &&
-                !text.includes('תמונה') && !text.includes('photos') &&
-                !text.includes('חדש') && !text.includes('עוד') && // Block UI elements
-                !text.includes('New') && !text.includes('More') &&
-                !text.includes('Click') && !text.includes('לחץ') &&
-                !/^\d+$/.test(text) && // Not just numbers
-                !/^[.,:;!?\s]+$/.test(text) && // Not just punctuation
-                /[\u0590-\u05FF\u0041-\u005A\u0061-\u007A]/.test(text) && // Contains letters
-                !/(https?:\/\/|www\.)/i.test(text)) { // Not a URL
+            // Check if it's positioned near the star rating (author names usually are)
+            try {
+              const elementRect = (el as HTMLElement).getBoundingClientRect();
+              const verticalDistance = Math.abs(elementRect.top - starRect.top);
               
-              // Check position relative to star (names are usually near ratings)
-              const rect = (el as HTMLElement).getBoundingClientRect();
-              const starRect = starEl.getBoundingClientRect();
-              if (Math.abs(rect.top - starRect.top) < 80) {
-                // Additional check: ensure it's not review text by checking length and content
-                if (!text.includes('טעים') && !text.includes('נהדר') && !text.includes('מקום') &&
-                    !text.includes('delicious') && !text.includes('great') && !text.includes('place')) {
-                  authorName = text;
+              // If it's reasonably close to the star rating and looks like a name
+              if (verticalDistance < 100 && /^[a-zA-Z\u0590-\u05FF][a-zA-Z\u0590-\u05FF\s.'-]*$/.test(text)) {
+                // Final cleaning
+                const cleanText = text
+                  .replace(/\s*ממליץ מקומי.*$/gi, '')
+                  .replace(/\s*Local Guide.*$/gi, '')
+                  .replace(/\s*\d+.*$/g, '')
+                  .trim();
+                
+                if (cleanText.length >= 2 && cleanText.length <= 40) {
+                  authorName = cleanText;
+                  console.log(`[SCRAPER] Found positioned author: "${authorName}" (distance: ${verticalDistance}px)`);
                   break;
                 }
               }
+            } catch (e) {
+              // Continue if positioning check fails
             }
           }
         }
