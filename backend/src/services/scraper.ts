@@ -1261,7 +1261,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             rating: rating,
             text: reviewText,
             author: authorName,
-            date: actualDate, // Keep as Date object to match RawReview interface
+            date: actualDate.toISOString(), // Serialize to string for browser-to-node transfer
             originalDate: reviewDate, // Keep original for debugging
             position: i + 1,
             extractedAt: new Date().toISOString()
@@ -1270,7 +1270,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           reviews.push(reviewObject);
           
           console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - Date: ${actualDate.toISOString()} (original: "${reviewDate}") - "${reviewText.substring(0, 50)}..."`);
-          console.log(`[SCRAPER] Review object date type: ${typeof reviewObject.date}, isValid: ${!isNaN(reviewObject.date.getTime())}, value: ${reviewObject.date}`);
+          console.log(`[SCRAPER] Review object date type: ${typeof reviewObject.date}, value: ${reviewObject.date}`);
           
           // Remove arbitrary limit - let the strategy decide how many reviews to collect
         }
@@ -1289,14 +1289,20 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     // Add backend logging to see the actual results
     console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
     
-    // Debug first few reviews to understand the data structure
-    if (result.length > 0) {
-      console.log('[Scraper-Backend] Sample of first review:');
-      const firstReview = result[0];
+    // Convert string dates back to Date objects and debug
+    const processedResult = result.map(review => ({
+      ...review,
+      date: new Date(review.date) // Convert ISO string back to Date object
+    }));
+    
+    if (processedResult.length > 0) {
+      console.log('[Scraper-Backend] Sample of first review after processing:');
+      const firstReview = processedResult[0];
       console.log(`- Author: "${firstReview.author}"`);
       console.log(`- Date: ${firstReview.date} (type: ${typeof firstReview.date})`);
       console.log(`- Original Date: "${firstReview.originalDate}"`);
       console.log(`- Date valid: ${firstReview.date instanceof Date ? !isNaN(firstReview.date.getTime()) : 'Not a Date object'}`);
+      console.log(`- Date ISO: ${firstReview.date instanceof Date ? firstReview.date.toISOString() : 'N/A'}`);
     }
     
     this.log(`📋 More Button Stats: Found ${buttonStats.total} buttons, Clicked ${buttonStats.clicked} "more" buttons`);
@@ -1306,7 +1312,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       window.moreButtonStats = { total: 0, clicked: 0 };
     });
     
-    return result;
+    return processedResult;
   }
 
   /**
