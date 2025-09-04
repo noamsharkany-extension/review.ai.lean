@@ -510,21 +510,62 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         this.log(`⚠️ Could not apply ${sortType} sort, using current order`);
       }
       
-      // Wait for sort to take effect, expand More buttons, then extract (simplified approach)
+      // Wait for sort to take effect
       await page.waitForTimeout(4000);
-      this.log(`🔄 Running comprehensive bookmarklet expansion for ${sortType} sorted reviews...`);
-      await this.clickMoreButtonsOnPage(page);
       
-      this.log(`📊 Extracting all visible ${sortType} reviews after comprehensive expansion...`);
-      const allReviews = await this.extractBasicReviews(page);
+      this.log(`📜 Smart aggressive scrolling to load ${sortType} reviews (target: ${target})...`);
       
-      // Deduplicate the extracted reviews
-      const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(allReviews);
-      const uniqueReviews = deduplicationResult.uniqueReviews;
+      const allReviews: any[] = [];
+      let scrollIteration = 0;
+      const maxScrolls = 4; // Reasonable limit for ~100 reviews per category
       
-      this.log(`📊 ${sortType} extraction completed: ${uniqueReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed from ${allReviews.length} total)`);
+      while (scrollIteration < maxScrolls && allReviews.length < target) {
+        // Scroll to load more content
+        await page.evaluate(() => {
+          // Find review container and scroll it
+          const reviewContainer = document.querySelector('[data-review-id], .review, .section-review') || 
+                                  document.querySelector('div[jsname="fLiPzd"]') ||
+                                  document.querySelector('div[aria-label*="review"], div[aria-label*="Review"]') ||
+                                  document.querySelector('div[role="main"] div[tabindex="0"]');
+          
+          if (reviewContainer && reviewContainer.scrollHeight > reviewContainer.clientHeight) {
+            reviewContainer.scrollBy(0, reviewContainer.clientHeight * 2);
+          }
+          window.scrollBy(0, window.innerHeight * 2);
+        });
+        
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for content to load
+        
+        // Click More buttons robustly
+        await this.clickMoreButtonsRobust(page);
+        
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for More buttons to expand
+        
+        // Extract reviews after this scroll iteration
+        const newReviews = await this.extractBasicReviews(page);
+        const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews([...allReviews, ...newReviews]);
+        const uniqueReviews = deduplicationResult.uniqueReviews;
+        
+        this.log(`${sortType} - Scroll ${scrollIteration + 1}: Found ${uniqueReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed, raw: ${newReviews.length})`);
+        
+        if (uniqueReviews.length <= allReviews.length) {
+          this.log(`✅ ${sortType} - No new reviews found, stopping scrolling`);
+          break;
+        }
+        
+        if (uniqueReviews.length >= target) {
+          this.log(`✅ ${sortType} - Reached target of ${target} reviews`);
+          break;
+        }
+        
+        allReviews.length = 0;
+        allReviews.push(...uniqueReviews);
+        scrollIteration++;
+      }
       
-      return uniqueReviews.slice(0, target); // Return up to target amount
+      this.log(`📊 ${sortType} collection completed: ${allReviews.length} reviews (target was ${target})`);
+      
+      return allReviews.slice(0, target); // Return up to target amount
       
     } catch (error) {
       this.log(`❌ Error collecting ${sortType} reviews: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -731,6 +772,41 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     } catch (error) {
       this.log(`❌ Error applying ${sortType} sort filter: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return false;
+    }
+  }
+
+  /**
+   * Robust More button clicking without the comprehensive scrolling
+   * Used during scroll iterations to click visible More buttons
+   */
+  private async clickMoreButtonsRobust(page: Page): Promise<void> {
+    this.log('🔄 Starting robust More button clicking...');
+    
+    try {
+      const result = await page.evaluate(() => {
+        console.log('[MORE_CLICKING] Finding More buttons...');
+        
+        // Find all More buttons using the proven match logic
+        const match = (t: Element): boolean => /^more$/i.test(((t as HTMLElement).innerText || '').trim());
+        const moreButtons = [...document.querySelectorAll('button,[role="button"],span')]
+          .filter(el => match(el));
+        
+        let clicked = 0;
+        moreButtons.forEach(el => {
+          try {
+            (el as HTMLElement).click();
+            clicked++;
+          } catch {}
+        });
+        
+        console.log(`[MORE_CLICKING] Clicked ${clicked} More buttons out of ${moreButtons.length} found`);
+        return { found: moreButtons.length, clicked };
+      });
+      
+      this.log(`✅ More button clicking completed: ${result.clicked} buttons clicked, waiting for content to load...`);
+      
+    } catch (error) {
+      this.log(`❌ Error during More button clicking: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
