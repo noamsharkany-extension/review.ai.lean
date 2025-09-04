@@ -71,7 +71,7 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
         const prompt = this.buildSentimentPrompt(reviews);
         
         const response = await this.openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-5',
           messages: [
             {
               role: 'system',
@@ -305,7 +305,7 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
         const prompt = this.buildFakeDetectionPrompt(reviews);
         
         const response = await this.openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-5',
           messages: [
             {
               role: 'system',

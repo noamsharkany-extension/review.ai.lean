@@ -25,6 +25,9 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     samplingInfo: SampledReviews,
     originalReviewCount: number
   ): AnalysisResults {
+    
+    // Debug the array length mismatch issue
+    console.log(`[VERDICT-DEBUG] Array lengths - Reviews: ${reviews.length}, Sentiment: ${sentimentAnalysis.length}, Fake: ${fakeAnalysis.length}`);
     // Filter out fake reviews for scoring calculations but keep them for transparency
     const authenticReviews = this.filterAuthenticReviews(reviews, fakeAnalysis);
     const authenticSentiment = this.filterAuthenticSentiment(sentimentAnalysis, fakeAnalysis);
@@ -153,11 +156,18 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     sentimentAnalysis: SentimentAnalysis[], 
     fakeAnalysis: FakeReviewAnalysis[]
   ): { fakeReviewRatio: number; sentimentMismatchRatio: number; confidenceScore: number } {
-    const totalReviews = sentimentAnalysis.length;
+    // CRITICAL FIX: Use the maximum of both arrays to get the true total reviews count
+    // The issue was that we were using sentimentAnalysis.length as totalReviews
+    // but if fake analysis processed more reviews, the ratio would exceed 1.0
+    const totalReviews = Math.max(sentimentAnalysis.length, fakeAnalysis.length);
     
     // Calculate fake review ratio
     const fakeReviews = fakeAnalysis.filter(analysis => analysis.isFake).length;
     const fakeReviewRatio = totalReviews > 0 ? fakeReviews / totalReviews : 0;
+    
+    // Debug logging to trace the 141% issue
+    console.log(`[VERDICT-DEBUG] FIXED - Total reviews (max): ${totalReviews}, Fake reviews: ${fakeReviews}, Ratio: ${fakeReviewRatio}`);
+    console.log(`[VERDICT-DEBUG] Array lengths - Sentiment: ${sentimentAnalysis.length}, Fake: ${fakeAnalysis.length}`);
 
     // Calculate sentiment mismatch ratio (from all reviews, not just authentic ones)
     const sentimentMismatches = sentimentAnalysis.filter(s => s.mismatchDetected).length;
@@ -168,10 +178,17 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     const fakeDetectionConfidence = fakeAnalysis.reduce((sum, f) => sum + f.confidence, 0) / totalReviews;
     const confidenceScore = (sentimentConfidence + fakeDetectionConfidence) / 2;
 
+    // Fix the calculation - these should return 0-1 ratios, not percentages
+    const finalFakeRatio = Math.min(1.0, fakeReviewRatio); // Cap at 1.0
+    const finalMismatchRatio = Math.min(1.0, sentimentMismatchRatio); // Cap at 1.0  
+    const finalConfidenceScore = Math.min(1.0, confidenceScore); // Cap at 1.0
+    
+    console.log(`[VERDICT-DEBUG] Final ratios - Fake: ${finalFakeRatio}, Mismatch: ${finalMismatchRatio}, Confidence: ${finalConfidenceScore}`);
+    
     return {
-      fakeReviewRatio: Math.min(1.0, Math.round(fakeReviewRatio * 100) / 100), // Cap at 1.0 (100%)
-      sentimentMismatchRatio: Math.min(1.0, Math.round(sentimentMismatchRatio * 100) / 100), // Cap at 1.0 (100%)
-      confidenceScore: Math.min(1.0, Math.round(confidenceScore * 100) / 100) // Cap at 1.0 (100%)
+      fakeReviewRatio: finalFakeRatio, // Returns 0-1 ratio
+      sentimentMismatchRatio: finalMismatchRatio, // Returns 0-1 ratio
+      confidenceScore: finalConfidenceScore // Returns 0-1 ratio
     };
   }
 
