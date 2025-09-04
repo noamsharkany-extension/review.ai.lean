@@ -68,8 +68,22 @@ const ReviewCitationCard: React.FC<ReviewCitationCardProps> = ({
   isExpanded,
   onToggle
 }) => {
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
+  const formatDate = (date: Date | string) => {
+    // If it's already a string (like "5 months ago", "2 weeks ago"), return as-is
+    if (typeof date === 'string' && date.match(/\d+\s+(hour|day|week|month|year)s?\s+ago/i)) {
+      return date;
+    }
+    
+    // Handle Date objects and parseable date strings
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) {
+      // If it's a string that couldn't be parsed, return it as-is (for relative dates)
+      return typeof date === 'string' ? date : 'Recent';
+    }
+    
+    return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

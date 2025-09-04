@@ -154,7 +154,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       // Set locale formatting
       if (typeof Intl !== 'undefined') {
         const originalDateTimeFormat = Intl.DateTimeFormat;
-        Intl.DateTimeFormat = function(locale, options) {
+        Intl.DateTimeFormat = function(locale: any, options: any) {
           return new originalDateTimeFormat('en-US', options);
         } as any;
       }
@@ -182,7 +182,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       });
       
       // Block ALL clicks that might cause navigation
-      document.addEventListener('click', function(e) {
+      document.addEventListener('click', function(e): boolean {
         const target = e.target as HTMLElement;
         const href = target.getAttribute('href') || target.getAttribute('data-href') || '';
         
@@ -203,6 +203,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           e.stopImmediatePropagation();
           return false;
         }
+        
+        return true;
       }, true);
       
       // Block programmatic navigation attempts
@@ -823,7 +825,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             button.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
             // Click the button
-            button.click();
+            (button as HTMLElement).click();
             totalClicked++;
             
             console.log(`[MORE_BUTTON] Successfully clicked button ${i + 1}`);
@@ -967,284 +969,155 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           reviewText = bestText;
         }
         
-        // Aggressive Google Maps author extraction - multiple strategies
+        // Google Maps author extraction using the correct structure
         let authorName = 'Anonymous';
         
-        // Strategy 1: Common Google Maps author class patterns (most likely)
-        const authorSelectors = [
-          'div[data-review-id] .d4r55',           // Specific to review containers
-          'div[data-review-id] .TSUbDb',          // Alternative author class
-          'div[data-review-id] span[jsname]',     // JS component spans
-          'div[data-review-id] [data-value]',     // Data value attributes
-          '.jftiEf',                              // Common author class
-          '.fontBodyMedium',                      // Font styling classes
-          '.fontBodySmall',
-          '.fontHeaderMedium',
-          'span[class*="font"]',                  // Any font-related class
-          'div[class*="font"]'
-        ];
+        console.log(`[SCRAPER] DEBUG: Starting author extraction for container ${i + 1}`);
+        console.log(`[SCRAPER] DEBUG: Container HTML snippet:`, container.outerHTML?.substring(0, 300) + '...');
         
-        for (const selector of authorSelectors) {
-          const elements = container.querySelectorAll(selector);
-          for (const element of elements) {
-            let text = element.textContent?.trim() || '';
-            
-            // Skip empty or very short/long text
-            if (!text || text.length < 2 || text.length > 50) continue;
-            
-            // Skip obvious non-name patterns
-            if (text.includes('★') || text.includes('star') || text.includes('כוכב') ||
-                text.includes('ago') || text.includes('לפני') ||
-                /^\d+\s*(day|week|month|year|hour|min)/i.test(text) ||
-                text.includes('more') || text.includes('עוד') ||
-                text.includes('Local Guide') || text.includes('ממליץ מקומי') ||
-                /\d+\s*(review|ביקורת)/.test(text) ||
-                /^visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i.test(text)) continue;
-            
-            // Clean the text
-            text = text
-              .replace(/\s*ממליץ מקומי.*$/gi, '')
-              .replace(/\s*Local Guide.*$/gi, '')
-              .replace(/\s*\d+.*$/g, '') // Remove anything after numbers
-              .replace(/\s*·.*$/g, '')
-              .replace(/\s*\|.*$/g, '')
-              .trim();
-            
-            // Validate it looks like a proper name
-            if (text.length >= 2 && text.length <= 40 && 
-                /^[a-zA-Z\u0590-\u05FF][a-zA-Z\u0590-\u05FF\s.'-]*$/.test(text) &&
-                !/^(more|less|show|hide|click|the|and|or|of|in|at|to|for|with|by)$/i.test(text)) {
-              
-              authorName = text;
-              console.log(`[SCRAPER] Found author via selector "${selector}": "${authorName}"`);
-              break;
+        // Primary method: Look for the specific Google Maps name structure
+        // <div class="d4r55 fontTitleMedium">Name</div>
+        const nameElement = container.querySelector('.d4r55.fontTitleMedium');
+        console.log(`[SCRAPER] DEBUG: nameElement found: ${!!nameElement}`);
+        if (nameElement) {
+          const extractedName = nameElement.textContent?.trim() || '';
+          console.log(`[SCRAPER] Found name element with class d4r55 fontTitleMedium: "${extractedName}"`);
+          
+          if (extractedName.length >= 2 && extractedName.length <= 50) {
+            authorName = extractedName;
+            console.log(`[SCRAPER] ✅ Using extracted name: "${authorName}"`);
+          }
+        } else {
+          console.log(`[SCRAPER] No .d4r55.fontTitleMedium element found, trying fallback methods`);
+          
+          // Debug: Let's see what classes are actually in this container
+          const allDivs = container.querySelectorAll('div');
+          console.log(`[SCRAPER] DEBUG: Found ${allDivs.length} divs in container`);
+          let foundD4r55 = false;
+          for (let j = 0; j < Math.min(allDivs.length, 5); j++) {
+            const div = allDivs[j];
+            const className = div.className;
+            const text = div.textContent?.trim().substring(0, 50) || '';
+            console.log(`[SCRAPER] DEBUG: Div ${j + 1} classes: "${className}", text: "${text}"`);
+            if (className.includes('d4r55')) {
+              foundD4r55 = true;
+              console.log(`[SCRAPER] DEBUG: FOUND d4r55 class in div ${j + 1}!`);
             }
           }
-          if (authorName !== 'Anonymous') break;
-        }
-        
-        // Strategy 2: Look for clickable author elements (profile links, buttons)
-        if (authorName === 'Anonymous') {
-          const clickableElements = container.querySelectorAll('a, button, [role="button"], [data-href], [tabindex]');
-          for (const element of clickableElements) {
-            let text = element.textContent?.trim() || '';
-            
-            // Skip obvious non-names
-            if (!text || text.length < 2 || text.length > 40 ||
-                text.includes('★') || text.includes('star') || text.includes('כוכב') ||
-                text.includes('ago') || text.includes('לפני') ||
-                /more|less|show|hide|click|menu|button/i.test(text) ||
-                /^\d+$/.test(text) || // Just numbers
-                /^(review|ביקורת|photo|תמונה|video|וידיאו)$/i.test(text) ||
-                /^visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i.test(text)) continue;
-            
-            // Clean and validate
-            const originalText = text;
-            text = text
-              .replace(/\s*ממליץ מקומי.*$/gi, '')
-              .replace(/\s*Local Guide.*$/gi, '')
-              .replace(/\s*\d+.*$/g, '') // Remove anything after numbers
-              .replace(/\s*·.*$/g, '')
-              .replace(/\s*\|.*$/g, '')
-              .trim();
-            
-            if (text.length >= 2 && text.length <= 40 &&
-                /^[a-zA-Z\u0590-\u05FF][a-zA-Z\u0590-\u05FF\s.'-]*$/.test(text)) {
-              
-              authorName = text;
-              console.log(`[SCRAPER] Found author via clickable element: "${authorName}" (original: "${originalText}")`);
-              break;
-            }
-          }
-        }
-        
-        // Strategy 3: Aggressive text search within reasonable positioning
-        if (authorName === 'Anonymous') {
-          console.log(`[SCRAPER] Using aggressive text search for author`);
+          console.log(`[SCRAPER] DEBUG: Any d4r55 classes found: ${foundD4r55}`);
           
-          // Look for any text that could be an author name (positioned near rating)
-          const allTextElements = container.querySelectorAll('span, div, p, h1, h2, h3, h4, h5, h6');
-          const starRect = starEl.getBoundingClientRect();
-          
-          for (const el of allTextElements) {
-            const text = el.textContent?.trim() || '';
-            
-            // Must be reasonable name length and pattern
-            if (text.length < 2 || text.length > 40) continue;
-            
-            // Skip obviously non-name content
-            if (text.includes('★') || text.includes('star') || text.includes('כוכב') ||
-                text.includes('ago') || text.includes('לפני') ||
-                text.includes('review') || text.includes('ביקורת') ||
-                text.includes('more') || text.includes('עוד') ||
-                text.includes('Google') || text.includes('Map') ||
-                /^\d+$/.test(text) ||  // Just numbers
-                /^(a|an|the|this|that|with|and|or|but|if|then|when|where|why|how)$/i.test(text) ||
-                /^visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i.test(text) ||
-                text.length > 50) continue;
-            
-            // Check if it's positioned near the star rating (author names usually are)
-            try {
-              const elementRect = (el as HTMLElement).getBoundingClientRect();
-              const verticalDistance = Math.abs(elementRect.top - starRect.top);
+          // Fallback: Look for other name patterns in the button structure
+          const buttonElement = container.querySelector('button[jsaction*="reviewerLink"]');
+          console.log(`[SCRAPER] DEBUG: buttonElement found: ${!!buttonElement}`);
+          if (buttonElement) {
+            const nameDiv = buttonElement.querySelector('div.d4r55') || buttonElement.querySelector('[class*="d4r55"]');
+            if (nameDiv) {
+              const fallbackName = nameDiv.textContent?.trim() || '';
+              console.log(`[SCRAPER] Found fallback name in button: "${fallbackName}"`);
               
-              // If it's reasonably close to the star rating and looks like a name
-              if (verticalDistance < 100 && /^[a-zA-Z\u0590-\u05FF][a-zA-Z\u0590-\u05FF\s.'-]*$/.test(text)) {
-                // Final cleaning
-                const cleanText = text
-                  .replace(/\s*ממליץ מקומי.*$/gi, '')
-                  .replace(/\s*Local Guide.*$/gi, '')
-                  .replace(/\s*\d+.*$/g, '')
-                  .trim();
-                
-                if (cleanText.length >= 2 && cleanText.length <= 40) {
-                  authorName = cleanText;
-                  console.log(`[SCRAPER] Found positioned author: "${authorName}" (distance: ${verticalDistance}px)`);
-                  break;
-                }
+              if (fallbackName.length >= 2 && fallbackName.length <= 50) {
+                authorName = fallbackName;
+                console.log(`[SCRAPER] ✅ Using fallback name: "${authorName}"`);
               }
-            } catch (e) {
-              // Continue if positioning check fails
+            } else {
+              console.log(`[SCRAPER] DEBUG: No d4r55 div found in button`);
+            }
+          }
+          
+          // Final fallback: Look for any div with d4r55 class
+          if (authorName === 'Anonymous') {
+            const d4r55Elements = container.querySelectorAll('.d4r55');
+            console.log(`[SCRAPER] DEBUG: Found ${d4r55Elements.length} elements with d4r55 class`);
+            for (const el of d4r55Elements) {
+              const candidateName = el.textContent?.trim() || '';
+              console.log(`[SCRAPER] Checking d4r55 element: "${candidateName}"`);
+              
+              // Basic name validation - not too strict this time
+              if (candidateName.length >= 2 && 
+                  candidateName.length <= 50 && 
+                  !candidateName.includes('Local Guide') &&
+                  !candidateName.includes('reviews') &&
+                  !candidateName.includes('photos') &&
+                  !/^\d+$/.test(candidateName)) {
+                authorName = candidateName;
+                console.log(`[SCRAPER] ✅ Using d4r55 fallback name: "${authorName}"`);
+                break;
+              }
             }
           }
         }
         
-        // Enhanced date extraction using regex pattern matching from container text
+        console.log(`[SCRAPER] Final author name: "${authorName}"`)
+        
+        // Google Maps date extraction using the correct structure
         let reviewDate = 'Recent';
-        const containerText = container.textContent || '';
         
-        console.log(`[SCRAPER] Extracting date from container text (${containerText.length} chars) for author "${authorName}"`);
+        console.log(`[SCRAPER] DEBUG: Starting date extraction for author "${authorName}"`);
         
-        // Try to find date patterns in the container text directly using regex
-        const datePatterns = [
-          // "Visited in [Month]" patterns that appear in the results
-          /visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i,
-          // Hebrew relative patterns: לפני X שעות, לפני X ימים, לפני X חודשים  
-          /לפני\s+\d+\s*(שעות?|ימים?|חודשים?|שנים?)/,
-          // English relative patterns: X hours ago, X days ago, etc.
-          /\d+\s*(hour|day|week|month|year)s?\s+ago/i,
-          // Short relative patterns: 2h, 5d, 3w, 1m, 2y
-          /\b\d+\s*(h|d|w|m|y)\b/,
-          // Absolute dates with year
-          /\b\d{1,2}\/\d{1,2}\/\d{4}\b/,
-          // Month names with potential year
-          /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}/i
-        ];
-        
-        for (const pattern of datePatterns) {
-          const match = containerText.match(pattern);
-          if (match) {
-            reviewDate = match[0].trim();
-            console.log(`[SCRAPER] Found date pattern: "${reviewDate}"`);
-            break;
+        // Primary method: Look for the specific Google Maps date structure
+        // <span class="rsqaWe">5 months ago</span>
+        const dateElement = container.querySelector('.rsqaWe');
+        console.log(`[SCRAPER] DEBUG: dateElement (.rsqaWe) found: ${!!dateElement}`);
+        if (dateElement) {
+          const dateText = dateElement.textContent?.trim() || '';
+          console.log(`[SCRAPER] Found date element with class rsqaWe: "${dateText}"`);
+          reviewDate = dateText;
+        } else {
+          console.log(`[SCRAPER] No .rsqaWe element found, checking all spans for date patterns`);
+          
+          // Debug: Let's see what spans are actually in this container
+          const allSpans = container.querySelectorAll('span');
+          console.log(`[SCRAPER] DEBUG: Found ${allSpans.length} spans in container`);
+          let foundRsqaWe = false;
+          for (let j = 0; j < Math.min(allSpans.length, 10); j++) {
+            const span = allSpans[j];
+            const className = span.className;
+            const text = span.textContent?.trim().substring(0, 30) || '';
+            console.log(`[SCRAPER] DEBUG: Span ${j + 1} classes: "${className}", text: "${text}"`);
+            if (className.includes('rsqaWe')) {
+              foundRsqaWe = true;
+              console.log(`[SCRAPER] DEBUG: FOUND rsqaWe class in span ${j + 1}!`);
+            }
+            // Check for time patterns in any span
+            if (text.match(/\d+\s*(hour|day|week|month|year)s?\s+ago/i)) {
+              console.log(`[SCRAPER] DEBUG: Found date-like text in span ${j + 1}: "${text}"`);
+            }
+          }
+          console.log(`[SCRAPER] DEBUG: Any rsqaWe classes found: ${foundRsqaWe}`);
+          
+          // Fallback: Try to find date patterns in container text
+          const containerText = container.textContent || '';
+          console.log(`[SCRAPER] DEBUG: Searching in container text (first 200 chars): "${containerText.substring(0, 200)}"`);
+          const datePatterns = [
+            // English relative patterns: X hours ago, X days ago, etc.
+            /\d+\s*(hour|day|week|month|year)s?\s+ago/i,
+            // "Visited in [Month]" patterns
+            /visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i,
+            // Hebrew relative patterns: לפני X שעות, לפני X ימים, לפני X חודשים  
+            /לפני\s+\d+\s*(שעות?|ימים?|חודשים?|שנים?)/,
+            // Absolute dates with year
+            /\b\d{1,2}\/\d{1,2}\/\d{4}\b/,
+            // Month names with potential year
+            /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}/i
+          ];
+          
+          for (const pattern of datePatterns) {
+            const match = containerText.match(pattern);
+            if (match) {
+              reviewDate = match[0].trim();
+              console.log(`[SCRAPER] Found fallback date pattern: "${reviewDate}"`);
+              break;
+            }
+          }
+          
+          if (reviewDate === 'Recent') {
+            console.log(`[SCRAPER] DEBUG: No date patterns found in container text`);
           }
         }
         
         if (reviewText.length > 10) {
-          // Convert Hebrew/relative dates to actual Date objects
-          let actualDate = new Date();
-          if (reviewDate !== 'Recent') {
-            try {
-              // Parse Hebrew relative dates
-              if (reviewDate.includes('לפני')) {
-                const match = reviewDate.match(/(\d+)\s*(שעות?|ימים?|חודשים?|שנים?)/);
-                if (match) {
-                  const num = parseInt(match[1]);
-                  const unit = match[2];
-                  
-                  if (unit.includes('שעות')) { // hours
-                    actualDate = new Date(Date.now() - (num * 60 * 60 * 1000));
-                  } else if (unit.includes('ימים')) { // days
-                    actualDate = new Date(Date.now() - (num * 24 * 60 * 60 * 1000));
-                  } else if (unit.includes('חודשים')) { // months
-                    actualDate = new Date(Date.now() - (num * 30 * 24 * 60 * 60 * 1000));
-                  } else if (unit.includes('שנים')) { // years
-                    actualDate = new Date(Date.now() - (num * 365 * 24 * 60 * 60 * 1000));
-                  }
-                }
-              }
-              // Parse English relative dates
-              else if (reviewDate.includes('ago')) {
-                const match = reviewDate.match(/(\d+)\s*(hour|day|week|month|year)/);
-                if (match) {
-                  const num = parseInt(match[1]);
-                  const unit = match[2];
-                  
-                  switch (unit) {
-                    case 'hour': actualDate = new Date(Date.now() - (num * 60 * 60 * 1000)); break;
-                    case 'day': actualDate = new Date(Date.now() - (num * 24 * 60 * 60 * 1000)); break;
-                    case 'week': actualDate = new Date(Date.now() - (num * 7 * 24 * 60 * 60 * 1000)); break;
-                    case 'month': actualDate = new Date(Date.now() - (num * 30 * 24 * 60 * 60 * 1000)); break;
-                    case 'year': actualDate = new Date(Date.now() - (num * 365 * 24 * 60 * 60 * 1000)); break;
-                  }
-                }
-              }
-              // Enhanced date parsing for month names and temporal references
-              else {
-                // Handle "Visited in [Month]" patterns specifically
-                const visitedMatch = reviewDate.match(/visited in (January|February|March|April|May|June|July|August|September|October|November|December)/i);
-                if (visitedMatch) {
-                  console.log(`[SCRAPER] Parsing "Visited in Month" pattern: "${reviewDate}"`);
-                  const now = new Date();
-                  const currentMonth = now.getMonth();
-                  const currentYear = now.getFullYear();
-                  
-                  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                                   'July', 'August', 'September', 'October', 'November', 'December'];
-                  
-                  const monthIndex = monthNames.findIndex(m => m.toLowerCase() === visitedMatch[1].toLowerCase());
-                  
-                  if (monthIndex !== -1) {
-                    // If the month is in the future, assume it's from last year
-                    const targetYear = monthIndex > currentMonth ? currentYear - 1 : currentYear;
-                    actualDate = new Date(targetYear, monthIndex, 15); // Use middle of month as approximation
-                    console.log(`[SCRAPER] Converted "${reviewDate}" to date: ${actualDate.toISOString()}`);
-                  }
-                }
-                // Try to parse other month names - estimate current year and appropriate month
-                else {
-                  const monthMatch = reviewDate.match(/(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
-                  if (monthMatch) {
-                    const now = new Date();
-                    const currentMonth = now.getMonth();
-                    const currentYear = now.getFullYear();
-                    
-                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                                     'July', 'August', 'September', 'October', 'November', 'December'];
-                    const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    
-                    let monthIndex = monthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
-                    if (monthIndex === -1) {
-                      monthIndex = shortMonthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
-                    }
-                    
-                    if (monthIndex !== -1) {
-                      // If the month is in the future, assume it's from last year
-                      const targetYear = monthIndex > currentMonth ? currentYear - 1 : currentYear;
-                      actualDate = new Date(targetYear, monthIndex, 15); // Use middle of month as approximation
-                    }
-                  } else {
-                    // Fallback: try native Date parsing for any other format
-                    const parsedDate = new Date(reviewDate);
-                    if (!isNaN(parsedDate.getTime())) {
-                      actualDate = parsedDate;
-                    }
-                  }
-                }
-              }
-            } catch (error) {
-              console.log(`Error parsing date "${reviewDate}":`, error);
-            }
-          }
-          
-          // Final validation - ensure we never have Invalid Date objects
-          if (isNaN(actualDate.getTime())) {
-            console.log(`[SCRAPER] Warning: Could not parse date "${reviewDate}" for author "${authorName}", using current date as fallback`);
-            actualDate = new Date(); // Use current date as safe fallback
-          } else {
-            console.log(`[SCRAPER] Successfully parsed date "${reviewDate}" -> ${actualDate.toISOString()} for author "${authorName}"`);
-          }
+          // Keep dates as they appear in Google Maps (e.g., "5 months ago")
+          console.log(`[SCRAPER] Using date as-is from Google Maps: "${reviewDate}" for author "${authorName}"`)
           
           // Create more stable ID based on content
           const contentStr = `${authorName}_${reviewText}_${rating}`.substring(0, 100);
@@ -1261,16 +1134,14 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             rating: rating,
             text: reviewText,
             author: authorName,
-            date: actualDate.toISOString(), // Serialize to string for browser-to-node transfer
-            originalDate: reviewDate, // Keep original for debugging
+            date: reviewDate, // Use the date as-is from Google Maps
             position: i + 1,
             extractedAt: new Date().toISOString()
           };
           
           reviews.push(reviewObject);
           
-          console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - Date: ${actualDate.toISOString()} (original: "${reviewDate}") - "${reviewText.substring(0, 50)}..."`);
-          console.log(`[SCRAPER] Review object date type: ${typeof reviewObject.date}, value: ${reviewObject.date}`);
+          console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - Date: "${reviewDate}" - "${reviewText.substring(0, 50)}..."`);
           
           // Remove arbitrary limit - let the strategy decide how many reviews to collect
         }
@@ -1283,33 +1154,48 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     
     // Check button click stats from the browser context
     const buttonStats = await page.evaluate(() => {
-      return window.moreButtonStats || { total: 0, clicked: 0 };
+      return (window as any).moreButtonStats || { total: 0, clicked: 0 };
     });
     
     // Add backend logging to see the actual results
     console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
     
-    // Convert string dates back to Date objects and debug
-    const processedResult = result.map(review => ({
-      ...review,
-      date: new Date(review.date) // Convert ISO string back to Date object
-    }));
+    // Keep result as-is since dates are now strings from Google Maps
+    const processedResult = result;
     
     if (processedResult.length > 0) {
-      console.log('[Scraper-Backend] Sample of first review after processing:');
+      console.log('[Scraper-Backend] Sample of first review:');
       const firstReview = processedResult[0];
       console.log(`- Author: "${firstReview.author}"`);
-      console.log(`- Date: ${firstReview.date} (type: ${typeof firstReview.date})`);
-      console.log(`- Original Date: "${firstReview.originalDate}"`);
-      console.log(`- Date valid: ${firstReview.date instanceof Date ? !isNaN(firstReview.date.getTime()) : 'Not a Date object'}`);
-      console.log(`- Date ISO: ${firstReview.date instanceof Date ? firstReview.date.toISOString() : 'N/A'}`);
+      console.log(`- Date: "${firstReview.date}"`);
+      console.log(`- Text: "${firstReview.text.substring(0, 100)}..."`);
+      
+      // Add comprehensive name extraction statistics
+      const anonymousCount = processedResult.filter(r => r.author === 'Anonymous').length;
+      const namedCount = processedResult.filter(r => r.author !== 'Anonymous').length;
+      const successRate = ((namedCount / processedResult.length) * 100).toFixed(1);
+      
+      console.log(`[Scraper-Backend] Name Extraction Stats:`);
+      console.log(`- Total reviews: ${processedResult.length}`);
+      console.log(`- Named reviews: ${namedCount}`);
+      console.log(`- Anonymous reviews: ${anonymousCount}`);
+      console.log(`- Success rate: ${successRate}%`);
+      
+      // Show a few examples of extracted names (not Anonymous)
+      const namedExamples = processedResult.filter(r => r.author !== 'Anonymous').slice(0, 5);
+      if (namedExamples.length > 0) {
+        console.log(`[Scraper-Backend] Sample extracted names:`);
+        namedExamples.forEach((review, i) => {
+          console.log(`  ${i + 1}. "${review.author}"`);
+        });
+      }
     }
     
     this.log(`📋 More Button Stats: Found ${buttonStats.total} buttons, Clicked ${buttonStats.clicked} "more" buttons`);
     
     // Reset stats for next extraction
     await page.evaluate(() => {
-      window.moreButtonStats = { total: 0, clicked: 0 };
+      (window as any).moreButtonStats = { total: 0, clicked: 0 };
     });
     
     return processedResult;
