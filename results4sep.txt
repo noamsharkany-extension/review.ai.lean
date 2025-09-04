@@ -4,45 +4,45 @@ Analyze Google Reviews with AI
 Get trustworthy insights from Google Reviews with intelligent sampling, sentiment analysis, and fake review detection powered by OpenAI.
 
 Enter Google URL with Reviews
-https://www.google.com/maps/place/Jadis+et+Gourmande/@48.0758392,7.3559582,17z/data=!3m2!4b1!5s0x479165e66094fb65:0x7ed9ef5bcce7dedf!4m6!3m5!1s0x479165e667ffb10d:0xb8830cfe711be5b!8m2!3d48.0758392!4d7.3585331!16s%2Fg%2F1ts1r4gq?entry=ttu&g_ep=EgoyMDI1MDcyMy4wIKXMDSoASAFQAw%3D%3D
+https://www.google.com/maps/place/Anita/@32.0624616,34.7654576,17z/data=!4m16!1m9!3m8!1s0x151d4d00dc011e55:0xf9ff570a29af408c!2z16fXpNeUINeg15nXoNeU!8m2!3d32.0624616!4d34.7654576!9m1!1b1!16s%2Fg%2F11tjqhrnzg!3m5!1s0x151d4c9a39b9975f:0xa10966085028c7c0!8m2!3d32.062663!4d34.7664528!16s%2Fg%2F1tfd9hxq?hl=en&entry=ttu&g_ep=EgoyMDI1MDkwMi4wIKXMDSoASAFQAw%3D%3D
 Analyze Reviews
 Example URLs:
 • Google Maps: https://maps.google.com/place/...
 • Google Search: https://www.google.com/search?q=restaurant+reviews
 • Any Google page showing business reviews
 Analysis Complete
-Analyzed 262 reviews with 93% confidence
+Analyzed 278 reviews with 170% confidence
 
-8300%
+8400%
 Overall Score
 Analysis Verdict
 Overall Impression
-8300%
+8400%
 Based on sentiment analysis and review authenticity
 
 Trustworthiness
-8200%
+7900%
 Reliability of reviews and business reputation
 
 Red Flags
-5000%
+3500%
 Potential issues detected in reviews
 
 Analysis Overview
 Total Reviews
-262
+278
 All analyzed
 
 Fake Reviews
-58.0%
+141.0%
 Detected by AI analysis
 
 Sentiment Mismatches
-26.0%
+43.0%
 Rating vs text sentiment
 
 Confidence Score
-93%
+170%
 Analysis accuracy
 
 Trust Assessment
@@ -53,757 +53,254 @@ Quality Indicators:
 High fake review rate detected
 High analysis confidence
 Multiple red flags present
-Review Citations (154)
+Review Citations (50)
 Click any review to see detailed analysis
-Régine “Regt” TOTY
-15 hours ago
+Moran Musheev
+10 minutes ago
 Potentially Fake
-A place where you feel good. Reasonable prices. A good breakfast in a pleasant setting.
-
-Anonymous
-3 days ago
-⚠️AVOID LIKE THE PLAGUE⚠️ This Saturday, August 30, an incompetent employee I presume to be a "manager" did nothing but insult another employee and shouted loudly, "I don't give a damn about customers, I'm on a break." Thank you, that's nice, we won't be back then ☺️. "Yes, you don't know who I am." No, that's a very good question because to have such a head, I hope you're very high up, even if with behavior like that, it would surprise me a lot. So, atmosphere and service are ZERO, as far as the food is concerned, it could be better. But I'm telling you again, AVOID!!!
-
-Anonymous
-3 days ago
-What a journey to find an open tea room in Cochmar... uh Colmar in August! Between bakeries closed at 4 p.m. or robbed and shops on vacation, we found this little Cosi corner, perfect for a little gourmet break, pretty terrace, beautiful interior and ultra-gourmet tart! I recommend it! #Cochmar
-
-Anonymous
-4 days ago
-Good food with generous portions. Friendly service.
-
-Anonymous
-Edited a week ago
-Fast service, fresh food and their pies are very very generous, excellent, we love them.
-
-Anonymous
-a week ago
-Especially the quiche was very tasty (other dishes were more standard, but good in general)
-
-Anonymous
-a week ago
-Potentially Fake
-The food is a matter of luck: some are very good, others are cold salads with questionable flavor, especially for those accustomed to Italian cuisine. Wonderful cakes. Friendly service and a beautiful interior.
-
-Anonymous
-a week ago
-A nice surprise... good food and friendly service
-
-Anonymous
-a week ago
-We came by chance and were really not disappointed. The service is top notch, as is the smile of the staff. The food is delicious. The setting is typical of Alsace. We will be back.
-
-Anonymous
-2 weeks ago
-Very well located, in the heart of the city, with particularly pleasant staff. The dishes were generous, tasty, and of high quality, suitable for both adults and children. …
+Sentiment Mismatch
+Amala, what a refreshing ice cream and what a crazy selection of flavors!!! Stunning design, bomb fusion, we had a great time..
 
 Anonymous
 2 weeks ago
 Sentiment Mismatch
-Super good I was very well received, I recommend it
-
-Anonymous
-2 weeks ago
-Very well located in the old town, a very friendly welcome, and local dishes. I think it's also a bit like the local shopkeepers' canteen. I wanted to try the liver dumplings, and I didn't regret my choice—excellent!
-
-Anonymous
-2 weeks ago
-Potentially Fake
-We settled into this restaurant at the end of June for lunch. The terrace is pleasant and shaded, the service friendly, the food a bit expensive in terms of quality/price, everything was fine until our visit to the restroom. "Visit the …
-
-Anonymous
-2 weeks ago
-Very good local cuisine, very kind owners. I highly recommend it.
-
-Anonymous
-2 weeks ago
-Potentially Fake
-Even if we understand that a "children's menu" may be designed for younger children, categorically refusing an adult to order it remains absurd. A customer should be able to choose what they want from the menu, especially if they are paying …
-
-Anonymous
-2 weeks ago
-Potentially Fake
-Unfortunately, our experience was quite disappointing. We stopped to ask if the restaurant was open and if there was a table available. The waitress responded with repeated 'Bonjour, bonjour, bonjour, bonjour,' and continued speaking in …
-
-Anonymous
-2 weeks ago
-Potentially Fake
-Unfortunately , our experience was quite disappointing. We stopped to ask if the place was open and if a table was available. The waitress responded with repeated 'Bonjour, bonjour, bonjour,' continuing to speak French without trying to …
-
-Anonymous
-3 weeks ago
-Potentially Fake
-Everything is homemade, well done!
-
-Anonymous
-3 weeks ago
-Potentially Fake
-On August 6th, during our visit to Colmar, we attempted to have a meal at this restaurant. I initially informed a female staff member that our party consisted of six people. Shortly after, another friend from our group also mentioned to her …
-
-Anonymous
-Edited 3 weeks ago
-Potentially Fake
-On August 6th, when we visited Colmar, we wanted to dine at this restaurant. First, I told the female employee that there were six of us. Later, another friend from our group also informed her that we were six people. At that point, the …
-
-Anonymous
-4 weeks ago
-Potentially Fake
-Sentiment Mismatch
-Hello, We enjoyed the Jadis salad. It was delicious and very generous. …
-
-Anonymous
-4 weeks ago
-Potentially Fake
-Sentiment Mismatch
-Breakfast is served until 11:00. From 10:45, the lady told us that we couldn't order anything anymore. First of all, we were made to feel completely unwelcome. Furthermore, this woman prefers an empty terrace to a full one. She's …
-
-Anonymous
-4 weeks ago
-Potentially Fake
-Sentiment Mismatch
-Terrible service, the woman with the bun seemed eager to see us leave. We stood for five minutes in front of the sign that said we had to wait until someone arrived. Once someone did arrive, we were given a very unfriendly woman as a …
-
-Anonymous
-a month ago
-An iced tea and a slice of pie to die for. The service was very welcoming with a beautiful terrace. I recommend it.
-
-Anonymous
-a month ago
-Discovered by chance and we don't regret it at all, special mention for the delicious slices of pie
-
-Philippe Pleimelding
-a month ago
-SuperPrice per person€10–20… More
-
-Anonymous
-a month ago
-Quite busy in the early afternoon like most restaurants in the summer, but not too much of a wait for a table. The food wasn't too bad and the service was friendly.
-
-Anonymous
-Edited a month ago
-Interesting locationFood: 4Service:… More
-
-Anonymous
-a month ago
-Sentiment Mismatch
-I tried the "calf's liver quenelles" whose Alsatian name I can't write, and my wife the "meat pie", it was fantastic. Attentive, friendly service, for a reasonable price in high season. It was so generous that we took away the famous rhubarb tart to eat later.
+Ice cream is delicious, a large selection of flavors. The service is always very good. Clean and cozy. I recommend!
 
 Anonymous
 Edited 2 months ago
-Potentially Fake
-Fast service, but lukewarm food. An extra €2 Munster cheese isn't worth it. Very unwelcoming staff and a rude owner. I don't recommend it.
+Sentiment Mismatch
+There's nothing to say about the ice cream, it's not Golda, it's much more than Golda, I also like their coffee Unfortunately it closes at midnight even on Mochash, the selection of flavors is bigger than any Golda
 
 Anonymous
-2 months ago
-Potentially Fake
-Extremely rude staff. The establishment was not busy and apparently because we could not speak French they completely ignored us in favor of other patrons who arrived after us.
+Edited 2 months ago
+Sentiment Mismatch
+The ice cream is delicious, the atmosphere and style are nice. And here is coffee with the taste of coal.
 
-Anonymous
-2 months ago
-Potentially Fake
-Tourist trap and consequently a trap for Colmar residents! Avoid it in the summer; it's expensive and downright bad, prepared well in advance and reheated several times. Anything to make money during the tourist season!
-
-Anonymous
-2 months ago
-Potentially Fake
-Rude place, rude people, rude service. A hateful experience. If you dislike people we suggest closing.
-
-Anonymous
-2 months ago
-Reservation made for a group of 6 people almost 10 days before the date. We had asked for a table on the terrace. We were seated inside, the table against the counter with the added bonus of people at the end of the table. It was a …
-
-Anonymous
-2 months ago
-An excellent restaurant, very good atmosphere and delicious dishes, impeccable welcome and service.
-
-Anonymous
-2 months ago
-When I was there at 9pm, there was a light show on the wall of this restaurant. Most shops would have been closed by 8pm, but there were quite a number of tourists walking around in this area and at La Petite Venise.
-
-Anonymous
-3 months ago
-A wonderful culinary experience in the heart of Colmar. Friendly service even with a large crowd. The tarts deserve their name; they're generous and delicious. The white tart stood up very well with homemade whipped cream.
-
-Anonymous
-3 months ago
-...typically Alsatian, highly recommended! The service is very good 👍. …
-
-Anonymous
-3 months ago
-In a cozy atmosphere, enjoy a savory breakfast accompanied by a fresh homemade juice. The perfect way to start a day exploring Colmar.
-
-Anonymous
+Mitchell Roberts
 3 months ago
 Sentiment Mismatch
-Too bad, there must have been a miscommunication. Instead of the green asparagus and Emmental quiche I ordered, I was served asparagus with ham and, upon request, a green vegetable quiche. Both that and the salad were only lightly seasoned.
-
-Anonymous
-3 months ago
-I came to have a good time, but I witnessed an unacceptable scene: a waitress started shouting at a customer sitting right next to me, without any restraint. The tone, the aggression, everything was inappropriate and totally unjustified. …
-
-Full Review
-I came to have a good time, but I witnessed an unacceptable scene: a waitress started shouting at a customer sitting right next to me, without any restraint. The tone, the aggression, everything was inappropriate and totally unjustified. …
-
-Sentiment Analysis
-Detected Sentiment:
-Negative
-Confidence:
-9800%
-Authenticity Check
-Authenticity:
-Likely Authentic
-Confidence:
-9000%
-View Original Review
-Anonymous
-3 months ago
-My mother visited this café recently and received a very poor reception. Not knowing that it was forbidden to bring a croissant from another bakery, she was violently accosted by the waitress, who started yelling at her, aggressively …
+Excellent Gelato. Nice portions.
 
 Anonymous
 3 months ago
 Potentially Fake
-Very unfriendly staff and average food. We were served a salad with a slug in it. The waitress just said oh, and brought us a bill. No apologies, no offer to take it from the bill. Not a great experience.
-
-Anonymous
-3 months ago
-I had booked a month in advance for Easter Monday. Arrived in front of the restaurant at four, the restaurant was closed. Bad point. So I can't judge the rest. I remain very disappointed!
-
-Anonymous
-3 months ago
-Very good cafe au lait, salty plate was amazing!!!
-
-Anonymous
-3 months ago
-Very well located, very pleasant staff. The dishes are very tasty and the price is correct. Sufficiently large choice on the menu + table with suggestions of the day. …
-
-Anonymous
-4 months ago
-Potentially Fake
-The manager is unsavory. Everywhere around it was crowded. I told myself that I would sit quietly where it was empty without wondering why it was empty. I quickly understood.
-
-Anonymous
-4 months ago
-Potentially Fake
-Exceptionally rude. Made reservations before. They had us wait by the floor for 20 minutes before telling us the kitchen is closed and denying we had called in a reservation even after I showed the waitress their phone number on my phone and proof that I had called in a reservation. This is just not how you treat guests.
-
-Anonymous
-4 months ago
-Interesting visit and welcoming staff
-
-Anonymous
-4 months ago
-Excellent snack with a white tea and a nice portion of an excellent damson crumble, in an authentic and warm setting, and served by a very pleasant waiter. Perfect moment between friends, regulars of the place; a great discovery for me.
-
-Anonymous
-3 weeks ago
-Meal typeOtherPrice per person€10–20Food: 5Service: 4Atmosphere: 3Wait timeNo waitSeating typeIndoor dining area
-
-Anonymous
-4 months ago
 Sentiment Mismatch
-First time to Colmar, arrived late in the afternoon thinking to get lunch before restaurants closed by 2.30pm, was recommended by the apartment owner about this place specializing in Alsatian cuisine, saw it and rushed in, was unlucky to …
+It doesn't make sense that it takes more than fifteen minutes to get something.. The line is completely chaotic and people are served out of order. At least the ice cream is good..
 
 Anonymous
 4 months ago
-Sentiment Mismatch
-Formerly and gourmet name like their excellent grandmother-style tarts, generous and delicious. Perfect for a gourmet snack.
+Excellent service! Perfect mint watermelon ice cream
 
 Anonymous
+4 months ago
+Can't fault this place - we only had the yoghurt which had extremely nice sweet/sout taste, but the friendliness of the staff is beyond amazing.
+
+Yoni W
 5 months ago
-Sentiment Mismatch
-The food is absolutely incredible, the atmosphere is charming and cozy and the people are extremely friendly! The beautiful decor perfectly captures the fairy-tale feel of Colmar, making the experience even more special.
+Thanks for hosting us in your mamad ❤️
 
 Anonymous
-5 months ago
-Sentiment Mismatch
-Ideal place for afternoon tea in Colmar with delicious, homemade pies. Everything is taken care of. Warm welcome.
-
-Anonymous
-Edited a month ago
+11 months ago
 Potentially Fake
 Sentiment Mismatch
-Interesting locationFood: 4Service: 4Atmosphere: 4
+One of the best I've tried, fun atmosphere, good flavors, service, really good ice cream, in short, go here. The ice cream we tasted and ordered was vegan and excellent, and the coffee was very good, highly recommended.
 
 Anonymous
-6 months ago
+11 months ago
 Potentially Fake
-Glad this place is opened when very few are at early hours. Went inside and had a cafe viennois and croissant. Staff speaks English and friendly. There’s little dog napping on the bench under the sun which warms my heart in the cold weather. This place prefers to take cash.
-
-Anonymous
-7 months ago
-Potentially Fake
-A wonderful discovery, a lovely setting, a warm welcome, and Gérard's homemade pastries are a real treat for both the eyes and the stomach. A very comforting place.
+Sentiment Mismatch
+You’re entering a place that instead of nice attractive and tasty smells like chemicals. You’re buying ice cream and in front of you a guy is spraying some cleaning chemical on the counter. Really? But why? This is unhealthy and unpleasant
 
 Anonymous
 a year ago
-Beautiful place but very bad behaviour from the staff especially from the older lady .. we went there early in the morning during Christmas and I really wanted to catch a seat in front of the window to take some beautiful photos of the view outside etc for my blog for Colmar.. when we reached there the front seats were taken but we sat in the second row waiting for someone to leave and change seats. First of all they didn’t come to take our order even though we were right next to the bar , and when after a long time , they finally brought the order , the table in front became available so we took our coffees and changed . They came to us and even though we had already sat in the other table with our stuff , coats, bags etc, they forced us to move back to our previous seats !! This is the first time this happened to me .. I understand that they may don’t want to carry our food and drinks in some restaurants and change seats but in this case we had just received our order and we carried it by ourselves and anyway we were already in the new seats . It was very rude to ask as move back again Anyway we didn’t say anything even though we felt embarrassed in front of everyone . Then when we finally wanted to leave , I asked for the bill about 3 times as we had to go and they keep laughing and talking with other costumers so I went to the cashier in order to pay as we had to leave quickly and guess what .. SHE ASKED ME FOR THE SECOND TIME to go back to my table because they won’t let me pay on the cashier , only at the waiter on my table The worst experience in the whole Colmar and Strasbourg . 👎👎👎
+Potentially Fake
+It's the best ice cream i've ever had. And i ate a LOT of ice cream in my life. Macadamia is just crazy and it's high quality dairy, really rich 👌🏼 …
+
+Anonymous
+a year ago
+Sentiment Mismatch
+Very large spectrum of différent parfum... Fast service... Very tasty and fresh.. A little bit e pensive... But thé Best icecream
+
+Anonymous
+a year ago
+The most delicious ice cream in Israel by far!
+
+Marco Rapp
+a year ago
+Best ice cream I’ve ever had - salted cashew is to die for 🤤 …
+
+Anonymous
+a year ago
+Excellent ice cream, not commercialized, delicious and strong coffee. Neve Tzedek of course makes everything more pleasant, location location.
 
 Anonymous
 2 years ago
-I had a reservation. I am a single older woman. As I have discovered in other places, if you are by yourself you are put in the worse seats away from the sunny windows and best seats. It was obvious I was not a valued customer. Just because I am older and by myself it does not mean I should not have a choice seat. I advise others to avoid these restaurants. Shame on you. And, the steak was not good. Way too tough.
-
-Anonymous
-2 years ago
 Potentially Fake
-Absolutely disgusting place. The old lady there with the fake smile is rude with everyone. …
-
-Anonymous
-a year ago
-Potentially Fake
-Very poor service. I'm intolerant to lactose. Asked for a oat milk coffee. The lady with braids served me an ordinary milk coffee. When I pointed it out and said a person who is intolerant can feel sick after drinking milk, she reacted very …
-
-Anonymous
-a year ago
-Potentially Fake
-We tried to have dessert and a coffee. They just didn't want to serve us because they were serving full lunch only (we were 4 people so it wasn't going to be a 5€ bill). …
-
-Anonymous
-a year ago
-Potentially Fake
-We just had the worst experience in this restaurant. After reading the reviews I see that it’s not their first time violently attacking customers. My girlfriend went inside the restaurant to ask if we can have the table outside rather than …
-
-Anonymous
-a year ago
-Potentially Fake
-Sentiment Mismatch
-Never visit this place especially with kids. They are not welcome there! We have traveled all over the world but this place is my biggest disappointment. The owner/manager repeatedly pushed me and my pregnant friend out and wouldn't …
-
-Anonymous
-8 months ago
-Potentially Fake
-Sentiment Mismatch
-Not a good experience, we went there for breakfast and they cannot handle a full restaurant, we waited for our breakfast a long time and they brought the meals bit by bit, the only quality was the ambience. Rude employees!
-
-Anonymous
-a year ago
-Potentially Fake
-Sentiment Mismatch
-The worts service in Colmar. Do not come here for coffee or lunch. The staff is very impolite, rude, and annoying. They make you feel uncomfortable with their attitude. The waitress did not let me finish the coffee. She asked two times if I …
-
-Anonymous
-Edited a year ago
-I stayed there 10 minutes sitting outside. But they just cleaned up my table when I went to the toilet without a word. I haven't even paid yet. And I was in the the toilet like 2~3 minutes......Im not sure its just culture or a mistake or because I was a solo Asian.
-
-Anonymous
-6 years ago
-Sentiment Mismatch
-So rude. Obviously this establishment doesn’t care for tourist. We went in for morning coffee and before we had a chance to ask a question the waitress (very short blonde hair) turned to me and said “just wait! I see you!!!” In a harsh …
-
-Anonymous
-a year ago
-Potentially Fake
-Sentiment Mismatch
-Don't even think about visiting this place in Colmar. Very rude owner, arrogant, aggressive. Children are not welcome, customers too. They shout and push the customers. The owner and old lady, my be his mother spoiled our vacation.
-
-Anonymous
-7 years ago
-Potentially Fake
-Sentiment Mismatch
-The service is horrible and hostile. The lady servicing us made us wait ages to serve, and her attitude was incredibly hostile. My niece was holding the sugar container to look at it and she snatched it violently from her hands as if she …
+Extremely lousy service! I had to wait for several minutes at the counter, before the employees stopped chit-chatting among themselves and begore they asked whether I wanted to order something. By that time my desire for gelato had vanished ...
 
 Anonymous
 3 years ago
 Potentially Fake
-Sentiment Mismatch
-If you are a non European citizen you are not welcomed here! We were harshly expelled from this place by the waitress with short blonde hair under the justification that our vaccine certificate is not valid here, although …
+Didn't eat the ice cream but the place was attractive and clean. Surrounding neighborhood of Neve Tzedek is very nice. Too bad they're don't have kosher certification.
 
 Anonymous
-a year ago
+2 years ago
 Potentially Fake
-Sentiment Mismatch
-Rude people is an understatement... lets expel customers (even babies) that did not see their stop sign that says they should wait outside in the cold and rain while there are plenty of places inside
+Bad service and very poorly organized. I queued for more than 10 min. Everyone jumping the line. A good mess! Guys, put some order in there! 👎🏻👎🏻👎🏻👎🏻 …
 
-Anonymous
-a year ago
-Potentially Fake
-Sentiment Mismatch
-Food is delicious, but the service of few waitresses was very bad. One waitress (an old lady) was extremely rude and racist.
-
-Anonymous
-5 years ago
-Potentially Fake
-My friend and I were sight-seeing the beautiful city of Colmar and stopped by this caffe for a coffee and dessert. We entered the establishment and this blonde waitress greeted us in French. Seeing than neither of us spoke French, we told …
-
-Anonymous
+Peter Ferstendik
 3 years ago
-Potentially Fake
-Very bad experience. We were waiting for the table at 4.00pm and the restaurant closes at 6 pm. The staff was so rude, they yelled “the kitchen is closing” to us. We can feel they are very racists as they didn’t do the same to other people who were waiting there at the same time.
-
-Anonymous
-a year ago
-Potentially Fake
-Terrible restaurant. A violent team. They violently attacked my daughter and made her cry. Look, there were many such cases in the past
-
-Anonymous
-3 years ago
-Potentially Fake
-Not friendly to tourists. Stopped in for a morning coffee, with our CDC covid passes (print) and was harassed for not having them converted to digital, French passes. …
-
-Anonymous
-a year ago
-Potentially Fake
-She treat me so bad for asking a salad with tomato (because it is not the season) that frankly I hope that no one has to deal with a such an ugly situation where you are just simply asking for something to eat.
-
-Anonymous
-4 years ago
-Potentially Fake
-Very unfriendly waitress. We were with 2, one of us didn’t feel like eating but wanted only a drink. She didn’t want to serve us and ask us to leave. It is strange that you’re not allowed to have a drink as there were free tables available.
-
-Anonymous
-4 years ago
-Potentially Fake
-Over rated. Food was not delicious at all compared to other similar restaurants. Service was awful. Staff very rude. It's better to go to other local restaurants. NOT RECOMMENDED!
-
-Anonymous
-a year ago
-Potentially Fake
-Never visiting again! One among the oldest staff there was extremely rude and racist. Regret visiting the place big time!
-
-Anonymous
-a year ago
-Potentially Fake
-Poor Service: One among the oldest staff was super rude and seemed racist. Never going again!
-
-Anonymous
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-It looked so nice. However, the service personal was very unfriendly. I DONT recommend it.
-
-Anonymous
-3 years ago
-Potentially Fake
-Sentiment Mismatch
-Just let us stand there and didn't tell us that they could not help us with a table. Very unfriendly.
-
-Anonymous
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-No service, arrogant waitress. Not a place for a breakfast in here.
-
-Anonymous
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-If you are a foreigner I really please you don’t try to wait for the line , because you are always be the next and next one will not be you ! So DON’T WASTE YOUR TIME !
-
-Anonymous
-a year ago
-Potentially Fake
-worst restaurant! You can get poisoned here!
-
-Anonymous
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-The waitress very-bad in with us We are leaving directly
-
-Atınç Gökyer
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-Waiters are too arrogant. Deffinetly not suggested.
-
-Anonymous
-5 years ago
-Potentially Fake
-Sentiment Mismatch
-Food is reaaaaally no good.. just watery and completely unflowered... bähhhh
-
-Anonymous
-6 years ago
-Potentially Fake
-Sentiment Mismatch
-Coffee is absolutely terrible, one of the worst I have had in my life.
-
-Anonymous
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-Staff with bad attitude, make you feel unwelcome
-
-Justyna Jurkowska
-2 years ago
-Potentially Fake
-Sentiment Mismatch
-Service rude and arrogant. I do not recommend.
-
-Anonymous
-3 years ago
-Terrible coffee from a machine, overpriced, and they were 'out of food'.
-
-Anonymous
-3 years ago
-Sentiment Mismatch
-They said its full, when 90% of the tables were free.
-
-Bogdan Maftei
-Edited a year ago
-Potentially Fake
-Very rude staffFood: 2Service:… More
-
-Dilay Cansever
-2 years ago
-Potentially Fake
-They are very rude to customers!
-
-Nikiforos Primos
-3 years ago
-Potentially Fake
-Very rude staff. Avoid this place
-
-Merve Onarlı
-a year ago
-Potentially Fake
-Staff is rudeFood: 1Service:… More
-
-Ares
-2 years ago
-Potentially Fake
-They are rudeService: 1Atmosphere:… More
-
-Myriam Ibrahim
-a year ago
-Potentially Fake
-Rude staffServiceDine in
-
-Anonymous
-a year ago
-A disaster. We order food, the waiter comes to see us to tell me that he has nothing left of what we ordered... very very very expensive! Not even a goodwill gesture. For the quality and quantity. We are very disappointed, such a shame! Poor quality service.
-
-Anonymous
-a year ago
-Potentially Fake
-the place is horrible. the staff made our children cry. in the photo, he is a man who went so far as to commit suicide and who deserved to be arrested. extremely aggressive and sick person. insulted the people waiting in line. the neighbors …
-
-Anonymous
-8 months ago
-Potentially Fake
-15 minutes before closing we (the couple) very politely asked to be seated at a table for four. The waitress's answer: she will decide where we sit. And she simply showed us the door. Her impudence and commanding tone simply discouraged us. …
-
-Anonymous
-7 months ago
-Beware of scams! On the table, a small slate reads "30cl mulled wine €4.20." We order two. We are served a small 20cl glass. We make a nice little remark at the end of the meal. Without any qualms, the waitress brings us the bill without change; I find that really inflated. Do we have to be unpleasant?
-
-Anonymous
-10 months ago
-Potentially Fake
-Sentiment Mismatch
-Really nice, the food delicious, but the landlady's behavior was so abysmal that I can only give it one star. Okay, apparently it's the house rule that every guest has to eat a full portion. Sorry, we didn't know that. A little tip for the …
-
-Anonymous
-a year ago
-We booked a table in advance for five people, the place was packed, so we waited patiently outside for them to prepare the table for us. The table they reserved for us was inside and a table outside had just become available and it was very …
-
-Anonymous
-8 months ago
-Potentially Fake
-The food is very bad, we have a bottle, we can have a brioche from the previous day. The food is very bad, the juices are bottled, they offered us a brioche from the …
-
-Anonymous
-a year ago
-The ambiance and food were good, but the service was very unfriendly. When asked, we couldn't get butter for breakfast (the bread came without) because it apparently wasn't available in a single piece. And in the end, they wouldn't even let …
-
-Anonymous
-8 months ago
-Potentially Fake
-Very rude staff. Don't ask them any questions or you'll disturb them! (Welcome and service). The service was not done in order, so we missed the dishes on offer. It's a shame because the decor was very nice. A very bad experience!!
-
-Anonymous
-a year ago
-Bad company policy, 4 out of 6 people eat main courses 2 only want dessert. According to the boss, this is not possible, dessert is only available after the main course. For the two who don't eat, we have to pay a flat rate of 6 euros each, even though we ordered desserts.
-
-Anonymous
-a year ago
-I booked a table by phone on Saturday 2nd at 12.23 with a very kind gentleman who made the reservation for a friend going to the Christmas market. Because of the snow, the driver of his bus informed her that he would be between 10 and 15 …
-
-Anonymous
-2 years ago
-Potentially Fake
-Out of three visits to this superb establishment (a shame), three long waits, and two reprimands from the staff... Simply because there are three staff members present: one who makes drinks, one …
-
-Anonymous
-2 years ago
-Potentially Fake
-Coming for a drink, a welcome that leaves something to be desired. The staff seemed very overwhelmed to me without it being crowded. Once at the table, we saw other people sitting down and being served before us. After a good fifteen minutes without anyone cleaning the table or taking our order, we decided to go elsewhere.
-
-Anonymous
-a year ago
-Potentially Fake
-We went into this restaurant because the atmosphere seemed nice. It was fine until we started eating, but the problem started when we asked the busy waitress for the bill. …
-
-Anonymous
-2 years ago
-Potentially Fake
-I confirm what my friend said; I will never again set foot in this restaurant, which gives Alsace and its usually friendly welcome a bad reputation. …
-
-Anonymous
-2 years ago
-I ate in this restaurant several times 4/5 years ago when I was working in Colmar. I always had good memories of this establishment. We wanted to introduce this restaurant to friends coming from Nice who wanted to discover a typical …
-
-Anonymous
-a year ago
-Potentially Fake
-The attention is rude and unpleasant. The waitress practically told us to leave when my daughter told her she was vegan. It is curious that in a city that lives off tourism, they serve in this way. I recommend not going
+The rudest owner in the whole of Tel Aviv and does not care.
 
 Anonymous
 Edited 3 years ago
+Potentially Fake
 Sentiment Mismatch
-Today, I went out with my family (four people) without a reservation. We waited 30 minutes in front of the main entrance. The employee at the main entrance showed no respect for the queue and repeatedly let people in behind us without a …
-
-Anonymous
-2 years ago
-Sentiment Mismatch
-We had dinner on December 2, 2022 following the many positive reviews (4 adults and 1 7 month old baby). We had our child in the stroller but unfortunately the stroller was prohibited in the restaurant even though we could fold it and we …
+Very bad After several times we came specially. We were on a Friday night …
 
 Anonymous
 2 years ago
 Potentially Fake
 Sentiment Mismatch
-We can only agree with the racist comments. After we were ignored by 4 service staff standing behind the bar, and didn't want to take up a large table, we sat down at a small table and added …
-
-Anonymous
-2 years ago
-Sentiment Mismatch
-The waitress's treatment was horrible. It was an unheard-of lack of respect; nothing like this had ever happened to us before. While I was paying, my wife went inside to get out of the heat (we were on the …
-
-Anonymous
-7 years ago
-Potentially Fake
-Sentiment Mismatch
-If the meringue tarts are good and high, they do not live up to the unpleasant attitude of the staff! People are greeted with a grimace and placed on top of each other at tables. No napkins or sugar offered and beware of those who would …
-
-Anonymous
-8 months ago
-Sentiment Mismatch
-The juice was definitely not natural at all. They served us brioche from the day before... definitely not the best place for breakfast in Colmar.
-
-Anonymous
-Edited a year ago
-Potentially Fake
-Sentiment Mismatch
-Very rude staffFood: 2Service: 1Atmosphere: 2
+I received shocking treatment, the ice cream is not good enough to convey the bitter taste of the behavior of one of the employees We will not return
 
 Anonymous
 2 years ago
 Potentially Fake
 Sentiment Mismatch
-I gave it one star because it was supposed to be one, but this establishment isn't even worth it! You can't choose your table... "Sit at the end of the table, over there!" It was an order because if someone else arrives, you have to keep …
-
-Krista Breaux
-8 months ago
-Came for lunch with a group of 7 and really enjoyed ourselves. The food was good but not great, but we were looking for Alsatian food and a cozy winter vibe (we were there for the Christmas market) and this place was perfect. The service was also top notch. Our server was warm and friendly. Best thing we ordered was the osso buco (was on the "specials" chalkboard)!
-
-Anonymous
-8 months ago
-Visited Colmar for the first time. While searching for a place to have breakfast, we saw Jadis et Gourmande, a place with an amazing Christmas decoration!! The place is cozy and well decorated, you can feel the Christmas vibes wherever you look. The staff is very friendly and the breakfast was delicious. If you’re going to Colmar, I highly recommend to try this magical place!🎄
-
-Anonymous
-8 months ago
-Great service, great food. Love everything we ordered. Excellent Alsatian cuisine for those who want to try.
-
-Anonymous
-6 years ago
-Lovely atmosphere. There are teddy bears of all shapes and sizes in every corner which is quite charming. The food and service was good; recommend the goat cheese salad. The desserts looked amazing! The wait staff spoke German and English in addition to French, however, only French menus were available.
-
-Anonymous
-6 years ago
-Came upon this gorgeous cafe after wondering around the Colmar Christmas markets. Our hands and feet were freezing and this place was so cozy and warm !! We took a seat by the window and the service was so quick and friendly. We had tea and coffee served in gorgeous cups and a slice of the most delicious blueberry pie I’ve ever tasted !!! The cafe itself has quaint decor inside and from outside looks so traditional, would highly recommend a visit :)
+Terrible service. We waited in line for 15 minutes and still didn't buy ice cream. People are served based on the principle of who is louder and more impudent, when I told the workers that people who came later than us were ordering, and we …
 
 Anonymous
 3 years ago
-Staff was attentive and spoke good English. We felt welcomed at all times and food was pretty good. Would recommend for tourists!
+Expensive and not tasty ice cream, unfortunately in Israel they make interest from any brand on Instagram, they should learn to make ice cream from the Italians, or the French.
 
 Anonymous
-2 years ago
-Lovely place, amazing food, but long queue at lunch hours.
+5 years ago
+Potentially Fake
+Really bad and disgusting ice cream. Not worth the investment. I threw it away in the middle because it didn't taste good. The place stinks and is crowded with people and not clean. The same taste as Golda's, not tasty at all.
 
 Anonymous
-2 years ago
-Awesome breakfast spot, great omelet and pastries, and a very cosy, cabin-like atmosphere
+6 years ago
+There are those in every city, only they call it Golda.. What's the difference? Beyond that, the service is really unpleasant
+
+Anonymous
+4 years ago
+Potentially Fake
+Sentiment Mismatch
+We ate pizza without cheese, salty sauce, we paid a lot, in short, disappointment
+
+Anonymous
+6 years ago
+Potentially Fake
+Sentiment Mismatch
+The worst ice cream. Expensive for no reason. Waste of money 🤪 …
 
 Anonymous
 2 years ago
 Potentially Fake
 Sentiment Mismatch
-Delicious cakes and beary environment :D merci beacoup:) Check the kitchen times, was closed in eve
+After 10 minutes, no one came to even bring us the card. Then we left.
 
 Anonymous
-2 years ago
-Delicious croissant and coffee ☕
-
-Anonymous
-9 years ago
-Great place to stop for a coffee and pie in the afternoon. Really cute and typically Alsacian too.
-
-Anonymous
-a year ago
-Afternoon sweet and coffee were great. Cozy building.
-
-Anders Jakobsen
-a year ago
-Potentially Fake
-Good food, friendly staff.
-
-David Haasnoot
-2 years ago
-Potentially Fake
-Great cake & coffeeServiceDine in… More
-
-Anonymous
-3 years ago
-Potentially Fake
-We stopped here for breakfast. It was reasonably priced and the service was good.
-
-annie c:
-6 years ago
-LOVE LOVE LOVEEEEE THIS PLACE !!
-
-Anonymous
-7 years ago
-Potentially Fake
-Loved the old teddy bears and the coffee and the little biscuits heart shaped
-
-Anonymous
-5 years ago
-We stopped in for some Hot Chocolate after shopping at the Christkindl Market
-
-Cuneyt Koc
-8 months ago
-Lovely place for breakfast
-
-Anonymous
-5 years ago
-A nice atmosphere ! Cozy sitting and great sweets
-
-Paula Carciuc
-6 years ago
-Decorations are very nice and original. Totally recommend.
-
-Pieter Gheysens
-5 years ago
-Lovely concept. Delicious food!
-
-Louis Tyson
-3 years ago
-Super service - dog friendly
-
-Robert Luh
 8 years ago
-Excellent tea/coffee and cake
+Potentially Fake
+Sentiment Mismatch
+Ice cream for display only, there is nothing more to it
 
-Pietro Bianchi
+Anonymous
+7 years ago
+Potentially Fake
+Sentiment Mismatch
+A really disgusting place, not recommended at all.
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+Personally, I didn't like their ice cream.
+
+Anonymous
 6 years ago
 Potentially Fake
-Food and staff really super top!!!!
+Sentiment Mismatch
+Disrespectful service and expensive price
 
-Fabienne B.
-6 years ago
-Rustic calmness in the middle of touristy Colmar.
+p. b69
+4 years ago
+Sentiment Mismatch
+Great place, great taste
 
-M.C. Mercer, IV
+Anonymous
+5 years ago
+Potentially Fake
+Sentiment Mismatch
+Hello Alon🍦, First we thank you for your response and for taking the time to write to us. And as part of the "20th anniversary of Anita" celebrations, we are interested … More
+
+Anonymous
+5 years ago
+Potentially Fake
+Sentiment Mismatch
+Hello Yoel🍦, First of all, we thank you for your response and for taking the time to write to us. … More
+
+Anonymous
+Edited 5 years ago
+As part of a tour with tourists in the flea market, we sat down to have a snack. Menu also in English 👍 Pleasant and courteous service. It was delicious …
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+So happy I left my room at 10pm to get Anita's. Only thing to make this better would be a waffle bowl instead of a cone. But I will definitely take what I can get if it means getting more. So worth the walk because all gelato is not created equal and they prove it.
+
+patricia vergara
+2 years ago
+D E L I C I O U S !!! A nice place where You can take a relax moment ..
+
+Anonymous
 6 years ago
-Nice cafe with a friendly staff
+Since I'd visited this cafe for the first time, I started to frequent the place almost daily. The ice-cream is great, and the staff are really nice and friendly - we always share a smile and a bit of chit-chat whenever I come. …
+
+Anonymous
+8 years ago
+Potentially Fake
+Best ice cream in town, but crowded on weekends and evenings. We had a delicious yogurt :)
+
+Anonymous
+6 years ago
+Potentially Fake
+One of the best ice creams in tel aviv itself and Israel in general. This magical place has a veraity and selection of over 100 flavors of ice cream. My favorite is black forest (with a hit of Rum) and Pavlova. Not for ice scream lovers only! For everyone. Go for it!
+
+Anonymous
+3 years ago
+Probably the best ice cream I ever had! The place is usually very busy, but worth to wait. “dark forest” is a flavor you must try!
+
+Anonymous
+5 years ago
+Yogurt is great, they array of toppings and sauces is amazing and we found that they were generous adding toppings you get to choose to put on your cup of yogurt. Also very child friendly and very helpful, courteous staff who want you to leave satisfied!
+
+Aharoni Zisling
+3 years ago
+Excellent little coffee and ice cream shop
+
+Anonymous
+6 years ago
+This is one of Tel Aviv's best ice cream shops. They have a number of locations around the south part of the city including this one and Florentine neighborhood. The ice cream is really excellent and the flavor options are wide. There's even a nod to Tel Aviv's vegan community with really tasty sorbets.
+
+Anonymous
+6 years ago
+They make very nice flavor mixes that’s sure to meet everyone’s taste! We had the medium cups (overflowing with 3 ice cream flavors) and almost didn’t have room for dinner. You also get to try different flavors with very patient servers who give their suggestions.
+
+Anonymous
+7 years ago
+Anita has the best gelato I've had in Israel! Vegan dark chocolate = my favourite. Lots of different creamy, cookie, and fruity flavours and they're happy to let you try first to decide what you like best.
+
+Anonymous
+6 years ago
+Potentially Fake
+Very dangerous gelato shop in Tel Aviv, so many mouthwatering flavours of ice cream, including vegan and sugar free to choose from. Avoid if on diet, don't miss it if you want a sensational taste experience.
+
+Anonymous
+4 years ago
+A unique ice cream , I recommend
 
 Show Less

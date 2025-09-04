@@ -71,11 +71,11 @@ export const ResultsArea: React.FC<ResultsAreaProps> = ({
           <div>
             <h2 className="text-2xl font-bold mb-2">Analysis Complete</h2>
             <p className="text-blue-100">
-              Analyzed {results.sampling.totalReviews} reviews with {(results.analysis.confidenceScore * 100).toFixed(0)}% confidence
+              Analyzed {results.sampling.totalReviews} reviews with {Math.min(100, Math.round(results.analysis.confidenceScore * 100))}% confidence
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">{Math.round(results.verdict.overallScore * 100)}%</div>
+            <div className="text-3xl font-bold">{Math.max(0, Math.min(100, Math.round(results.verdict.overallScore)))}%</div>
             <div className="text-blue-100 text-sm">Overall Score</div>
           </div>
         </div>
@@ -123,19 +123,19 @@ export const ResultsArea: React.FC<ResultsAreaProps> = ({
           />
           <MetricCard
             title="Fake Reviews"
-            value={`${(results.analysis.fakeReviewRatio * 100).toFixed(1)}%`}
+            value={`${Math.min(100, (results.analysis.fakeReviewRatio * 100)).toFixed(1)}%`}
             subtitle="Detected by AI analysis"
             trend={results.analysis.fakeReviewRatio > 0.1 ? 'negative' : 'positive'}
           />
           <MetricCard
             title="Sentiment Mismatches"
-            value={`${(results.analysis.sentimentMismatchRatio * 100).toFixed(1)}%`}
+            value={`${Math.min(100, (results.analysis.sentimentMismatchRatio * 100)).toFixed(1)}%`}
             subtitle="Rating vs text sentiment"
             trend={results.analysis.sentimentMismatchRatio > 0.15 ? 'negative' : 'positive'}
           />
           <MetricCard
             title="Confidence Score"
-            value={`${(results.analysis.confidenceScore * 100).toFixed(0)}%`}
+            value={`${Math.min(100, Math.round(results.analysis.confidenceScore * 100))}%`}
             subtitle="Analysis accuracy"
             trend={results.analysis.confidenceScore > 0.8 ? 'positive' : results.analysis.confidenceScore > 0.6 ? 'neutral' : 'negative'}
             highlight={results.analysis.confidenceScore > 0.9}

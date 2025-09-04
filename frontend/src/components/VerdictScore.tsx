@@ -13,33 +13,38 @@ export const VerdictScore: React.FC<VerdictScoreProps> = ({
   description,
   isInverted = false
 }) => {
-  // Convert score (0-1) to percentage
-  const percentage = Math.round(score * 100)
+  // Score is already 0-100, so just ensure it's within bounds
+  const percentage = Math.max(0, Math.min(100, Math.round(score)))
   
   // Determine color based on score and whether it's inverted
+  // Convert score from 0-100 to 0-1 for color calculations
   const getScoreColor = (score: number, inverted: boolean) => {
-    const effectiveScore = inverted ? 1 - score : score
+    const normalizedScore = score / 100
+    const effectiveScore = inverted ? 1 - normalizedScore : normalizedScore
     if (effectiveScore >= 0.8) return 'text-green-600'
     if (effectiveScore >= 0.6) return 'text-yellow-600'
     return 'text-red-600'
   }
 
   const getProgressColor = (score: number, inverted: boolean) => {
-    const effectiveScore = inverted ? 1 - score : score
+    const normalizedScore = score / 100
+    const effectiveScore = inverted ? 1 - normalizedScore : normalizedScore
     if (effectiveScore >= 0.8) return 'bg-green-500'
     if (effectiveScore >= 0.6) return 'bg-yellow-500'
     return 'bg-red-500'
   }
 
   const getBackgroundColor = (score: number, inverted: boolean) => {
-    const effectiveScore = inverted ? 1 - score : score
+    const normalizedScore = score / 100
+    const effectiveScore = inverted ? 1 - normalizedScore : normalizedScore
     if (effectiveScore >= 0.8) return 'bg-green-50 border-green-200'
     if (effectiveScore >= 0.6) return 'bg-yellow-50 border-yellow-200'
     return 'bg-red-50 border-red-200'
   }
 
   const getTrustIcon = (score: number, inverted: boolean) => {
-    const effectiveScore = inverted ? 1 - score : score
+    const normalizedScore = score / 100
+    const effectiveScore = inverted ? 1 - normalizedScore : normalizedScore
     if (effectiveScore >= 0.8) {
       return (
         <svg className="w-6 h-6 text-green-600 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">

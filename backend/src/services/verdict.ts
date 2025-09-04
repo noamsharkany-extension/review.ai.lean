@@ -169,9 +169,9 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     const confidenceScore = (sentimentConfidence + fakeDetectionConfidence) / 2;
 
     return {
-      fakeReviewRatio: Math.round(fakeReviewRatio * 100) / 100, // Round to 2 decimal places
-      sentimentMismatchRatio: Math.round(sentimentMismatchRatio * 100) / 100,
-      confidenceScore: Math.round(confidenceScore * 100) / 100
+      fakeReviewRatio: Math.min(1.0, Math.round(fakeReviewRatio * 100) / 100), // Cap at 1.0 (100%)
+      sentimentMismatchRatio: Math.min(1.0, Math.round(sentimentMismatchRatio * 100) / 100), // Cap at 1.0 (100%)
+      confidenceScore: Math.min(1.0, Math.round(confidenceScore * 100) / 100) // Cap at 1.0 (100%)
     };
   }
 

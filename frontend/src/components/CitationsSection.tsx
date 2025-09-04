@@ -174,7 +174,7 @@ const ReviewCitationCard: React.FC<ReviewCitationCardProps> = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Confidence:</span>
-                    <span className="text-sm font-medium">{(citation.sentiment.confidence * 100).toFixed(0)}%</span>
+                    <span className="text-sm font-medium">{Math.min(100, Math.round(citation.sentiment.confidence * 100))}%</span>
                   </div>
                   {citation.sentiment.mismatchDetected && (
                     <div className="text-sm text-orange-700 bg-orange-50 p-2 rounded">
@@ -197,7 +197,7 @@ const ReviewCitationCard: React.FC<ReviewCitationCardProps> = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Confidence:</span>
-                    <span className="text-sm font-medium">{(citation.fakeAnalysis.confidence * 100).toFixed(0)}%</span>
+                    <span className="text-sm font-medium">{Math.min(100, Math.round(citation.fakeAnalysis.confidence * 100))}%</span>
                   </div>
                   {citation.fakeAnalysis.reasons.length > 0 && (
                     <div className="text-sm text-gray-600">
