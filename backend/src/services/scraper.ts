@@ -510,67 +510,21 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         this.log(`⚠️ Could not apply ${sortType} sort, using current order`);
       }
       
-      // Wait for sort to take effect
+      // Wait for sort to take effect, expand More buttons, then extract (simplified approach)
       await page.waitForTimeout(4000);
-      
-      // Expand More buttons after sort change (user's bookmarklet approach)
-      this.log(`🔄 Expanding More buttons for ${sortType} sorted reviews...`);
+      this.log(`🔄 Running comprehensive bookmarklet expansion for ${sortType} sorted reviews...`);
       await this.clickMoreButtonsOnPage(page);
       
-      let collectedReviews: any[] = [];
-      let previousCount = 0;
-      let stagnantRounds = 0;
-      const maxStagnantRounds = 5; // Match 4801237 patience level
-      const maxScrollAttempts = 25; // Reduced from 40 to 25 for better efficiency while maintaining effectiveness
+      this.log(`📊 Extracting all visible ${sortType} reviews after comprehensive expansion...`);
+      const allReviews = await this.extractBasicReviews(page);
       
-      this.log(`📜 Smart aggressive scrolling to load ${sortType} reviews (target: ${target})...`);
-      for (let i = 0; i < maxScrollAttempts; i++) {
-        // Smart multi-scroll approach: fewer but more effective scrolls
-        for (let j = 0; j < 3; j++) { // Reduced from 5 to 3 scrolls per round
-          await this.performAggressiveScrolling(page);
-          await page.waitForTimeout(800); // Slightly longer wait for content to load
-        }
-        
-        // Additional wait for content to load
-        await page.waitForTimeout(1500); // Increased wait time for better content loading
-        
-        // Extract reviews after scrolling
-        const currentReviews = await this.extractBasicReviews(page);
-        
-        // Use deduplication to ensure we have unique reviews
-        const combinedReviews = [...collectedReviews, ...currentReviews];
-        const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(combinedReviews);
-        collectedReviews = deduplicationResult.uniqueReviews;
-        
-        this.log(`${sortType} - Scroll ${i + 1}: Found ${collectedReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed, raw: ${currentReviews.length})`);
-        
-        // Check if we're getting new reviews
-        if (collectedReviews.length === previousCount) {
-          stagnantRounds++;
-          if (stagnantRounds >= maxStagnantRounds) {
-            this.log(`⚠️ ${sortType} - No new reviews found in ${stagnantRounds} attempts, stopping at ${collectedReviews.length} reviews`);
-            break;
-          }
-        } else {
-          stagnantRounds = 0;
-          previousCount = collectedReviews.length;
-        }
-        
-        // If we have enough reviews, stop scrolling
-        if (collectedReviews.length >= target) {
-          this.log(`✅ ${sortType} - Reached target of ${target} reviews`);
-          break;
-        }
-        
-        // Show progress every 5 attempts when we're struggling
-        if (i % 5 === 0 && i > 0) {
-          this.log(`📊 ${sortType} progress: ${collectedReviews.length}/${target} reviews after ${i + 1} scroll attempts`);
-        }
-      }
+      // Deduplicate the extracted reviews
+      const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(allReviews);
+      const uniqueReviews = deduplicationResult.uniqueReviews;
       
-      this.log(`📊 ${sortType} collection completed: ${collectedReviews.length} reviews (target was ${target})`);
+      this.log(`📊 ${sortType} extraction completed: ${uniqueReviews.length} unique reviews (${deduplicationResult.duplicateCount} duplicates removed from ${allReviews.length} total)`);
       
-      return collectedReviews.slice(0, target); // Limit to target but return what we have
+      return uniqueReviews.slice(0, target); // Return up to target amount
       
     } catch (error) {
       this.log(`❌ Error collecting ${sortType} reviews: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -815,34 +769,21 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           
           // EXACT tick function from user's working bookmarklet
           const tick = () => {
-            // Count buttons before clicking
-            const beforeCount = [...document.querySelectorAll('button,[role="button"],span')]
-              .filter(el => match(el)).length;
-            
             clickAll();
-            
-            // Count buttons after clicking (for logging)
-            const afterCount = [...document.querySelectorAll('button,[role="button"],span')]
-              .filter(el => match(el)).length;
-            totalClicked += (beforeCount - afterCount);
-            
             scrollers.forEach(el => {
               try {
                 el.scrollBy(0, el.clientHeight);
               } catch {}
             });
-            
             window.scrollBy(0, window.innerHeight);
             i++;
             
-            console.log(`[MORE_EXPANSION] Iteration ${i}/50, clicked ${beforeCount} More buttons this round`);
-            
-            if (i < 50) {
+            if (i < 15) { // Reduced from 50 to 15 - sufficient for ~100 reviews per category
               setTimeout(tick, 400);
             } else {
-              clickAll(); // Final click pass
-              console.log(`[MORE_EXPANSION] Completed! Total iterations: ${i}`);
-              resolve({ clicked: totalClicked });
+              clickAll(); // Final click pass exactly as in user's bookmarklet
+              console.log(`[MORE_EXPANSION] Completed! ${i} iterations with final clickAll()`);
+              resolve({ clicked: i });
             }
           };
           
