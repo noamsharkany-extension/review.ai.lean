@@ -772,82 +772,121 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Robust More button clicking with JavaScript executor and anti-bot evasion
+   * Comprehensive More button expansion with scrolling - based on user's bookmarklet
+   * Opens all 100+ reviews fully by scrolling and clicking all "More" buttons systematically
    */
   private async clickMoreButtonsOnPage(page: Page): Promise<void> {
-    this.log('🔄 Starting robust More button clicking...');
+    this.log('🔄 Starting comprehensive More button expansion with scrolling...');
     
     try {
-      const clicked = await page.evaluate(() => {
-        let totalClicked = 0;
-        
-        console.log('[MORE_BUTTON] Starting More button detection...');
-        
-        // Find all potential More buttons using text content
-        const allButtons = document.querySelectorAll('button, [role="button"]');
-        console.log(`[MORE_BUTTON] Found ${allButtons.length} total buttons`);
-        
-        const moreButtons = [];
-        
-        for (let i = 0; i < allButtons.length; i++) {
-          const btn = allButtons[i];
-          const text = (btn.textContent || '').toLowerCase().trim();
-          const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+      const result = await page.evaluate(() => {
+        return new Promise<{clicked: number, expanded: number}>((resolve) => {
+          let totalClicked = 0;
+          let totalExpanded = 0;
           
-          // Check for More button patterns
-          if (text === 'more' || text === 'עוד' || text === 'show more' || text === 'read more' ||
-              ariaLabel.includes('more') || ariaLabel.includes('עוד')) {
+          console.log('[MORE_EXPANSION] Starting comprehensive More button expansion...');
+          
+          // Enhanced match function to detect "More" buttons (based on user's bookmarklet)
+          const match = (element: Element): boolean => {
+            const text = (element.textContent || '').trim();
+            return /^more$/i.test(text) || 
+                   /^show more$/i.test(text) ||
+                   /^read more$/i.test(text) ||
+                   /^voir plus$/i.test(text) ||
+                   /^más$/i.test(text) ||
+                   /^עוד$/i.test(text) ||
+                   /^altro$/i.test(text) ||
+                   /^plus$/i.test(text);
+          };
+          
+          // Click all More buttons function
+          const clickAll = (): number => {
+            let clicked = 0;
+            const candidates = [...document.querySelectorAll('button, [role="button"], span')];
+            console.log(`[MORE_EXPANSION] Scanning ${candidates.length} potential More button candidates`);
             
-            // Verify it's visible and not disabled
-            const rect = btn.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0 && !btn.hasAttribute('disabled')) {
-              moreButtons.push(btn);
-              console.log(`[MORE_BUTTON] Found candidate: "${text}" (aria: "${ariaLabel}")`);
+            candidates.filter(el => match(el)).forEach(el => {
+              try {
+                // Check if element is visible and clickable
+                if (el.offsetParent !== null && !el.hasAttribute('disabled')) {
+                  const htmlEl = el as HTMLElement;
+                  
+                  // Scroll element into view first
+                  htmlEl.scrollIntoView({ behavior: 'instant', block: 'center' });
+                  
+                  // Click the element
+                  htmlEl.click();
+                  clicked++;
+                  console.log(`[MORE_EXPANSION] Clicked More button: "${el.textContent?.trim()}"`);
+                }
+              } catch (error) {
+                console.log(`[MORE_EXPANSION] Error clicking element: ${error}`);
+              }
+            });
+            
+            return clicked;
+          };
+          
+          // Find all scrollable containers (from user's bookmarklet logic)
+          const scrollers = [...document.querySelectorAll('*')].filter(el => 
+            el.scrollHeight > el.clientHeight && 
+            el.scrollHeight > 100 // Only meaningful scrollers
+          );
+          console.log(`[MORE_EXPANSION] Found ${scrollers.length} scrollable containers`);
+          
+          let iteration = 0;
+          const maxIterations = 50; // Safety limit (from user's bookmarklet)
+          
+          // Main expansion loop with scrolling (adapted from user's bookmarklet)
+          const tick = () => {
+            // Click all visible More buttons
+            const clickedThisRound = clickAll();
+            totalClicked += clickedThisRound;
+            
+            // Scroll all scrollable containers by their client height
+            scrollers.forEach(el => {
+              try {
+                el.scrollBy(0, el.clientHeight);
+              } catch (error) {
+                console.log(`[MORE_EXPANSION] Error scrolling container: ${error}`);
+              }
+            });
+            
+            // Scroll the main window by its inner height
+            try {
+              window.scrollBy(0, window.innerHeight);
+            } catch (error) {
+              console.log(`[MORE_EXPANSION] Error scrolling window: ${error}`);
             }
-          }
-        }
-        
-        console.log(`[MORE_BUTTON] Found ${moreButtons.length} More button candidates`);
-        
-        // Click the buttons synchronously (simplified approach)
-        for (let i = 0; i < Math.min(moreButtons.length, 10); i++) {
-          const button = moreButtons[i];
-          try {
-            console.log(`[MORE_BUTTON] Clicking button ${i + 1}: "${button.textContent?.trim()}"`);
             
-            // Skip if already expanded
-            if (button.getAttribute('aria-expanded') === 'true') {
-              console.log(`[MORE_BUTTON] Button already expanded, skipping`);
-              continue;
+            iteration++;
+            console.log(`[MORE_EXPANSION] Iteration ${iteration}/${maxIterations}, clicked ${clickedThisRound} buttons this round`);
+            
+            if (iteration < maxIterations) {
+              setTimeout(tick, 400); // 400ms delay between iterations (from user's bookmarklet)
+            } else {
+              // Final click pass after all scrolling (from user's bookmarklet)
+              const finalClicked = clickAll();
+              totalClicked += finalClicked;
+              totalExpanded = totalClicked;
+              
+              console.log(`[MORE_EXPANSION] Completed! Total More buttons clicked: ${totalClicked}`);
+              resolve({ clicked: totalClicked, expanded: totalExpanded });
             }
-            
-            // Scroll into view
-            button.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Click the button
-            (button as HTMLElement).click();
-            totalClicked++;
-            
-            console.log(`[MORE_BUTTON] Successfully clicked button ${i + 1}`);
-            
-          } catch (clickError) {
-            console.log(`[MORE_BUTTON] Click failed:`, clickError.message);
-          }
-        }
-        
-        console.log(`[MORE_BUTTON] Total buttons clicked: ${totalClicked}`);
-        return totalClicked;
+          };
+          
+          // Start the expansion process
+          tick();
+        });
       });
       
-      // Add a delay after clicking to allow content to load
-      if (clicked > 0) {
-        this.log(`✅ More button clicking completed: ${clicked} buttons clicked, waiting for content to load...`);
-        await page.waitForTimeout(3000); // Wait for content to load
-      } else {
-        this.log(`ℹ️ No More buttons found to click`);
-      }
+      this.log(`✅ Comprehensive More button expansion completed: ${result.clicked} buttons clicked, ${result.expanded} reviews expanded`);
+      
+      // Wait for final content to load
+      await page.waitForTimeout(2000);
+      
     } catch (error) {
-      this.log(`❌ More button clicking failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.log(`❌ More button expansion failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
