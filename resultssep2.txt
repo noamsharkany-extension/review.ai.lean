@@ -11,38 +11,38 @@ Example URLs:
 • Google Search: https://www.google.com/search?q=restaurant+reviews
 • Any Google page showing business reviews
 Analysis Complete
-Analyzed 262 reviews with 94% confidence
+Analyzed 264 reviews with 95% confidence
 
-7600%
+7900%
 Overall Score
 Analysis Verdict
 Overall Impression
-7600%
+7900%
 Based on sentiment analysis and review authenticity
 
 Trustworthiness
-7000%
+8500%
 Reliability of reviews and business reputation
 
 Red Flags
-5000%
+3000%
 Potential issues detected in reviews
 
 Analysis Overview
 Total Reviews
-262
+264
 All analyzed
 
 Fake Reviews
-54.0%
+64.0%
 Detected by AI analysis
 
 Sentiment Mismatches
-36.0%
+32.0%
 Rating vs text sentiment
 
 Confidence Score
-94%
+95%
 Analysis accuracy
 
 Trust Assessment
@@ -53,536 +53,527 @@ Quality Indicators:
 High fake review rate detected
 High analysis confidence
 Multiple red flags present
-Review Citations (110)
+Review Citations (105)
 Click any review to see detailed analysis
-Mael Weiss
-Invalid Date
+More
+Sep 15, 2025
+Potentially Fake
+Absolutely disgusting place. The old lady there with the fake smile is rude with everyone. …
+
+Anonymous
+Sep 15, 2025
+Potentially Fake
+My friend and I were sight-seeing the beautiful city of Colmar and stopped by this caffe for a coffee and dessert. We entered the establishment and this blonde waitress greeted us in French. Seeing than neither of us spoke French, we told …
+
+Anonymous
+Sep 15, 2025
+Potentially Fake
+Very unfriendly waitress. We were with 2, one of us didn’t feel like eating but wanted only a drink. She didn’t want to serve us and ask us to leave. It is strange that you’re not allowed to have a drink as there were free tables available.
+
+Anonymous
+Sep 15, 2025
+It looked so nice. However, the service personal was very unfriendly. I DONT recommend it.
+
+Anonymous
+Sep 15, 2025
+Just let us stand there and didn't tell us that they could not help us with a table. Very unfriendly.
+
+Anonymous
+Sep 15, 2025
+Potentially Fake
+We can only agree with the racist comments. After we were ignored by 4 service staff standing behind the bar, and didn't want to take up a large table, we sat down at a small table and added …
+
+Service
+Sep 2, 2025
+Potentially Fake
+worst restaurant! You can get poisoned here!
+
+More
+Sep 2, 2025
+Potentially Fake
+She treat me so bad for asking a salad with tomato (because it is not the season) that frankly I hope that no one has to deal with a such an ugly situation where you are just simply asking for something to eat.
+
+Anonymous
+Sep 2, 2025
+Potentially Fake
+Don't even think about visiting this place in Colmar. Very rude owner, arrogant, aggressive. Children are not welcome, customers too. They shout and push the customers. The owner and old lady, my be his mother spoiled our vacation.
+
+Anonymous
+Sep 2, 2025
+I stayed there 10 minutes sitting outside. But they just cleaned up my table when I went to the toilet without a word. I haven't even paid yet. And I was in the the toilet like 2~3 minutes......Im not sure its just culture or a mistake or because I was a solo Asian.
+
+Google policies
+Aug 15, 2025
 Potentially Fake
 Sentiment Mismatch
 ⚠️AVOID LIKE THE PLAGUE⚠️ This Saturday, August 30, an incompetent employee I presume to be a "manager" did nothing but insult another employee and shouted loudly, "I don't give a damn about customers, I'm on a break." Thank you, that's nice, we won't be back then ☺️. "Yes, you don't know who I am." No, that's a very good question because to have such a head, I hope you're very high up, even if with behavior like that, it would surprise me a lot. So, atmosphere and service are ZERO, as far as the food is concerned, it could be better. But I'm telling you again, AVOID!!!
 
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
+Potentially Fake
+Sentiment Mismatch
 Very well located in the old town, a very friendly welcome, and local dishes. I think it's also a bit like the local shopkeepers' canteen. I wanted to try the liver dumplings, and I didn't regret my choice—excellent!
 
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
+Potentially Fake
+Sentiment Mismatch
 We settled into this restaurant at the end of June for lunch. The terrace is pleasant and shaded, the service friendly, the food a bit expensive in terms of quality/price, everything was fine until our visit to the restroom. "Visit the …
 
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
+Potentially Fake
+Sentiment Mismatch
 Very good local cuisine, very kind owners. I highly recommend it.
 
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
+Potentially Fake
+Sentiment Mismatch
 Even if we understand that a "children's menu" may be designed for younger children, categorically refusing an adult to order it remains absurd. A customer should be able to choose what they want from the menu, especially if they are paying …
 
-Visited in August
-Invalid Date
-Unfortunately, our experience was quite disappointing. We stopped to ask if the restaurant was open and if there was a table available. The waitress responded with repeated 'Bonjour, bonjour, bonjour, bonjour,' and continued speaking in …
-
-Visited in August
-Invalid Date
-Unfortunately , our experience was quite disappointing. We stopped to ask if the place was open and if a table was available. The waitress responded with repeated 'Bonjour, bonjour, bonjour,' continuing to speak French without trying to …
-
-Visited in August
-Invalid Date
-Everything is homemade, well done!
-
-Visited in August
-Invalid Date
-Potentially Fake
-On August 6th, during our visit to Colmar, we attempted to have a meal at this restaurant. I initially informed a female staff member that our party consisted of six people. Shortly after, another friend from our group also mentioned to her …
-
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
 Potentially Fake
 Sentiment Mismatch
 Breakfast is served until 11:00. From 10:45, the lady told us that we couldn't order anything anymore. First of all, we were made to feel completely unwelcome. Furthermore, this woman prefers an empty terrace to a full one. She's …
 
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
 Potentially Fake
 Sentiment Mismatch
 Terrible service, the woman with the bun seemed eager to see us leave. We stood for five minutes in front of the sign that said we had to wait until someone arrived. Once someone did arrive, we were given a very unfriendly woman as a …
 
-Visited in August
-Invalid Date
+New
+Aug 15, 2025
 Potentially Fake
 Very unfriendly and unpleasant staff. More concerned with managing opening hours and tidying up the terrace than welcoming customers in a friendly manner.
 
-Visited in August
-Invalid Date
-Top-notch staff! Warm atmosphere, a great restaurant (which also serves as a tea room). Very generous plates and delicious liver dumplings.
-
-Visited in July
-Invalid Date
-Very very good piesMeal typeLunch… More
-
-Visited in July
-Invalid Date
-An iced tea and a slice of pie to die for. The service was very welcoming with a beautiful terrace. I recommend it.
-
-Visited in July
-Invalid Date
-Discovered by chance and we don't regret it at all, special mention for the delicious slices of pie
-
-Philippe Pleimelding
-Invalid Date
-Potentially Fake
-SuperPrice per person€10–20… More
-
-Visited in July
-Invalid Date
-Quite busy in the early afternoon like most restaurants in the summer, but not too much of a wait for a table. The food wasn't too bad and the service was friendly.
-
-Visited in July
-Invalid Date
-Interesting locationFood: 4Service:… More
-
-Visited in July
-Invalid Date
-The beef pie I had was very dry, I would not recommend. Other mains were ok.
-
-Visited in July
-Invalid Date
-I tried the "calf's liver quenelles" whose Alsatian name I can't write, and my wife the "meat pie", it was fantastic. Attentive, friendly service, for a reasonable price in high season. It was so generous that we took away the famous rhubarb tart to eat later.
-
-Visited in August
-Invalid Date
+More
+Aug 15, 2025
 Potentially Fake
 Sentiment Mismatch
 Fast service, but lukewarm food. An extra €2 Munster cheese isn't worth it. Very unwelcoming staff and a rude owner. I don't recommend it.
 
-Visited in June
-Invalid Date
+Anonymous
+Aug 15, 2025
+Potentially Fake
+Very poor service. I'm intolerant to lactose. Asked for a oat milk coffee. The lady with braids served me an ordinary milk coffee. When I pointed it out and said a person who is intolerant can feel sick after drinking milk, she reacted very …
+
+Anonymous
+Aug 15, 2025
+Potentially Fake
+Very bad experience. We were waiting for the table at 4.00pm and the restaurant closes at 6 pm. The staff was so rude, they yelled “the kitchen is closing” to us. We can feel they are very racists as they didn’t do the same to other people who were waiting there at the same time.
+
+Anonymous
+Aug 15, 2025
+Potentially Fake
+Sentiment Mismatch
+Staff with bad attitude, make you feel unwelcome
+
+Bogdan Maftei
+Aug 15, 2025
+Potentially Fake
+Sentiment Mismatch
+Very rude staffFood: 2Service:… More
+
+Anonymous
+Jul 15, 2025
+Discovered by chance and we don't regret it at all, special mention for the delicious slices of pie
+
+Philippe Pleimelding
+Jul 15, 2025
+Potentially Fake
+SuperPrice per person€10–20… More
+
+More
+Jul 15, 2025
+Quite busy in the early afternoon like most restaurants in the summer, but not too much of a wait for a table. The food wasn't too bad and the service was friendly.
+
+Interesting location
+Jul 15, 2025
+Interesting locationFood: 4Service:… More
+
+Anonymous
+Jul 15, 2025
+The beef pie I had was very dry, I would not recommend. Other mains were ok.
+
+Anonymous
+Jul 15, 2025
+I tried the "calf's liver quenelles" whose Alsatian name I can't write, and my wife the "meat pie", it was fantastic. Attentive, friendly service, for a reasonable price in high season. It was so generous that we took away the famous rhubarb tart to eat later.
+
+Interesting location
+Jul 15, 2025
+Potentially Fake
+Sentiment Mismatch
+Interesting locationFood: 4Service: 4Atmosphere: 4
+
+Anonymous
+Jul 15, 2025
+Potentially Fake
+We just had the worst experience in this restaurant. After reading the reviews I see that it’s not their first time violently attacking customers. My girlfriend went inside the restaurant to ask if we can have the table outside rather than …
+
+Anonymous
+Jul 15, 2025
+So rude. Obviously this establishment doesn’t care for tourist. We went in for morning coffee and before we had a chance to ask a question the waitress (very short blonde hair) turned to me and said “just wait! I see you!!!” In a harsh …
+
+More
+Jul 15, 2025
+Terrible restaurant. A violent team. They violently attacked my daughter and made her cry. Look, there were many such cases in the past
+
+Anonymous
+Jul 15, 2025
+Potentially Fake
+The waitress very-bad in with us We are leaving directly
+
+Anonymous
+Jul 15, 2025
+Potentially Fake
+Coffee is absolutely terrible, one of the worst I have had in my life.
+
+Anonymous
+Jul 15, 2025
+We booked a table in advance for five people, the place was packed, so we waited patiently outside for them to prepare the table for us. The table they reserved for us was inside and a table outside had just become available and it was very …
+
+Anonymous
+Jul 15, 2025
+Potentially Fake
+Sentiment Mismatch
+The ambiance and food were good, but the service was very unfriendly. When asked, we couldn't get butter for breakfast (the bread came without) because it apparently wasn't available in a single piece. And in the end, they wouldn't even let …
+
+More
+Jun 15, 2025
 Potentially Fake
 Extremely rude staff. The establishment was not busy and apparently because we could not speak French they completely ignored us in favor of other patrons who arrived after us.
 
-Visited in June
-Invalid Date
+Anonymous
+Jun 15, 2025
 Potentially Fake
 Tourist trap and consequently a trap for Colmar residents! Avoid it in the summer; it's expensive and downright bad, prepared well in advance and reheated several times. Anything to make money during the tourist season!
 
-Visited in June
-Invalid Date
+More
+Jun 15, 2025
 Potentially Fake
 Rude place, rude people, rude service. A hateful experience. If you dislike people we suggest closing.
 
-Visited in June
-Invalid Date
+Anonymous
+Jun 15, 2025
 Reservation made for a group of 6 people almost 10 days before the date. We had asked for a table on the terrace. We were seated inside, the table against the counter with the added bonus of people at the end of the table. It was a …
 
-Visited in December
-Invalid Date
-An excellent restaurant, very good atmosphere and delicious dishes, impeccable welcome and service.
-
-Visited in April
-Invalid Date
-Potentially Fake
-When I was there at 9pm, there was a light show on the wall of this restaurant. Most shops would have been closed by 8pm, but there were quite a number of tourists walking around in this area and at La Petite Venise.
-
-Visited in May
-Invalid Date
-Potentially Fake
+Anonymous
+May 15, 2025
 A wonderful culinary experience in the heart of Colmar. Friendly service even with a large crowd. The tarts deserve their name; they're generous and delicious. The white tart stood up very well with homemade whipped cream.
 
-Visited in May
-Invalid Date
+Anonymous
+May 15, 2025
+...typically Alsatian, highly recommended! The service is very good 👍. …
+
+More
+May 15, 2025
+In a cozy atmosphere, enjoy a savory breakfast accompanied by a fresh homemade juice. The perfect way to start a day exploring Colmar.
+
+Anonymous
+May 15, 2025
+Potentially Fake
+A beautiful day in Colmar, sat at a table for 4 outside in the sun, but was told to move to a table for 2, which there were no tables in the sun. Just walked away will never go to this establishment. Poor service!
+
+Anonymous
+May 15, 2025
+Too bad, there must have been a miscommunication. Instead of the green asparagus and Emmental quiche I ordered, I was served asparagus with ham and, upon request, a green vegetable quiche. Both that and the salad were only lightly seasoned.
+
+Anonymous
+May 15, 2025
 Potentially Fake
 Sentiment Mismatch
 I came to have a good time, but I witnessed an unacceptable scene: a waitress started shouting at a customer sitting right next to me, without any restraint. The tone, the aggression, everything was inappropriate and totally unjustified. …
 
-Visited in May
-Invalid Date
+Anonymous
+May 15, 2025
 Potentially Fake
 Sentiment Mismatch
 My mother visited this café recently and received a very poor reception. Not knowing that it was forbidden to bring a croissant from another bakery, she was violently accosted by the waitress, who started yelling at her, aggressively …
 
-Visited in May
-Invalid Date
+Anonymous
+May 15, 2025
 Potentially Fake
 Sentiment Mismatch
 Very unfriendly staff and average food. We were served a salad with a slug in it. The waitress just said oh, and brought us a bill. No apologies, no offer to take it from the bill. Not a great experience.
 
-Visited in May
-Invalid Date
+Anonymous
+May 15, 2025
+Potentially Fake
 Sentiment Mismatch
 I had booked a month in advance for Easter Monday. Arrived in front of the restaurant at four, the restaurant was closed. Bad point. So I can't judge the rest. I remain very disappointed!
 
-Visited in May
-Invalid Date
+Meal type
+May 15, 2025
 Very good cafe au lait, salty plate was amazing!!!
 
-Visited in May
-Invalid Date
+More
+May 15, 2025
 Very well located, very pleasant staff. The dishes are very tasty and the price is correct. Sufficiently large choice on the menu + table with suggestions of the day. …
 
-Visited in May
-Invalid Date
+Anonymous
+May 15, 2025
 Potentially Fake
-Sentiment Mismatch
 The manager is unsavory. Everywhere around it was crowded. I told myself that I would sit quietly where it was empty without wondering why it was empty. I quickly understood.
 
-Visited in May
-Invalid Date
+Anonymous
+May 15, 2025
 Potentially Fake
-Sentiment Mismatch
 Exceptionally rude. Made reservations before. They had us wait by the floor for 20 minutes before telling us the kitchen is closed and denying we had called in a reservation even after I showed the waitress their phone number on my phone and proof that I had called in a reservation. This is just not how you treat guests.
 
-Visited in April
-Invalid Date
+More
+May 15, 2025
 Potentially Fake
+We tried to have dessert and a coffee. They just didn't want to serve us because they were serving full lunch only (we were 4 people so it wasn't going to be a 5€ bill). …
+
+Anonymous
+May 15, 2025
+We tried to have dessert and a coffee. They just didn't want to serve us because they were serving full lunch only (we were 4 people so it wasn't going to be a 5€ bill). I can see that in most of France you need to consult a big guide on what to eat, how much and at WHAT hours, but this was the most extreme. The place was half-empty, in extra-season in a very touristic city...
+
+Justyna Jurkowska
+May 15, 2025
+Potentially Fake
+Sentiment Mismatch
+Service rude and arrogant. I do not recommend.
+
+Anonymous
+May 15, 2025
+Sentiment Mismatch
+Coming for a drink, a welcome that leaves something to be desired. The staff seemed very overwhelmed to me without it being crowded. Once at the table, we saw other people sitting down and being served before us. After a good fifteen minutes without anyone cleaning the table or taking our order, we decided to go elsewhere.
+
+Anonymous
+Apr 15, 2025
+When I was there at 9pm, there was a light show on the wall of this restaurant. Most shops would have been closed by 8pm, but there were quite a number of tourists walking around in this area and at La Petite Venise.
+
+Interesting visit and welcoming staff
+Apr 15, 2025
+Interesting visit and welcoming staff
+
+Anonymous
+Apr 15, 2025
+Excellent snack with a white tea and a nice portion of an excellent damson crumble, in an authentic and warm setting, and served by a very pleasant waiter. Perfect moment between friends, regulars of the place; a great discovery for me.
+
+Anonymous
+Apr 15, 2025
+First time to Colmar, arrived late in the afternoon thinking to get lunch before restaurants closed by 2.30pm, was recommended by the apartment owner about this place specializing in Alsatian cuisine, saw it and rushed in, was unlucky to …
+
+More
+Apr 15, 2025
 Sentiment Mismatch
 Formerly and gourmet name like their excellent grandmother-style tarts, generous and delicious. Perfect for a gourmet snack.
 
-Visited in April
-Invalid Date
+Anonymous
+Apr 15, 2025
+Potentially Fake
 Sentiment Mismatch
 We arrive at the terrace where customers are already seated. We are informed that it is closed and that there is no longer any service. People sit next to us and are served... I ask the staff why and I am curtly informed that they are "regulars". Absolutely avoid.
 
-Visited in March
-Invalid Date
+Anonymous
+Apr 15, 2025
+I had a reservation. I am a single older woman. As I have discovered in other places, if you are by yourself you are put in the worse seats away from the sunny windows and best seats. It was obvious I was not a valued customer. Just because I am older and by myself it does not mean I should not have a choice seat. I advise others to avoid these restaurants. Shame on you. And, the steak was not good. Way too tough.
+
+Anonymous
+Apr 15, 2025
+No service, arrogant waitress. Not a place for a breakfast in here.
+
+Anonymous
+Apr 15, 2025
+This place is so cosy you never want to leave. My husband and I shared apfelstrudel and oh my, it was to die for! The hotel we stayed at served the usual breakfast but instead we decided to go back to Jadis et Gourmande and enjoyed eggs and …
+
+More
+Mar 15, 2025
 Potentially Fake
 Sentiment Mismatch
 Ideal place for afternoon tea in Colmar with delicious, homemade pies. Everything is taken care of. Warm welcome.
 
 Kath
-Invalid Date
+Mar 15, 2025
 Potentially Fake
 Sentiment Mismatch
 Lovely lunch, sitting outside in the sun!
 
-Visited in July
-Invalid Date
-Sentiment Mismatch
-Interesting locationFood: 4Service: 4Atmosphere: 4
+Anonymous
+Mar 15, 2025
+The service is very rude and it seems that foreigners are mainly targeted by their bad mood. I saw another group of foreigners who have been treated in the same way like my group. It is ridiculous that this behaviour still exisits in 2022, that people still tolerate this and that people still visit a place where foreigners are treated in a different way like citizens. (I can judge by my observations, because I understand French, but prefer to speak English) This restaurant is under my level. And I, as a very tolerant and open minded person, will never come back.
 
-Visited in February
-Invalid Date
+Nikiforos Primos
+Mar 15, 2025
+Potentially Fake
+Sentiment Mismatch
+Very rude staff. Avoid this place
+
+More
+Feb 15, 2025
 Potentially Fake
 A wonderful discovery, a lovely setting, a warm welcome, and Gérard's homemade pastries are a real treat for both the eyes and the stomach. A very comforting place.
 
-Visited in January
-Invalid Date
+Staff is rude
+Feb 15, 2025
 Potentially Fake
-Went there at 11am They were closed Didn’t even bother to come tell us …
+Sentiment Mismatch
+Staff is rudeFood: 1Service:… More
 
-Visited in December
-Invalid Date
+Anonymous
+Feb 15, 2025
+The attention is rude and unpleasant. The waitress practically told us to leave when my daughter told her she was vegan. It is curious that in a city that lives off tourism, they serve in this way. I recommend not going
+
+Anonymous
+Dec 15, 2024
+An excellent restaurant, very good atmosphere and delicious dishes, impeccable welcome and service.
+
+Anonymous
+Dec 15, 2024
 Beautiful place but very bad behaviour from the staff especially from the older lady .. we went there early in the morning during Christmas and I really wanted to catch a seat in front of the window to take some beautiful photos of the view outside etc for my blog for Colmar.. when we reached there the front seats were taken but we sat in the second row waiting for someone to leave and change seats. First of all they didn’t come to take our order even though we were right next to the bar , and when after a long time , they finally brought the order , the table in front became available so we took our coffees and changed . They came to us and even though we had already sat in the other table with our stuff , coats, bags etc, they forced us to move back to our previous seats !! This is the first time this happened to me .. I understand that they may don’t want to carry our food and drinks in some restaurants and change seats but in this case we had just received our order and we carried it by ourselves and anyway we were already in the new seats . It was very rude to ask as move back again Anyway we didn’t say anything even though we felt embarrassed in front of everyone . Then when we finally wanted to leave , I asked for the bill about 3 times as we had to go and they keep laughing and talking with other costumers so I went to the cashier in order to pay as we had to leave quickly and guess what .. SHE ASKED ME FOR THE SECOND TIME to go back to my table because they won’t let me pay on the cashier , only at the waiter on my table The worst experience in the whole Colmar and Strasbourg . 👎👎👎
 
-Visited in April
-Invalid Date
-I had a reservation. I am a single older woman. As I have discovered in other places, if you are by yourself you are put in the worse seats away from the sunny windows and best seats. It was obvious I was not a valued customer. Just because I am older and by myself it does not mean I should not have a choice seat. I advise others to avoid these restaurants. Shame on you. And, the steak was not good. Way too tough.
-
-Visited in September
-Invalid Date
-Absolutely disgusting place. The old lady there with the fake smile is rude with everyone. …
-
-Visited in December
-Invalid Date
+Anonymous
+Dec 15, 2024
 Potentially Fake
 Sentiment Mismatch
 Never visit this place especially with kids. They are not welcome there! We have traveled all over the world but this place is my biggest disappointment. The owner/manager repeatedly pushed me and my pregnant friend out and wouldn't …
 
-Visited in December
-Invalid Date
-Sentiment Mismatch
+Anonymous
+Dec 15, 2024
+Potentially Fake
 Not a good experience, we went there for breakfast and they cannot handle a full restaurant, we waited for our breakfast a long time and they brought the meals bit by bit, the only quality was the ambience. Rude employees!
 
-Visited in December
-Invalid Date
+Anonymous
+Dec 15, 2024
 Potentially Fake
-Sentiment Mismatch
 The worts service in Colmar. Do not come here for coffee or lunch. The staff is very impolite, rude, and annoying. They make you feel uncomfortable with their attitude. The waitress did not let me finish the coffee. She asked two times if I …
 
-Visited in December
-Invalid Date
-Nice place but not good hospitality for non- french spoken. If you cant speak french, I’m not recommend.
-
-Visited in March
-Invalid Date
-Sentiment Mismatch
-The service is very rude and it seems that foreigners are mainly targeted by their bad mood. I saw another group of foreigners who have been treated in the same way like my group. …
-
-Anonymous
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-This place is a SHAME for Colmar!!! Terrible experience!!! ⛔️RUDE staff! An old witch and a psychopath use VIOLENCE to drive away their customers! They hit a pregnant woman and her child while her husband was waiting …
-
-Response from the owner
-Invalid Date
-I stayed there 10 minutes sitting outside. But they just cleaned up my table when I went to the toilet without a word. I haven't even paid yet. And I was in the the toilet like 2~3 minutes......Im not sure its just culture or a mistake or because I was a solo Asian.
-
-Visited in July
-Invalid Date
-Sentiment Mismatch
-So rude. Obviously this establishment doesn’t care for tourist. We went in for morning coffee and before we had a chance to ask a question the waitress (very short blonde hair) turned to me and said “just wait! I see you!!!” In a harsh …
-
-Anonymous
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-Don't even think about visiting this place in Colmar. Very rude owner, arrogant, aggressive. Children are not welcome, customers too. They shout and push the customers. The owner and old lady, my be his mother spoiled our vacation.
-
-Anonymous
-Invalid Date
-Sentiment Mismatch
-The service is horrible and hostile. The lady servicing us made us wait ages to serve, and her attitude was incredibly hostile. My niece was holding the sugar container to look at it and she snatched it violently from her hands as if she …
-
-Visited in October
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-If you are a non European citizen you are not welcomed here! We were harshly expelled from this place by the waitress with short blonde hair under the justification that our vaccine certificate is not valid here, although …
-
-Visited in December
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
+More
+Dec 15, 2024
 Rude people is an understatement... lets expel customers (even babies) that did not see their stop sign that says they should wait outside in the cold and rain while there are plenty of places inside
 
-Visited in December
-Invalid Date
+Anonymous
+Dec 15, 2024
 Potentially Fake
 Sentiment Mismatch
 Food is delicious, but the service of few waitresses was very bad. One waitress (an old lady) was extremely rude and racist.
 
-Visited in September
-Invalid Date
+More
+Dec 15, 2024
 Potentially Fake
-My friend and I were sight-seeing the beautiful city of Colmar and stopped by this caffe for a coffee and dessert. We entered the establishment and this blonde waitress greeted us in French. Seeing than neither of us spoke French, we told …
+Never visiting again! One among the oldest staff there was extremely rude and racist. Regret visiting the place big time!
 
-Visited in August
-Invalid Date
+Anonymous
+Dec 15, 2024
 Potentially Fake
-Very bad experience. We were waiting for the table at 4.00pm and the restaurant closes at 6 pm. The staff was so rude, they yelled “the kitchen is closing” to us. We can feel they are very racists as they didn’t do the same to other people who were waiting there at the same time.
+The old women at the door, was very rude. Dont acept our spanish vaccinaton passport
 
-Visited in July
-Invalid Date
-Terrible restaurant. A violent team. They violently attacked my daughter and made her cry. Look, there were many such cases in the past
+Anonymous
+Dec 15, 2024
+Potentially Fake
+If you are a foreigner I really please you don’t try to wait for the line , because you are always be the next and next one will not be you ! So DON’T WASTE YOUR TIME !
 
-Visited in November
-Invalid Date
-Not friendly to tourists. Stopped in for a morning coffee, with our CDC covid passes (print) and was harassed for not having them converted to digital, French passes. …
+Anonymous
+Dec 15, 2024
+Potentially Fake
+Food is reaaaaally no good.. just watery and completely unflowered... bähhhh
+
+Anonymous
+Dec 15, 2024
+Potentially Fake
+Sentiment Mismatch
+the place is horrible. the staff made our children cry. in the photo, he is a man who went so far as to commit suicide and who deserved to be arrested. extremely aggressive and sick person. insulted the people waiting in line. the neighbors …
+
+Anonymous
+Dec 15, 2024
+Potentially Fake
+Sentiment Mismatch
+15 minutes before closing we (the couple) very politely asked to be seated at a table for four. The waitress's answer: she will decide where we sit. And she simply showed us the door. Her impudence and commanding tone simply discouraged us. …
+
+Anonymous
+Dec 15, 2024
+Potentially Fake
+Sentiment Mismatch
+Beware of scams! On the table, a small slate reads "30cl mulled wine €4.20." We order two. We are served a small 20cl glass. We make a nice little remark at the end of the meal. Without any qualms, the waitress brings us the bill without change; I find that really inflated. Do we have to be unpleasant?
 
 More
-Invalid Date
+Dec 15, 2024
 Potentially Fake
-She treat me so bad for asking a salad with tomato (because it is not the season) that frankly I hope that no one has to deal with a such an ugly situation where you are just simply asking for something to eat.
+Sentiment Mismatch
+The food is very bad, we have a bottle, we can have a brioche from the previous day. The food is very bad, the juices are bottled, they offered us a brioche from the …
 
-Visited in September
-Invalid Date
+Anonymous
+Dec 15, 2024
+Today, I went out with my family (four people) without a reservation. We waited 30 minutes in front of the main entrance. The employee at the main entrance showed no respect for the queue and repeatedly let people in behind us without a …
+
+Anonymous
+Dec 15, 2024
 Potentially Fake
-Very unfriendly waitress. We were with 2, one of us didn’t feel like eating but wanted only a drink. She didn’t want to serve us and ask us to leave. It is strange that you’re not allowed to have a drink as there were free tables available.
+We had dinner on December 2, 2022 following the many positive reviews (4 adults and 1 7 month old baby). We had our child in the stroller but unfortunately the stroller was prohibited in the restaurant even though we could fold it and we …
 
-Visited in October
-Invalid Date
+More
+Nov 15, 2024
+Not friendly to tourists. Stopped in for a morning coffee, with our CDC covid passes (print) and was harassed for not having them converted to digital, French passes. …
+
+Like
+Nov 15, 2024
 Potentially Fake
-Over rated. Food was not delicious at all compared to other similar restaurants. Service was awful. Staff very rude. It's better to go to other local restaurants. NOT RECOMMENDED!
-
-Visited in November
-Invalid Date
 Sentiment Mismatch
 They said its full, when 90% of the tables were free.
 
-Bogdan Maftei
-Invalid Date
+Anonymous
+Nov 15, 2024
+Potentially Fake
 Sentiment Mismatch
-Very rude staffFood: 2Service:… More
+Not friendly to tourists. Stopped in for a morning coffee, with our CDC covid passes (print) and was harassed for not having them converted to digital, French passes. Definitely not worth the bad energy/attitude to stay.
+
+Anonymous
+Oct 15, 2024
+Potentially Fake
+If you are a non European citizen you are not welcomed here! We were harshly expelled from this place by the waitress with short blonde hair under the justification that our vaccine certificate is not valid here, although …
+
+Anonymous
+Oct 15, 2024
+Potentially Fake
+Over rated. Food was not delicious at all compared to other similar restaurants. Service was awful. Staff very rude. It's better to go to other local restaurants. NOT RECOMMENDED!
+
+Anonymous
+Oct 15, 2024
+Potentially Fake
+Sentiment Mismatch
+Terrible coffee from a machine, overpriced, and they were 'out of food'.
+
+Anonymous
+Oct 15, 2024
+Potentially Fake
+Sentiment Mismatch
+Really nice, the food delicious, but the landlady's behavior was so abysmal that I can only give it one star. Okay, apparently it's the house rule that every guest has to eat a full portion. Sorry, we didn't know that. A little tip for the …
+
+Anonymous
+Oct 15, 2024
+We went into this restaurant because the atmosphere seemed nice. It was fine until we started eating, but the problem started when we asked the busy waitress for the bill. …
+
+More
+Oct 15, 2024
+Potentially Fake
+I confirm what my friend said; I will never again set foot in this restaurant, which gives Alsace and its usually friendly welcome a bad reputation. …
+
+Anonymous
+Oct 15, 2024
+I ate in this restaurant several times 4/5 years ago when I was working in Colmar. I always had good memories of this establishment. We wanted to introduce this restaurant to friends coming from Nice who wanted to discover a typical …
 
 Dilay Cansever
-Invalid Date
+Sep 3, 2023
+Potentially Fake
 Sentiment Mismatch
 They are very rude to customers!
 
-Nikiforos Primos
-Invalid Date
-Sentiment Mismatch
-Very rude staff. Avoid this place
-
-Visited in February
-Invalid Date
-Sentiment Mismatch
-Staff is rudeFood: 1Service:… More
-
-Ares
-Invalid Date
-Sentiment Mismatch
-They are rudeService: 1Atmosphere:… More
-
-Visited in July
-Invalid Date
-We booked a table in advance for five people, the place was packed, so we waited patiently outside for them to prepare the table for us. The table they reserved for us was inside and a table outside had just become available and it was very …
-
-Visited in December
-Invalid Date
+More
+Sep 3, 2023
 Potentially Fake
-The food is very bad, we have a bottle, we can have a brioche from the previous day. The food is very bad, the juices are bottled, they offered us a brioche from the …
-
-Visited in July
-Invalid Date
-The ambiance and food were good, but the service was very unfriendly. When asked, we couldn't get butter for breakfast (the bread came without) because it apparently wasn't available in a single piece. And in the end, they wouldn't even let …
-
-Visited in December
-Invalid Date
-Potentially Fake
-Very rude staff. Don't ask them any questions or you'll disturb them! (Welcome and service). The service was not done in order, so we missed the dishes on offer. It's a shame because the decor was very nice. A very bad experience!!
-
-Visited in August
-Invalid Date
-Potentially Fake
-Bad company policy, 4 out of 6 people eat main courses 2 only want dessert. According to the boss, this is not possible, dessert is only available after the main course. For the two who don't eat, we have to pay a flat rate of 6 euros each, even though we ordered desserts.
-
-Visited in December
-Invalid Date
-I booked a table by phone on Saturday 2nd at 12.23 with a very kind gentleman who made the reservation for a friend going to the Christmas market. Because of the snow, the driver of his bus informed her that he would be between 10 and 15 …
-
-Visited in April
-Invalid Date
-Potentially Fake
-Out of three visits to this superb establishment (a shame), three long waits, and two reprimands from the staff... Simply because there are three staff members present: one who makes drinks, one …
-
-Visited in May
-Invalid Date
-Potentially Fake
-Coming for a drink, a welcome that leaves something to be desired. The staff seemed very overwhelmed to me without it being crowded. Once at the table, we saw other people sitting down and being served before us. After a good fifteen minutes without anyone cleaning the table or taking our order, we decided to go elsewhere.
-
-Visited in December
-Invalid Date
-Sentiment Mismatch
-Today, I went out with my family (four people) without a reservation. We waited 30 minutes in front of the main entrance. The employee at the main entrance showed no respect for the queue and repeatedly let people in behind us without a …
-
-Visited in December
-Invalid Date
-Sentiment Mismatch
-We had dinner on December 2, 2022 following the many positive reviews (4 adults and 1 7 month old baby). We had our child in the stroller but unfortunately the stroller was prohibited in the restaurant even though we could fold it and we …
-
-Visited in September
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-We can only agree with the racist comments. After we were ignored by 4 service staff standing behind the bar, and didn't want to take up a large table, we sat down at a small table and added …
-
-Visited in June
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-The waitress's treatment was horrible. It was an unheard-of lack of respect; nothing like this had ever happened to us before. While I was paying, my wife went inside to get out of the heat (we were on the …
-
-Translated by Google
-Invalid Date
-Sentiment Mismatch
-If the meringue tarts are good and high, they do not live up to the unpleasant attitude of the staff! People are greeted with a grimace and placed on top of each other at tables. No napkins or sugar offered and beware of those who would …
-
-Visited in December
-Invalid Date
-Sentiment Mismatch
-The juice was definitely not natural at all. They served us brioche from the day before... definitely not the best place for breakfast in Colmar.
-
-Visited in August
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-Very rude staffFood: 2Service: 1Atmosphere: 2
-
-Visited in September
-Invalid Date
-Potentially Fake
-Sentiment Mismatch
-I gave it one star because it was supposed to be one, but this establishment isn't even worth it! You can't choose your table... "Sit at the end of the table, over there!" It was an order because if someone else arrives, you have to keep …
-
-Krista Breaux
-Invalid Date
-Came for lunch with a group of 7 and really enjoyed ourselves. The food was good but not great, but we were looking for Alsatian food and a cozy winter vibe (we were there for the Christmas market) and this place was perfect. The service was also top notch. Our server was warm and friendly. Best thing we ordered was the osso buco (was on the "specials" chalkboard)!
-
-Visited in December
-Invalid Date
-Visited Colmar for the first time. While searching for a place to have breakfast, we saw Jadis et Gourmande, a place with an amazing Christmas decoration!! The place is cozy and well decorated, you can feel the Christmas vibes wherever you look. The staff is very friendly and the breakfast was delicious. If you’re going to Colmar, I highly recommend to try this magical place!🎄
-
-Visited in December
-Invalid Date
-Great service, great food. Love everything we ordered. Excellent Alsatian cuisine for those who want to try.
+Waiters are too arrogant. Deffinetly not suggested.
 
 Anonymous
-Invalid Date
-Lovely atmosphere. There are teddy bears of all shapes and sizes in every corner which is quite charming. The food and service was good; recommend the goat cheese salad. The desserts looked amazing! The wait staff spoke German and English in addition to French, however, only French menus were available.
-
-Anonymous
-Invalid Date
-Sentiment Mismatch
+Sep 4, 2019
 Came upon this gorgeous cafe after wondering around the Colmar Christmas markets. Our hands and feet were freezing and this place was so cozy and warm !! We took a seat by the window and the service was so quick and friendly. We had tea and coffee served in gorgeous cups and a slice of the most delicious blueberry pie I’ve ever tasted !!! The cafe itself has quaint decor inside and from outside looks so traditional, would highly recommend a visit :)
 
-Visited in April
-Invalid Date
-Potentially Fake
-Lovely place, amazing food, but long queue at lunch hours.
-
-Visited in December
-Invalid Date
-Awesome breakfast spot, great omelet and pastries, and a very cosy, cabin-like atmosphere
-
-Anders Jakobsen
-Invalid Date
-Potentially Fake
-Good food, friendly staff.
-
-David Haasnoot
-Invalid Date
-Potentially Fake
-Great cake & coffeeServiceDine in… More
-
 Anonymous
-Invalid Date
-Potentially Fake
-LOVE LOVE LOVEEEEE THIS PLACE !!
-
-Like
-Invalid Date
-Potentially Fake
-Loved the old teddy bears and the coffee and the little biscuits heart shaped
-
-Cuneyt Koc
-Invalid Date
-Lovely place for breakfast
-
-Visited in December
-Invalid Date
-We stopped in for some Hot Chocolate after shopping at the Christkindl Market
-
-Visited in February
-Invalid Date
-A nice atmosphere ! Cozy sitting and great sweets
-
-Paula Carciuc
-Invalid Date
-Decorations are very nice and original. Totally recommend.
-
-Pieter Gheysens
-Invalid Date
-Lovely concept. Delicious food!
-
-Louis Tyson
-Invalid Date
-Super service - dog friendly
-
-Robert Luh
-Invalid Date
-Excellent tea/coffee and cake
-
-Pietro Bianchi
-Invalid Date
-Potentially Fake
-Food and staff really super top!!!!
-
-Fabienne B.
-Invalid Date
-Rustic calmness in the middle of touristy Colmar.
-
-Nice cafe with a friendly staff
-Invalid Date
-Nice cafe with a friendly staff
+Sep 4, 2018
+The service is horrible and hostile. The lady servicing us made us wait ages to serve, and her attitude was incredibly hostile. My niece was holding the sugar container to look at it and she snatched it violently from her hands as if she …
 
 Show Less

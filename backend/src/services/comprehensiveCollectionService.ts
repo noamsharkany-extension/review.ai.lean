@@ -59,11 +59,16 @@ export class ComprehensiveCollectionService {
           best: []
         },
         metadata: {
+          sessionId: 'temp-session-' + Date.now(),
           totalCollected: reviews.length,
           totalUnique: reviews.length,
           duplicatesRemoved: 0,
           collectionTime: Date.now(),
-          success: true
+          sortingResults: {
+            recent: { collected: reviews.length, target: reviews.length },
+            worst: { collected: 0, target: 0 },
+            best: { collected: 0, target: 0 }
+          }
         }
       };
       

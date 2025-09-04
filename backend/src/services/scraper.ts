@@ -975,7 +975,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         // Extract actual review text - find the review content specifically
         let reviewText = '';
         
-        // More buttons are now handled before review extraction
+        // Review content is now fully expanded by comprehensive More button system
         
         // Try specific review text selectors first
         const reviewSelectors = ['.wiI7pd', '.MyEned', '[data-expandable-section]', 'span[jsname="bN97Pc"]', '.review-full-text'];
@@ -1192,9 +1192,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     });
     
     // Check button click stats from the browser context
-    const buttonStats = await page.evaluate(() => {
-      return (window as any).moreButtonStats || { total: 0, clicked: 0 };
-    });
+    // More button expansion is now handled comprehensively before extraction
     
     // Add backend logging to see the actual results
     console.log(`[Scraper-Backend] extractBasicReviews returned ${result.length} reviews`);
@@ -1230,12 +1228,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       }
     }
     
-    this.log(`📋 More Button Stats: Found ${buttonStats.total} buttons, Clicked ${buttonStats.clicked} "more" buttons`);
-    
-    // Reset stats for next extraction
-    await page.evaluate(() => {
-      (window as any).moreButtonStats = { total: 0, clicked: 0 };
-    });
+    // Note: More button expansion completed comprehensively before this extraction
     
     return processedResult;
   }
@@ -1328,28 +1321,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             // Wait for content to load
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // Look for More buttons to click immediately
-            const moreButtons = document.querySelectorAll('button');
-            let buttonsClicked = 0;
-            
-            for (const btn of moreButtons) {
-              const text = (btn.textContent || '').toLowerCase().trim();
-              if (text === 'more' || text === 'עוד' || text === 'show more' || text === 'read more') {
-                const rect = btn.getBoundingClientRect();
-                if (rect.width > 0 && rect.height > 0 && !btn.hasAttribute('aria-expanded')) {
-                  console.log('[SCROLL] Clicking More button during scroll:', text);
-                  btn.click();
-                  buttonsClicked++;
-                  await new Promise(resolve => setTimeout(resolve, 800)); // Wait for content expansion
-                }
-              }
-            }
-            
-            if (buttonsClicked > 0) {
-              console.log(`[SCROLL] Clicked ${buttonsClicked} More buttons, updating scroll height`);
-              // Update scroll height after More button clicks
-              await new Promise(resolve => setTimeout(resolve, 1500));
-            }
+            // Note: More buttons already expanded comprehensively before this scroll
             
             // Check if new content was loaded
             const newScrollHeight = reviewContainer.scrollHeight;
