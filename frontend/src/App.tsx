@@ -155,7 +155,7 @@ function App() {
         {/* Results Section */}
         <ResultsArea 
           results={results}
-          isLoading={isLoading && !progress}
+          isLoading={isLoading && !results}
           error={error?.message}
         />
       </div>

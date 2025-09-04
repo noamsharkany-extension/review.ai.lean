@@ -275,18 +275,23 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       await this.clickReviewsTab(page);
       await page.waitForTimeout(2000);
       
-      // Step 2: Detect total number of reviews available
-      this.log('🔢 Step 2: Detecting total review count...');
+      // Step 2: Wait for default sort to load (no More button expansion yet)
+      this.log('⏳ Step 2: Waiting for default sort to load...');
+      await page.waitForTimeout(3000);
+      
+      // Step 3: Detect total number of reviews available
+      this.log('🔢 Step 3: Detecting total review count...');
       const totalReviewCount = await this.detectTotalReviewCount(page);
       this.log(`📊 Detected approximately ${totalReviewCount} total reviews`);
       
       let allUniqueReviews: any[];
       
-      // Always use Strategy B: Selective filtering (like successful commit 4801237)
+      // Step 4: Always use Strategy B: Selective filtering (like successful commit 4801237)
       // This ensures we get comprehensive coverage regardless of total review count
-      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest (matching commit 4801237)');
+      // More buttons will be expanded after each sort change
+      this.log('🎯 Step 4: Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest (with More button expansion per sort)');
       allUniqueReviews = await this.extractWithSelectiveFiltering(page);
-      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);      
+      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (with proper More button handling)`);      
       
       return allUniqueReviews;
       
@@ -507,6 +512,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       // Wait for sort to take effect
       await page.waitForTimeout(4000);
+      
+      // Expand More buttons after sort change (user's bookmarklet approach)
+      this.log(`🔄 Expanding More buttons for ${sortType} sorted reviews...`);
+      await this.clickMoreButtonsOnPage(page);
       
       let collectedReviews: any[] = [];
       let previousCount = 0;
@@ -772,106 +781,68 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Comprehensive More button expansion with scrolling - based on user's bookmarklet
-   * Opens all 100+ reviews fully by scrolling and clicking all "More" buttons systematically
+   * Comprehensive More button expansion with scrolling - implements user's JavaScript bookmarklet
+   * Runs after each sort change to expand ALL "More" buttons for that sorted category
+   * Based on: javascript:(()=>{const match=t=>/^more$/i.test((t.innerText||'').trim());...})();
    */
   private async clickMoreButtonsOnPage(page: Page): Promise<void> {
-    this.log('🔄 Starting comprehensive More button expansion with scrolling...');
+    this.log('🔄 Starting More button expansion using proven bookmarklet logic...');
     
     try {
       const result = await page.evaluate(() => {
-        return new Promise<{clicked: number, expanded: number}>((resolve) => {
-          let totalClicked = 0;
-          let totalExpanded = 0;
+        return new Promise<{clicked: number}>((resolve) => {
+          console.log('[MORE_EXPANSION] Starting expansion using exact bookmarklet logic...');
           
-          console.log('[MORE_EXPANSION] Starting comprehensive More button expansion...');
+          // EXACT match function from user's working bookmarklet
+          const match = (t: Element): boolean => /^more$/i.test(((t as HTMLElement).innerText || '').trim());
           
-          // Enhanced match function to detect "More" buttons (based on user's bookmarklet)
-          const match = (element: Element): boolean => {
-            const text = (element.textContent || '').trim();
-            return /^more$/i.test(text) || 
-                   /^show more$/i.test(text) ||
-                   /^read more$/i.test(text) ||
-                   /^voir plus$/i.test(text) ||
-                   /^más$/i.test(text) ||
-                   /^עוד$/i.test(text) ||
-                   /^altro$/i.test(text) ||
-                   /^plus$/i.test(text);
-          };
-          
-          // Click all More buttons function
-          const clickAll = (): number => {
-            let clicked = 0;
-            const candidates = [...document.querySelectorAll('button, [role="button"], span')];
-            console.log(`[MORE_EXPANSION] Scanning ${candidates.length} potential More button candidates`);
-            
-            candidates.filter(el => match(el)).forEach(el => {
+          // EXACT clickAll function from user's working bookmarklet
+          const clickAll = () => [...document.querySelectorAll('button,[role="button"],span')]
+            .filter(el => match(el))
+            .forEach(el => {
               try {
-                // Check if element is visible and clickable
-                if (el.offsetParent !== null && !el.hasAttribute('disabled')) {
-                  const htmlEl = el as HTMLElement;
-                  
-                  // Scroll element into view first
-                  htmlEl.scrollIntoView({ behavior: 'instant', block: 'center' });
-                  
-                  // Click the element
-                  htmlEl.click();
-                  clicked++;
-                  console.log(`[MORE_EXPANSION] Clicked More button: "${el.textContent?.trim()}"`);
-                }
-              } catch (error) {
-                console.log(`[MORE_EXPANSION] Error clicking element: ${error}`);
-              }
+                (el as HTMLElement).click();
+              } catch {}
             });
-            
-            return clicked;
-          };
           
-          // Find all scrollable containers (from user's bookmarklet logic)
+          // EXACT scrollers logic from user's working bookmarklet
           const scrollers = [...document.querySelectorAll('*')].filter(el => 
-            el.scrollHeight > el.clientHeight && 
-            el.scrollHeight > 100 // Only meaningful scrollers
+            el.scrollHeight > el.clientHeight
           );
-          console.log(`[MORE_EXPANSION] Found ${scrollers.length} scrollable containers`);
           
-          let iteration = 0;
-          const maxIterations = 50; // Safety limit (from user's bookmarklet)
+          let i = 0;
+          let totalClicked = 0;
           
-          // Main expansion loop with scrolling (adapted from user's bookmarklet)
+          // EXACT tick function from user's working bookmarklet
           const tick = () => {
-            // Click all visible More buttons
-            const clickedThisRound = clickAll();
-            totalClicked += clickedThisRound;
+            // Count buttons before clicking
+            const beforeCount = [...document.querySelectorAll('button,[role="button"],span')]
+              .filter(el => match(el)).length;
             
-            // Scroll all scrollable containers by their client height
+            clickAll();
+            
+            // Count buttons after clicking (for logging)
+            const afterCount = [...document.querySelectorAll('button,[role="button"],span')]
+              .filter(el => match(el)).length;
+            totalClicked += (beforeCount - afterCount);
+            
             scrollers.forEach(el => {
               try {
                 el.scrollBy(0, el.clientHeight);
-              } catch (error) {
-                console.log(`[MORE_EXPANSION] Error scrolling container: ${error}`);
-              }
+              } catch {}
             });
             
-            // Scroll the main window by its inner height
-            try {
-              window.scrollBy(0, window.innerHeight);
-            } catch (error) {
-              console.log(`[MORE_EXPANSION] Error scrolling window: ${error}`);
-            }
+            window.scrollBy(0, window.innerHeight);
+            i++;
             
-            iteration++;
-            console.log(`[MORE_EXPANSION] Iteration ${iteration}/${maxIterations}, clicked ${clickedThisRound} buttons this round`);
+            console.log(`[MORE_EXPANSION] Iteration ${i}/50, clicked ${beforeCount} More buttons this round`);
             
-            if (iteration < maxIterations) {
-              setTimeout(tick, 400); // 400ms delay between iterations (from user's bookmarklet)
+            if (i < 50) {
+              setTimeout(tick, 400);
             } else {
-              // Final click pass after all scrolling (from user's bookmarklet)
-              const finalClicked = clickAll();
-              totalClicked += finalClicked;
-              totalExpanded = totalClicked;
-              
-              console.log(`[MORE_EXPANSION] Completed! Total More buttons clicked: ${totalClicked}`);
-              resolve({ clicked: totalClicked, expanded: totalExpanded });
+              clickAll(); // Final click pass
+              console.log(`[MORE_EXPANSION] Completed! Total iterations: ${i}`);
+              resolve({ clicked: totalClicked });
             }
           };
           
@@ -880,7 +851,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         });
       });
       
-      this.log(`✅ Comprehensive More button expansion completed: ${result.clicked} buttons clicked, ${result.expanded} reviews expanded`);
+      this.log(`✅ More button expansion completed using bookmarklet logic: ${result.clicked} buttons processed`);
       
       // Wait for final content to load
       await page.waitForTimeout(2000);
@@ -940,8 +911,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       window.postMessage('START_SCRAPING', '*');
     });
     
-    // First, handle More button clicking robustly with proper async handling
-    await this.clickMoreButtonsOnPage(page);
+    // More buttons already expanded in collectReviewsBySort - no need to expand again
     
     const result = await page.evaluate(() => {
       const reviews = [];

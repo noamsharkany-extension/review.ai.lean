@@ -11,21 +11,21 @@ Example URLs:
 • Google Search: https://www.google.com/search?q=restaurant+reviews
 • Any Google page showing business reviews
 Analysis Complete
-Analyzed 278 reviews with 170% confidence
+Analyzed 278 reviews with 37% confidence
 
-8400%
+78%
 Overall Score
 Analysis Verdict
 Overall Impression
-8400%
+78%
 Based on sentiment analysis and review authenticity
 
 Trustworthiness
-7900%
+100%
 Reliability of reviews and business reputation
 
 Red Flags
-3500%
+35%
 Potential issues detected in reviews
 
 Analysis Overview
@@ -34,15 +34,15 @@ Total Reviews
 All analyzed
 
 Fake Reviews
-141.0%
+0.4%
 Detected by AI analysis
 
 Sentiment Mismatches
-43.0%
+0.4%
 Rating vs text sentiment
 
 Confidence Score
-170%
+37%
 Analysis accuracy
 
 Trust Assessment
@@ -50,42 +50,202 @@ Highly Trustworthy
 This business appears to have authentic, reliable reviews. You can trust the overall sentiment.
 
 Quality Indicators:
-High fake review rate detected
-High analysis confidence
+Low fake review rate
+Lower analysis confidence
 Multiple red flags present
-Review Citations (50)
+Review Citations (278)
 Click any review to see detailed analysis
 Moran Musheev
-10 minutes ago
-Potentially Fake
-Sentiment Mismatch
+34 minutes ago
 Amala, what a refreshing ice cream and what a crazy selection of flavors!!! Stunning design, bomb fusion, we had a great time..
 
 Anonymous
+a day ago
+Delicious and pleasant, we enjoyed it very much
+
+Yarden Shkibi
+a day ago
+Best Ice cream in Israel. Expensive.
+
+Uri Gavze
+4 days ago
+Great ice cream and service
+
+Anonymous
+Edited 5 days ago
+The most delicious ice cream
+
+Anonymous
+6 days ago
+Very tasty ice cream, amazing and pampering service (the bearded salesman is the manliest!)
+
+Anonymous
+a week ago
+The most delicious ice cream I've had in a while! Air-conditioned, clean and cozy.
+
+Anonymous
+a week ago
+A visit to an ice cream parlor is always a refreshing experience, but there are places where the experience becomes unforgettable – and that is exactly what happened here. From the moment you entered the place, you could feel the pleasant …
+
+L Ya
+a week ago
+6 vegan flavours!!! So tasty! You have to try
+
+Anonymous
+a week ago
+One branch for yogurt and next to it a branch for ice cream and desserts. Exceptional selection, fresh products with an emphasis on fruits and sauces, and extremely courteous service. …
+
+Anonymous
+a week ago
+The employee there was impatient with me in a really unpleasant way. I will not go back there again.
+
+Anonymous
+a week ago
+Good ice cream, courteous service, there is a place to sit, a little expensive
+
+Anonymous
 2 weeks ago
-Sentiment Mismatch
 Ice cream is delicious, a large selection of flavors. The service is always very good. Clean and cozy. I recommend!
 
 Anonymous
+3 weeks ago
+Amazing, wonderful service, delicious, fresh
+
+Danny Cohen
+3 weeks ago
+Good ice cream in Neve Tsedek neighborhood
+
+Anonymous
+3 weeks ago
+A pampering place that is fun to come to, personal attention to every customer, and they really give from the heart.
+
+George Vitebsky
+Edited 4 weeks ago
+The best gelato in the country.
+
+Anonymous
+a month ago
+Great place, not expensive at all and very tasty! Amazing sorbet
+
+Anonymous
+a month ago
+The most delicious, period!!!
+
+Anonymous
+a month ago
+A selection of ice creams in different flavors, highly recommended
+
+Anonymous
+a month ago
+A lovely place to refresh yourself with delicious ice cream
+
+Anonymous
+Edited a month ago
+Hello Gonen🍦, First of all, we thank you for your response and for taking the time to write to us. … More
+
+Anonymous
+a month ago
+A pleasant experience of delicious ice cream (!!), a clean place with courteous and pleasant service.
+
+Natalia Koppel
+2 months ago
+The best isce cream in town
+
+Anonymous
 Edited 2 months ago
-Sentiment Mismatch
 There's nothing to say about the ice cream, it's not Golda, it's much more than Golda, I also like their coffee Unfortunately it closes at midnight even on Mochash, the selection of flavors is bigger than any Golda
 
 Anonymous
 Edited 2 months ago
-Sentiment Mismatch
 The ice cream is delicious, the atmosphere and style are nice. And here is coffee with the taste of coal.
+
+Anonymous
+2 months ago
+Stop the killer Netanyahu
+
+Anonymous
+2 months ago
+Delicious ice cream. With over 30 flavours on offer, the ice cream here is some of the best that I've tasted anywhere in Israel.
+
+Anonymous
+Edited 2 months ago
+Great ice cream, love the pistachio and chocolate sorbet. Polite and generous staff.
+
+Anonymous
+2 months ago
+Wow, extremely good ice cream, large portions and flexible selection.
+
+Anonymous
+2 months ago
+Excellent quality ice cream Generously given The design of the place is amazing
+
+Anonymous
+2 months ago
+Wonderful ice cream! Giant portion! The best for my opinion in Tel Aviv)) My recommendation — chocolate mint ❤️
+
+Anonymous
+3 months ago
+Sweetest spot in Neve Tzedek area period. Authentic Italian gelato and great coffee. It has been our go to place whenever we visit the area. Very long hours of operation , nice staff and always so tasty!
+
+Harel Arzi
+3 months ago
+Good variety. Friendly and patient staff.
+
+Anonymous
+3 months ago
+Huge selection. Very tasty ice cream. One scoop 50 NIS.
+
+Anonymous
+3 months ago
+Good ice cream, less service
 
 Mitchell Roberts
 3 months ago
-Sentiment Mismatch
 Excellent Gelato. Nice portions.
 
 Anonymous
 3 months ago
-Potentially Fake
-Sentiment Mismatch
 It doesn't make sense that it takes more than fifteen minutes to get something.. The line is completely chaotic and people are served out of order. At least the ice cream is good..
+
+Ben Erdos
+3 months ago
+An ice cream institution!
+
+Anonymous
+3 months ago
+Galia is very tasty. I recommend the coconut ice cream to those who like...
+
+Anonymous
+3 months ago
+High-quality ice cream, my family and I really like it.
+
+Anonymous
+3 months ago
+This is a 5 star rating but really a complaint, about Aviv's overly good service I asked for a flavor recommendation …
+
+Anonymous
+3 months ago
+A large and delicious selection of special flavors. Also a comfortable bathroom downstairs. Not cheap. Recommended
+
+Anonymous
+3 months ago
+One of the best ice cream cafes. Ice cream and service are top notch
+
+Anonymous
+3 months ago
+Absolutely fantastic. I can only recommend it.
+
+Anonymous
+3 months ago
+The ice cream is really delicious, and the service is excellent - the guy really made sure to make us a proper cup.
+
+Anonymous
+3 months ago
+Great ice cream in the world! A refreshment station for travelers in Neve Tzedek. No parking - arriving on foot.
+
+Anonymous
+3 months ago
+We keep going back there, because it's simply delicious!
 
 Anonymous
 4 months ago
@@ -95,30 +255,192 @@ Anonymous
 4 months ago
 Can't fault this place - we only had the yoghurt which had extremely nice sweet/sout taste, but the friendliness of the staff is beyond amazing.
 
+Anonymous
+4 months ago
+Just great!! We ordered a huge yogurt and it was so delicious and indulgent!! We could load up on as many flavors as we like and the portion was just huge! And the price is simply surprising how reasonable it was and not porky compared to everything that happens in this city.
+
+Anonymous
+4 months ago
+A beautiful ice cream parlor with many different and diverse flavors of ice cream, very tasty! You can also drink coffee. There is plenty of room to sit inside and outside, but there are always a lot of people
+
+Miki Eshed
+Edited 4 months ago
+Best homemade ice cream !!
+
+Anonymous
+4 months ago
+tasty net Very meticulous Kind and considerate service
+
+Anonymous
+4 months ago
+Absolutely love this place! The staff are super friendly and the service is amazing. You can really tell they serve with heart — the portions are generous and the ice cream selection is fantastic. So many delicious flavors to choose from, …
+
+Anonymous
+4 months ago
+Nice ice-cream, just like Their Golden competitor, I was hoping to have something different but it was exactly the same, it was lovely and the portions were beyond what was expet
+
+Anonymous
+4 months ago
+Very tasty with many flavors to choose from. quite expensive
+
+דרורית דבוש
+4 months ago
+The best ice cream ever
+
+Anonymous
+4 months ago
+Very good ice cream and also the service. Very crowded inside the store and the queue of whoever grabs it. The prices are above any reasonable price for a scoop of ice cream
+
+Anonymous
+4 months ago
+High-quality and delicious ice cream
+
 Yoni W
 5 months ago
 Thanks for hosting us in your mamad ❤️
 
 Anonymous
+5 months ago
+We were on a Friday at noon, so there were a lot of people and the line wasn't quite orderly, but overall it was delicious 🍦😋 …
+
+Anonymous
+5 months ago
+Delicious, pleasant and beautiful
+
+Hysen Rebello
+5 months ago
+If it's ice cream in Tel Aviv, it has to be Anita.
+
+Anonymous
+5 months ago
+The most delicious ice cream in the world Pleasant service
+
+Anonymous
+5 months ago
+Amazing ice cream and service
+
+Anonymous
+7 months ago
+Hey, 👋, They gave us many many Frozen yoghurt in one cup. So nice of them 😁😊. So nice toppings. …
+
+Lara Yasinev
+7 months ago
+Best frozen yogurt in Tel Aviv 😍 …
+
+Anonymous
+7 months ago
+Anyone who thought they had the perfect yogurt hasn't been to Anita's yet, I'm seriously addicted and there's no Sabbath without their acai yogurt! Everything is at a high level, all the raw materials are invested at the level of any golden …
+
+Anonymous
+10 months ago
+We received service from Uri and Tomer, it was perfect, thank you very much!!!
+
+Anonymous
+10 months ago
+One of the best ice creams we have eaten, from the toppings to the edge of the cup. Excellent service. …
+
+Anonymous
+10 months ago
+We were pleasantly surprised from the very reasonable price. Tasty ice-cream, generous and nice stuff with a good attitude
+
+Anonymous
 11 months ago
-Potentially Fake
-Sentiment Mismatch
 One of the best I've tried, fun atmosphere, good flavors, service, really good ice cream, in short, go here. The ice cream we tasted and ordered was vegan and excellent, and the coffee was very good, highly recommended.
 
 Anonymous
 11 months ago
-Potentially Fake
-Sentiment Mismatch
 You’re entering a place that instead of nice attractive and tasty smells like chemicals. You’re buying ice cream and in front of you a guy is spraying some cleaning chemical on the counter. Really? But why? This is unhealthy and unpleasant
 
 Anonymous
+11 months ago
+The most delicious ice cream ever The most fun is that it is inside Neve Tzedek 🤌🏼 …
+
+Anonymous
+11 months ago
+Crazy ice creamServiceDine in… More
+
+Anonymous
+Edited 11 months ago
+Excellent ice cream from the leaders in Israel - this was my review until 10.9.2024, at which time, I arrived as usual and was amazed to discover how much the level had dropped. First, the quantity sold to the customer in the largest cup is …
+
+Anonymous
+11 months ago
+Awesome place I ordered yogurt ice cream with toppings. They generously gave me a refill on the toppings if I stayed in the area. Really not obvious
+
+Anonymous
 a year ago
-Potentially Fake
+It was really delicious, the employees were smiling and nice🍨 …
+
+Anonymous
+a year ago
+Pampering service.... Delicious ice cream ... a little too sweet .... Ra Ra Oira ... missing music ....
+
+Anonymous
+a year ago
+Very friendly. A magical place
+
+Anonymous
+a year ago
+As a vegan, I am overwhelmed by the options. Everything was delicious and the girls working on Shabbat were all nice and cheerful. The only problem is that they work too hard and are required to deal with abnormal chaos and I almost didn't …
+
+Anonymous
+Edited a year ago
+Hello Yaron🍦, First of all, we thank you for your response and for taking the time to write to us. … More
+
+Anonymous
+a year ago
+The most delicious ice cream I've ever eaten with very kind service!
+
+Anonymous
+a year ago
 It's the best ice cream i've ever had. And i ate a LOT of ice cream in my life. Macadamia is just crazy and it's high quality dairy, really rich 👌🏼 …
 
 Anonymous
 a year ago
-Sentiment Mismatch
+One of the tastiest ice cream parlors in the central region and in the country as a whole. Amazing vanilla. Chocolate in a variety of flavors. Exceptional service. A little pressure at the checkout, but that's because of the time we …
+
+Anonymous
+a year ago
+Hello, thank you very much for the service and for the ice cream ❤️
+
+Anonymous
+a year ago
+It was excellent service that doesn't mention the ice cream (lick your lips) Thank you very much, you made my ice cream dream come true today😍 …
+
+Anonymous
+a year ago
+Stumbled upon this place after seeing a crowd surrounding it. Absolutely fantastic ice cream at a very reasonable price. Great selection of flavours too.
+
+Anonymous
+a year ago
+Excellent experience! Great service from Yotam❣️
+
+Anonymous
+a year ago
+A rare place and the sellers are cool and indulgent
+
+Anonymous
+Edited a year ago
+Neve Tzedek as a preserved and well-kept site Great. Anita ice cream is delicious, clean and excellent
+
+Anonymous
+a year ago
+Great branch in a great location. Good service and a variety of ice creams and types of coffee
+
+Anonymous
+a year ago
+The best gelato place and yogurt! The flavors are intense and delicious Not too sweet and not too milky Which makes it a great gelato
+
+Anonymous
+a year ago
+Wonderful flavors and amazing service from the smiling Omri who made us a great holiday evening 🥰 …
+
+Zehavit Avraham
+a year ago
+The ice cream is the best that's a given, but LOVE the coffee as well!
+
+Anonymous
+a year ago
 Very large spectrum of différent parfum... Fast service... Very tasty and fresh.. A little bit e pensive... But thé Best icecream
 
 Anonymous
@@ -135,17 +457,14 @@ Excellent ice cream, not commercialized, delicious and strong coffee. Neve Tzede
 
 Anonymous
 2 years ago
-Potentially Fake
 Extremely lousy service! I had to wait for several minutes at the counter, before the employees stopped chit-chatting among themselves and begore they asked whether I wanted to order something. By that time my desire for gelato had vanished ...
 
 Anonymous
 3 years ago
-Potentially Fake
 Didn't eat the ice cream but the place was attractive and clean. Surrounding neighborhood of Neve Tzedek is very nice. Too bad they're don't have kosher certification.
 
 Anonymous
 2 years ago
-Potentially Fake
 Bad service and very poorly organized. I queued for more than 10 min. Everyone jumping the line. A good mess! Guys, put some order in there! 👎🏻👎🏻👎🏻👎🏻 …
 
 Peter Ferstendik
@@ -153,21 +472,31 @@ Peter Ferstendik
 The rudest owner in the whole of Tel Aviv and does not care.
 
 Anonymous
+2 years ago
+So slow and terrible service
+
+Anonymous
+5 years ago
+not good frozen yogurt
+
+Anonymous
+4 years ago
+Vegan? Keep going to Legenda!!!! 🥰 Rotchild 45 For vegans - it's better to continue to Rothschild Boulevard 45!!🥰 …
+
+Anonymous
+5 years ago
+We ordered half a kilo home - bamba chocolate flavor, salted cashew and berry pavlova. I called before ordering to consult with the seller about the flavor of the …
+
+Anonymous
 Edited 3 years ago
-Potentially Fake
-Sentiment Mismatch
 Very bad After several times we came specially. We were on a Friday night …
 
 Anonymous
 2 years ago
-Potentially Fake
-Sentiment Mismatch
 I received shocking treatment, the ice cream is not good enough to convey the bitter taste of the behavior of one of the employees We will not return
 
 Anonymous
 2 years ago
-Potentially Fake
-Sentiment Mismatch
 Terrible service. We waited in line for 15 minutes and still didn't buy ice cream. People are served based on the principle of who is louder and more impudent, when I told the workers that people who came later than us were ordering, and we …
 
 Anonymous
@@ -176,7 +505,6 @@ Expensive and not tasty ice cream, unfortunately in Israel they make interest fr
 
 Anonymous
 5 years ago
-Potentially Fake
 Really bad and disgusting ice cream. Not worth the investment. I threw it away in the middle because it didn't taste good. The place stinks and is crowded with people and not clean. The same taste as Golda's, not tasty at all.
 
 Anonymous
@@ -185,72 +513,509 @@ There are those in every city, only they call it Golda.. What's the difference? 
 
 Anonymous
 4 years ago
-Potentially Fake
-Sentiment Mismatch
 We ate pizza without cheese, salty sauce, we paid a lot, in short, disappointment
 
 Anonymous
 6 years ago
-Potentially Fake
-Sentiment Mismatch
 The worst ice cream. Expensive for no reason. Waste of money 🤪 …
 
 Anonymous
 2 years ago
-Potentially Fake
-Sentiment Mismatch
 After 10 minutes, no one came to even bring us the card. Then we left.
 
 Anonymous
 8 years ago
-Potentially Fake
-Sentiment Mismatch
 Ice cream for display only, there is nothing more to it
 
 Anonymous
 7 years ago
-Potentially Fake
-Sentiment Mismatch
 A really disgusting place, not recommended at all.
 
 Anonymous
 2 years ago
-Potentially Fake
-Sentiment Mismatch
 Personally, I didn't like their ice cream.
 
 Anonymous
 6 years ago
-Potentially Fake
-Sentiment Mismatch
 Disrespectful service and expensive price
 
 p. b69
 4 years ago
-Sentiment Mismatch
 Great place, great taste
+
+Mazal Emanuel
+4 years ago
+Great flavor for ice cream
+
+רוית ירון
+6 years ago
+Potentially Fake
+Condescending service
+
+יעלה אלפסי
+6 years ago
+Too sweet, too sweet.
 
 Anonymous
 5 years ago
-Potentially Fake
+Hello Zvi🍦, First of all, we thank you for your response and for taking the time to write to us. … More
+
+Anonymous
+3 years ago
+Hello, I'm sorry for the experience, I would like to know what caused this? Please leave a mobile number or contact the branch for further processing.
+
+Anonymous
+4 years ago
+Hi Yaron, we would be happy to receive full details about the experience by emailing tsipora@anita-gelato.com
+
+Anonymous
+4 years ago
+Hello Mansour, We would be happy to receive more information about your experience by email: Tsipora@anita-gelato.com Thank you and have a good day.
+
+Anonymous
+4 years ago
+Ice cream was great. But they have to replace their take away cups. Their cups are too small for the portion an in tel aviv heat, most of the ice cream is on the floor...
+
+Anonymous
+9 years ago
 Sentiment Mismatch
+I've heard about this place only good things, and how great is their ice cream, so I dragged my friends there. The ice cream, overpriced, was not to any of our tastes(each had different flavours).
+
+Anonymous
+7 years ago
+Fancy photo but ordinary taste. Only dark chocolate pretty good, the rest too sweet and you feel water instead of milk part.
+
+Steven Mandowsky
+3 years ago
+Very expensive, and I do not consider such a good icecream
+
+Anonymous
+7 years ago
+Nice but very veryexpensive for an ice cream. For same price you get much more usually.
+
+Anonymous
+6 years ago
+The place is overlooked, I didn't find any special things here. Not my personal taste.
+
+Noam Koenigstein
+Edited 2 years ago
+I personally prefer Othello.
+
+Brighitte Shalom
+5 years ago
+It's all about the service. And it is far from being acceptable
+
+Roei It
+5 years ago
+Sababa but not too much..
+
+Anonymous
+4 years ago
+Learn. This is the origin of Golda, the mother of the landlord, as they say ..and that's why you've actually arrived at Golda....so if you're superficial and a bag of gold or a beautiful pile of ice cream on display does that to you, …
+
+Anonymous
+Edited 3 years ago
+The price is high. The queue is chaotic. There is little seating space and everything is packed. The ice cream is put on by hands, they can’t even give the balls a round shape properly, so everything falls out of the cone. In short, the place is unreasonably popular!
+
+Anonymous
+6 years ago
+Quality service, the food quality is low due to the preparation and ingredients that make up the simple dishes. The quality of the cutlery is poor compared to my last visit about 3 years ago. Diving at a very low level.
+
+Anonymous
+Edited 4 years ago
+Very crowded, the owners and staff are grossly violating the rules of the Ministry of Health. No customer is wearing a mask. Not relevant. The ice cream is delicious but that really doesn't cover the lack of responsibility
+
+Anonymous
+7 years ago
+The place is disgusting no matter where you go there is a lot of noise this place is dirty as Hezbollah I would rather go out with a dirty crocodile than be in this place the service there is disgusting and I would not recommend you to be there
+
+Anonymous
+5 years ago
+Prices are tens of percent more expensive than much tastier and higher quality Italian ice creams. The ice creams I tasted were heavy to eat and overly sweet.
+
+Anonymous
+6 years ago
+Mainly sold for visibility, the yogurt is tasty but does not justify the pose and the price, in addition to first time visitors it is not clear how it was sold and the staff is reluctant to explain.
+
+Anonymous
+3 years ago
+We've exhausted these ice creams. It's more than just a posse. There are really better places.
+
+Anonymous
+3 years ago
+Something not like before. I haven't been in a long time and it was a disappointment
+
+Anonymous
+7 years ago
+A large crowd in the place creates a false impression of quality ice cream.
+
+Anonymous
+5 years ago
+Not fresh waffle, expensive price and a small scoop of ice cream
+
+Anonymous
+7 years ago
+Parking problem, busy, noisy but pretty tasty
+
+Anonymous
+5 years ago
+They are not following crowding guidelines and I saw it inside the store.
+
+Anonymous
+8 years ago
+Don't change flavors always the same
+
+Anonymous
+6 years ago
+Crowded, unorganized, uncomfortable... The ice cream is delicious
+
+Anonymous
+4 years ago
+Not kosher No kosher certificate
+
+Anonymous
+3 years ago
+Excellent ice cream but expensive, crowded and a predatory chain
+
+Anonymous
+6 years ago
+Very expensive, nothing to complain about
+
+Anonymous
+5 years ago
 Hello Alon🍦, First we thank you for your response and for taking the time to write to us. And as part of the "20th anniversary of Anita" celebrations, we are interested … More
 
 Anonymous
 5 years ago
-Potentially Fake
-Sentiment Mismatch
 Hello Yoel🍦, First of all, we thank you for your response and for taking the time to write to us. … More
+
+Anonymous
+2 years ago
+We went in since we heard good things about their ice cream, but we were disappointed. Ice cream is too sweet (I couldn't finish my serve), and the place plays very loud music. Overall, there are better options in the area.
+
+Anonymous
+7 years ago
+Very busy and trendy, but not one of the best - ice cream is wayyy too sweet and there's usually no place to sit.
+
+Eatalle
+8 years ago
+Best ice cream 🍦 World of flavors Good service …
+
+Anonymous
+Edited 7 years ago
+Overrated. Nice Ice-cream, but feels a bit industrial. There's better options in Tel Aviv
+
+Din Ben Yacob
+2 years ago
+Decent ice cream a bit too sweet for me
+
+Anonymous
+6 years ago
+The icecream was wonderful. Lots of choices and it was tasty but the service was terrible.
+
+Anonymous
+7 years ago
+I did not like the ice cream(I tried magnum&pistacio and Cookieman) but coffee is good.
+
+Yaacov Koren
+8 years ago
+Good ice cream but no place to seat.
+
+Ben Burgos
+2 years ago
+Service was great. The gelato was OK.
+
+Anonymous
+4 years ago
+Very tasty but use so much packaging!
+
+Giora Akavia
+4 years ago
+Everege taste of ice cream. Large portion
+
+Tamir Bahar
+7 years ago
+Ate some of the sorbets, didn't like it very much.
+
+Roberto Cohen
+3 years ago
+Ice cream so so, not very good
+
+Yonatan Brand
+6 years ago
+Tasty but a bit over rated.
+
+Peter Woolf
+5 years ago
+Chaotic, but good ice-cream
+
+Eliran V
+8 years ago
+Expensive yet delicious
+
+Anonymous
+6 years ago
+Very high quality ice creams with surprising flavors. When I visited the ice cream parlor there were different and wonderful chocolate flavors of many chocolates and I was even surprised to find out that they have Torino flavored chocolate …
+
+Anonymous
+7 years ago
+The taste is good, mainly chocolate flavor. If you like sweet food, you will like this store.
+
+Anonymous
+2 years ago
+20 shekels per scoop of ice cream, nice variety but everything is very sweet. Indulge in the quantity and one scoop is really enough. Very nice people, only minus the sweetness of the ice cream.
+
+Anonymous
+5 years ago
+The ice cream is, of course, very tasty and there is a large selection. But with it you have to go outside and eat while standing. Because the room is very small and there are always a lot of people in it. Everything is busy, there is …
+
+Anonymous
+5 years ago
+I thought I would get to taste flavors that Golda ice cream doesn't have. But overall, these are the same flavors (same chain). Anita is branded as higher quality. …
+
+Anonymous
+5 years ago
+Excellent service (I got into trouble with the toppings and the seller offered me things with tolerance even though I was a bit annoying lol). Amazing yogurt (I took half acai and half vanilla and it was more delicious). fresh fruit. Full …
+
+Anonymous
+4 years ago
+The selection and sales process is not regulated, so when there are a lot of people it is really unpleasant. The ice cream is good, lots of interesting flavors, a little too sweet and greasy for my taste.
+
+Anonymous
+5 years ago
+The ice creams are delicious and fresh. The place does not keep the purple note. Temperature is not measured at the entrance and there is no limit to the number of customers who come in to buy. For me personally, it is very disturbing that I might get infected for this reason.
+
+Anonymous
+4 years ago
+Delicious ice cream. We ordered 4 basic dishes in different flavors Fast and efficient service. Price similar to other ice cream parlors. …
+
+Anonymous
+Edited 2 years ago
+A lovely place and delicious ice cream, no doubt! But it's always so packed, it's a shame there isn't a courtyard or garden with more seating...
+
+Anonymous
+5 years ago
+During the days of Corona, the store was full of crowded customers, when I warned them, they said we are allowed 20, this is administrative manipulation... it was very crowded
+
+Anonymous
+9 years ago
+A well-stocked ice cream parlor with lots of flavors of homemade ice cream, including a variety of frozen yogurt. …
+
+Anonymous
+Edited 8 years ago
+Not bad ice cream, too much sugar. Weak pistachio, skip. As always in Israel, ridiculous prices: NIS 22 for a medium cup with 2 balls. A similar size in the center of Milan, at the Grom ice cream parlor, which is considered expensive, is NIS 12.6.
+
+Anonymous
+4 years ago
+I tried to buy it on Saturday, there was too long a line, I didn't have the patience, apparently it's delicious there.
+
+Anonymous
+4 years ago
+The ice cream is delicious, but insanely expensive. I paid 90 NIS for a pack of 5 ice cream scoops. In retrospect, it's not worth the price.
+
+Anonymous
+3 years ago
+I didn't like the taste, I ate pistachio flavored ice cream, really not close to pistachio. Belgian chocolate noel is not tasty.
+
+Anonymous
+4 years ago
+An ice cream shop, special flavors, the shop is located in the Neve Tzedek neighborhood. To enter the store it is necessary to go down stairs.
+
+Anonymous
+5 years ago
+Expensive! But going back to Shabazi, where I lived! It was really great fun! We went with some of the grandchildren on a roots tour, fun to remember those days!
 
 Anonymous
 Edited 5 years ago
 As part of a tour with tourists in the flea market, we sat down to have a snack. Menu also in English 👍 Pleasant and courteous service. It was delicious …
 
 Anonymous
+6 years ago
+A place to sell delicious ice cream but if you get dirty you don't have a water tap and I didn't see a toilet. There may be one but there is no sign to indicate it.
+
+Anonymous
+3 years ago
+100% goodness. There are so many chocolate-related flavors. I had to seek help from the staff …
+
+Anonymous
+3 years ago
+Best ice-cream I have ever had!!! What a lucky find! Your mouth will start watering when you enter. They have so many delicious flavours to choose from! I love the Salted Cashew!! We even went back the next day to try it again. The staff are also super friendly and helped with loads of tastings! 😁 …
+
+Anonymous
 2 years ago
-Potentially Fake
-Sentiment Mismatch
+Superb icecreams. I would eat them all. The white chocolate with pistachio flavor made me touch heaven. My favourite ice cream shop for sure.
+
+Anonymous
+2 years ago
+I had to try Anita in tel Aviv being from NYC, the taste was the same. I appreciated creamy flavors more than the fruity ones.
+
+Anonymous
+2 years ago
+Experience an amazing selection of flavors and a delightful atmosphere at Anita. The friendly and energetic staff curates playlists that keep everyone working to the beat. Perfect for those late-night sweet cravings, sit outside and soak in …
+
+Anonymous
+3 years ago
+I don’t have a sweet tooth but the salted cashew hits the spot every single time. It has became a ritual each time I visit Tel Aviv. The staff are always so cheerful and happy to let you sample the different flavours.
+
+Anonymous
+7 years ago
+Great ice cream shop. So many selections even though it was the later half of the day. The ice cream itself is superb. I took the watermelon and mint (super refreshing) and a scoop of white chocolate and pistachio cream - sweet but goes good with coffee.
+
+Anonymous
+2 years ago
+The best frozen yogurt I have ever eaten! Affordable price and a bowl full of ingredients depending on your flavors. Highly recommended.
+
+Anonymous
+2 years ago
+Gelato, ice cream, many, many flavours. Beautiful presented. Some interesting combinations, this week "Happy Poerim" . …
+
+Anonymous
+a year ago
+I am a gelato lover and their ice creams are really goooood !! They have a lot of flavours, and in my opinion it is not very expensive. For a medium size cup you can have 3 different flavors. All the staff is very nice and speaks English 😇. …
+
+Anonymous
+2 years ago
 So happy I left my room at 10pm to get Anita's. Only thing to make this better would be a waffle bowl instead of a cone. But I will definitely take what I can get if it means getting more. So worth the walk because all gelato is not created equal and they prove it.
+
+Anonymous
+2 years ago
+Best ice cream in tel Aviv. Really nice place, a lot of choice, fast service . Really nice staff and ice cream from an other world. …
+
+Anonymous
+6 years ago
+Best ice cream in the city! Variety of unique flavors And a new ones from time to time. Everything is tasty so no matter what you choose, you can’t go wrong. Usually busy at any time but the line moves quickly, there is enough sitting area inside and outside.
+
+Anonymous
+8 years ago
+Certainly one of the tastiest ice creams I ve had! I got there on a very busy Saturday evening! However the service was super quick and friendly. …
+
+Anonymous
+3 years ago
+Anita is probably my most favourite gelato shop in Israel and this is its principal and most picturesque location. Beware of crowds and do not forget to sample the strongest espresso ever (available here).
+
+Anonymous
+5 years ago
+The tropical sorbet is a mix of mango and passion fruit. The pistachio is super creamy and delicious. Generally this gelato is not too sweet which makes it so very good! The service is quick, attentive and fun. I would love to come back for more.
+
+Anonymous
+a year ago
+Very nice idea and good tast, you can also refill the fruits etc for free 😍 …
+
+Anonymous
+6 years ago
+Nice location, good variety of original icecream. Since this is in the middle of Neve Tzedek, it's always full.
+
+Anonymous
+2 years ago
+Each time I walk around this area I see this place food of people so wanted to check it for myself. Service was great, good selection and also vegan ones as well. Flavours were just right, not to sweet but full of flavour. Worth a visit
+
+Anonymous
+5 years ago
+Fantastic, Great variety of ice cream tastes Place is clean, good service …
+
+Anonymous
+Edited 3 years ago
+Good asian food Okinawa. Not Anita. I don't know why it was published under Anita.
+
+Diana Fruchter
+2 years ago
+Amazing ice creams. Very friendly staff. Extremely clean and tidy.
+
+Anonymous
+3 years ago
+I had such a wonderful experience here. I love the ambiance and clean modern feel. They clearly care about good service and offer nice brand name cups and specialty napkins. Whoever owns this shop is putting their heart and soul into their work. Thank you so much.
+
+Anonymous
+7 years ago
+After coffee at Loveat and strolling down thru the old Tel-Aviv you must stop for Gelato or Yogurt from Anita's! Wonderful flavors and serving options. I tried a tiny bit of a local favorite!
+
+Anonymous
+2 years ago
+Obviously the OG ice cream spot in Tel Aviv. Great service, immaculate shop
+
+Anonymous
+3 years ago
+Great ice cream shop. Great ice cream. Staff friendly and efficient Wide choice of flavours at a reasonable price
+
+Anonymous
+7 years ago
+Delicious ice cream, I almost went for a second portion. We tasted 4 flavours and all of them were great. The service is quick despite many customers. Looking forward to my next visit.
+
+Anonymous
+5 years ago
+Great gelato! We’ve tried few types and everything was superb! Vegan Oreo taste was delicious!
+
+Anonymous
+8 years ago
+Huge variety of flavours and toppings - and really unique choices as well. Rivals the best I've seen in Italy, highly suggest you stop if in the area.
+
+Anonymous
+5 years ago
+They have a great assortment of flavors, and it's a nice quiet place to get a quick dessert at night.
+
+Anonymous
+2 years ago
+The best rated ice cream shop is Tel-Aviv. Very popular so very crowded, not by chance! ☺️🍦 …
+
+Anonymous
+5 years ago
+Hands down the best salted caramel gelato ever. Located on a trendy, quaint picturesque street. Excellent, friendly service.
+
+Anonymous
+6 years ago
+Amazing icecream, it's always busy but it's well worth the wait. Salted caju is the best 😊 …
+
+Go to DrunkPhotography.com.
+6 years ago
+OMG hands down THE best Ice Cream in Tel Aviv.
+
+Anonymous
+3 years ago
+Delicious ice cream and so many flavours makes it super difficult to choose from
+
+Anonymous
+2 years ago
+"You can try as much as you want", told us the ice-cream vendor. Very friendly service and tasty ice cream!
+
+Anonymous
+2 years ago
+What a beautiful, tasty afternoon treat! If you can get past the line ups and grab a table…you’re golden!
+
+Anonymous
+6 years ago
+Amazing ice cream! Mint chocolate my favorite ❤️ I choose it every time when I came. Staff very friendly and place very nice. I think that this ice cream one of the best
+
+Anonymous
+3 years ago
+Simply the best. Great flavours. Amazing service. Such good sitting outside. Nice and clean.
+
+Anonymous
+5 years ago
+The best ice cream I’ve ever had! Place always crowded! Try caramel with almonds.
+
+Anonymous
+5 years ago
+Hands down, one of the best ice creams in town (head in head with Golda, which is the same ownership so technically both are no. One ;) ) Love it. Every time.
+
+Anonymous
+7 years ago
+Very very good ice cream! Loved both the taste and the nice location of this shop. Absolutely recccomanded!!
+
+Anonymous
+6 years ago
+The best yogurt ever! Verity of topings and just everything you need in order to make the best yogurt. Highly recommended!
+
+Anonymous
+2 years ago
+One of the best gelato I've had in my life. Pistacchio its outstanding .
+
+Anonymous
+7 years ago
+A lovely ice-cream place in the center of Neve-Tzedek. A wide selection of flavors, including some vegan ones.
+
+Anonymous
+7 years ago
+They have amazing ice cream and the one I took was a size small which is still huge. It tastes incredible.
 
 patricia vergara
 2 years ago
@@ -258,17 +1023,119 @@ D E L I C I O U S !!! A nice place where You can take a relax moment ..
 
 Anonymous
 6 years ago
+Awesome gelato. I had to have two in the same day! It would be dangerous to live near here.
+
+Anonymous
+3 years ago
+Great ice cream place. Multiple flavors, from sorbets, to non sugar ice cream. Wonderful atmosphere and service. The place is air conditioned ,clean and has some sitting room inside and outside. All in all ab excellent experience, see you soon Anita ice cream!!
+
+Anonymous
+2 years ago
+Maybe the best ice cream in the world, at least the best one "I" have ever tried. If you ever get a chance to be in Tel Aviv you should definitely come here and try it. You won't be disappointed
+
+Anonymous
+2 years ago
+After tasting a lot of flavors the decision was more difficult. Everything tastes great!
+
+Anonymous
+5 years ago
+Great gelato in every flavor imaginable. Two doors down from Anita yogurt.
+
+Anonymous
+2 years ago
+One of the best ice creams I’ve eaten in my life, and I’ve lived and traveled throughout Italy! Amazing taste and vast selection of typical and not so typical flavors - Salted Cashew is to die for ❤️
+
+Anonymous
+7 years ago
+A bit expensive, but the ice cream is definitely worth it and the portions are quite big 👍🏻 …
+
+Maor Raziel avital
+4 years ago
+Great service and great selection of amazing ice cream flavors
+
+Dor
+3 years ago
+Best ice cream in the world! Flavors, service EVERYTHING EVERYTIME!
+
+Anonymous
+4 years ago
+Always a great experience, the flavors are changing all the time so you can’t get enough, and nothing better than getting ice cream and walk around this beautiful neighborhood. …
+
+Anonymous
+5 years ago
+A must try when in Israel. Great number of flavors and absolutely delicious gelatos!
+
+Anonymous
+6 years ago
 Since I'd visited this cafe for the first time, I started to frequent the place almost daily. The ice-cream is great, and the staff are really nice and friendly - we always share a smile and a bit of chit-chat whenever I come. …
 
 Anonymous
+7 years ago
+Really good ice cream. Good espresso. Nice location this area. You have to try!
+
+Melanie L
+2 years ago
+Love that place, great ice cream and the shop is sooo beautiful
+
+Maxim Ellison
+6 years ago
+Mövenpick is gonna lose their business to these guys pretty soon!
+
+Anonymous
+3 years ago
+Quality and service are outstanding. Anita and Golda have the same owners and both are easily the best ice cream shops in Israel. So the ice cream is really top notch - in quality, flavors, texture, and variety. But the service in this …
+
+Anonymous
+7 years ago
+Best ice cream/dream what I have ever had in my life!!!! Thank you for this amazing quality and experience!
+
+Anonymous
+4 years ago
+Best Ice cream in the whole country! Pleasant welcoming service, large portions. …
+
+Anonymous
+2 years ago
+Love this place! The options are endless and the staff is so friendly and welcoming. The seating is limited so you might need to stand. Very close to a couple of restaurants so great option for dessert! Would and have come back many times!
+
+Anonymous
+5 years ago
+Go get yourself some ice cream (: The line is so long for a good reason - it’s freaking great !
+
+Anonymous
+7 years ago
+Lovely ice creams and frozen yogurts. Now they have opened up at a few more places in Israel. The selection of ice creams is wonderful and a few of them are really good. The frozen yogurts are generally of good quality with a wide variety of topping options available and quite a few sauces also available.
+
+Max Anatsko
+7 years ago
+Best ice-cream and frozen yogurt I’ve ever had!
+
+Anonymous
+7 years ago
+Oh wow how can I describe this ice cream parlor justly in words??! A little spot of ice cream heaven in the middle hustle bustle of Tel Aviv on a hot humid summer day.... …
+
+Anonymous
 8 years ago
-Potentially Fake
 Best ice cream in town, but crowded on weekends and evenings. We had a delicious yogurt :)
 
 Anonymous
 6 years ago
-Potentially Fake
 One of the best ice creams in tel aviv itself and Israel in general. This magical place has a veraity and selection of over 100 flavors of ice cream. My favorite is black forest (with a hit of Rum) and Pavlova. Not for ice scream lovers only! For everyone. Go for it!
+
+Anonymous
+5 years ago
+Amazing gelato. Just Amazing! Lots of flavors to choose from and a very cutesy ambiance. Just go!
+
+Anonymous
+3 years ago
+Great! Can't say the place is the cleanest, but it is designed so well, and the flavors they offer are the best. I had Zaatar ice cream and it may sound not so good but it was out of this world. Highly recommend, especially at this location in beautiful Never Tzedek.
+
+Anonymous
+2 years ago
+I think Anita has some of the better flavor combinations in town. Scoops may be a bit smaller but flavors bring the volume. Salted cashew and the chocolate with pretzels are some favorites
+
+Anonymous
+5 years ago
+One of my favourite ice cream spots here in Tel Aviv! The staff is always high up, super friendly and you can have some sugar free and …
 
 Anonymous
 3 years ago
@@ -296,7 +1163,6 @@ Anita has the best gelato I've had in Israel! Vegan dark chocolate = my favourit
 
 Anonymous
 6 years ago
-Potentially Fake
 Very dangerous gelato shop in Tel Aviv, so many mouthwatering flavours of ice cream, including vegan and sugar free to choose from. Avoid if on diet, don't miss it if you want a sensational taste experience.
 
 Anonymous
