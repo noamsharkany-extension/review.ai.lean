@@ -779,20 +779,21 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         
         console.log('[MORE_BUTTON] Starting More button detection...');
         
-        // Find all potential More buttons using text content
-        const allButtons = document.querySelectorAll('button, [role="button"]');
+        // Find all potential More buttons using text, aria, and known attributes
+        const allButtons = document.querySelectorAll('button, [role="button"], span.w8nwRe');
         console.log(`[MORE_BUTTON] Found ${allButtons.length} total buttons`);
         
         const moreButtons = [];
         
         for (let i = 0; i < allButtons.length; i++) {
-          const btn = allButtons[i];
+          const btn = allButtons[i] as HTMLElement;
           const text = (btn.textContent || '').toLowerCase().trim();
           const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+          const jsname = (btn.getAttribute('jsname') || '').toLowerCase();
           
           // Check for More button patterns
           if (text === 'more' || text === 'עוד' || text === 'show more' || text === 'read more' ||
-              ariaLabel.includes('more') || ariaLabel.includes('עוד')) {
+              ariaLabel.includes('more') || ariaLabel.includes('עוד') || jsname === 'gxjvle' || btn.classList.contains('w8nwRe')) {
             
             // Verify it's visible and not disabled
             const rect = btn.getBoundingClientRect();
@@ -807,7 +808,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         
         // Click the buttons synchronously (simplified approach)
         for (let i = 0; i < Math.min(moreButtons.length, 10); i++) {
-          const button = moreButtons[i];
+          const button = moreButtons[i] as HTMLElement;
           try {
             console.log(`[MORE_BUTTON] Clicking button ${i + 1}: "${button.textContent?.trim()}"`);
             
@@ -900,42 +901,69 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     // First, handle More button clicking robustly with proper async handling
     await this.clickMoreButtonsOnPage(page);
     
-    const result = await page.evaluate(() => {
+    const result = await page.evaluate(async () => {
       const reviews = [];
       console.log('[SCRAPER] Simple review extraction starting... - TESTING IF CHANGES WORK!!!');
       
-      // Find all elements with star ratings
-      const starElements = document.querySelectorAll('[role="img"][aria-label*="star"], [role="img"][aria-label*="כוכב"], [aria-label*="stars"], [aria-label*="כוכבים"]');
-      console.log(`[SCRAPER] Found ${starElements.length} star elements`);
+      // Prefer stable review card containers over star elements
+      const reviewCards = document.querySelectorAll('[data-review-id], div[class*="jftiEf"], .section-review-content');
+      const starElements = reviewCards.length > 0 
+        ? reviewCards 
+        : document.querySelectorAll('[role="img"][aria-label*="star"], [role="img"][aria-label*="כוכב"], [aria-label*="stars"], [aria-label*="כוכבים"]');
+      console.log(`[SCRAPER] Found ${starElements.length} review containers`);
       
       for (let i = 0; i < starElements.length; i++) {
         const starEl = starElements[i];
         
-        // Find the review container - go up the DOM tree to find a reasonable container
-        let container = starEl.closest('div');
-        for (let level = 0; level < 5 && container; level++) {
-          const containerText = container.textContent || '';
-          if (containerText.length > 100 && containerText.length < 2000) {
-            break; // Found good container
-          }
+        // Find the review container - prefer known review card, else climb DOM
+        let container = (starEl as HTMLElement).closest('[data-review-id], div[class*="jftiEf"], .section-review-content') || (starEl as HTMLElement).closest('div');
+        for (let level = 0; level < 6 && container; level++) {
+          if (container.querySelector('.d4r55')) break; // author present
           container = container.parentElement ? container.parentElement.closest('div') : null;
         }
         
         if (!container) continue;
         
-        // Extract rating
-        const ariaLabel = starEl.getAttribute('aria-label') || '';
-        const ratingMatch = ariaLabel.match(/(\d+)/);
-        const rating = ratingMatch ? parseInt(ratingMatch[1]) : null;
-        if (!rating || rating < 1 || rating > 5) continue;
+        // Extract rating from within container to avoid mismatches (optional)
+        let rating: number | null = null;
+        const ratingNodes = container.querySelectorAll('[role="img"][aria-label*="star" i], [aria-label*="star" i], [role="img"][aria-label*="כוכב"], [role="img"][aria-label*="כוכבים"], [aria-label*="כוכבים"]');
+        for (const node of Array.from(ratingNodes)) {
+          const label = (node as HTMLElement).getAttribute('aria-label') || '';
+          const m = label.match(/([0-5](?:\.\d)?)\s*star/i) || label.match(/([0-5])/);
+          if (m) {
+            const val = parseFloat(m[1]);
+            if (val >= 0 && val <= 5) { rating = Math.round(val as number); break; }
+          }
+        }
+        if (rating === null) { rating = 0; }
         
+        // Expand 'More' within this review card to reveal full text (per-card)
+        try {
+          const moreWithin = container.querySelectorAll('button, [role="button"], span.w8nwRe');
+          let expanded = false;
+          for (const btnEl of moreWithin) {
+            const btn = btnEl as HTMLElement;
+            const txt = (btn.textContent || '').toLowerCase().trim();
+            const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+            const jsnameAttr = (btn.getAttribute('jsname') || '').toLowerCase();
+            if (txt === 'more' || txt === 'show more' || txt === 'read more' || txt === 'עוד' ||
+                aria.includes('more') || aria.includes('עוד') || jsnameAttr === 'gxjvle' || btn.classList.contains('w8nwRe')) {
+              try { (btn as HTMLElement).click(); expanded = true; } catch {}
+            }
+          }
+          if (expanded) {
+            // eslint-disable-next-line @typescript-eslint/no-implied-eval
+            await new Promise((resolve) => setTimeout(resolve, 300));
+          }
+        } catch {}
+
         // Extract actual review text - find the review content specifically
         let reviewText = '';
         
         // More buttons are now handled before review extraction
         
-        // Try specific review text selectors first
-        const reviewSelectors = ['.wiI7pd', '.MyEned', '[data-expandable-section]', 'span[jsname="bN97Pc"]', '.review-full-text'];
+        // Try specific review text selectors first (stable content locations)
+        const reviewSelectors = ['.MyEned .wiI7pd', '.wiI7pd', '.review-full-text', 'span[jsname="bN97Pc"]', '[data-expandable-section]'];
         for (const selector of reviewSelectors) {
           const reviewEl = container.querySelector(selector);
           if (reviewEl) {
@@ -970,20 +998,15 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         
         console.log(`[SCRAPER] DEBUG: Starting author extraction for container ${i + 1}`);
         
-        // Modern Google Maps author name selectors (2024+) - prioritize actual names over UI elements
+        // Target only stable author elements in the header; avoid generic spans/divs
         const authorSelectors = [
-          'button[jsaction*="reviewerLink"] .d4r55',   // Button context - most reliable
-          '[data-value*="reviewer"] div',              // Data attribute based
-          '[aria-label*="reviewer"] div',              // Accessibility based
-          '.d4r55.fontTitleMedium',                    // Primary modern selector
-          'div[class*="fontTitleMedium"]',             // Font style based
-          'div[class*="fontBodyMedium"]:first-child',  // First body medium element
-          'span[class*="fontBodyMedium"]:first-child', // Span variant
-          '.d4r55',                                    // Fallback d4r55 class
-          'div[jsaction] span:first-child',            // JS action context
-          'div:first-child span:first-child',          // Structural fallback
+          '.d4r55',
           'a[data-original-href*="/contrib/"] .d4r55',
+          'a[href*="/contrib/"] .d4r55',
+          'button[jsaction*="reviewerLink"] .d4r55',
           'a[data-original-href*="/contrib/"]',
+          'a[href*="/contrib/"]',
+          'button[jsaction*="reviewerLink"]',
           'img[alt*="Photo of" i]',
           'img[alt*="תמונה של"]'
         ];
@@ -1008,54 +1031,26 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             }
             console.log(`[SCRAPER] Found name with selector "${selector}": "${extractedName}"`);
             
-            // Validate the extracted name (inline validation)
-            if (extractedName && extractedName.length >= 2 && extractedName.length <= 60 && 
-                /[a-zA-Z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff]/.test(extractedName) &&
-                !/^\d+$|ago|לפני|منذ|star|כוכב|نجمة|review|ביקורת|مراجعة|google|maps|local guide|מדריך מקומי|\d+\s*(review|photo|ביקורת|תמונ)|service|food|atmosphere|dine in|takeout|delivery|like|dislike|helpful|unhelpful|report|share|save/i.test(extractedName) &&
-                /^[A-Za-z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff\s.'-]+$/.test(extractedName)) {
-              authorName = extractedName;
+            // Validate the extracted name (keep as displayed, minimal filtering)
+            const cleanedName = extractedName.trim();
+            if (cleanedName && cleanedName.length >= 1 && cleanedName.length <= 80 &&
+                /\p{L}/u.test(cleanedName) &&
+                !/^\d+$|ago|לפני|منذ|star|כוכב|نجمة|review|ביקורת|مراجعة|google|maps|local guide|מדריך מקומי|\d+\s*(review|photo|ביקורת|תמונ)|service|food|atmosphere|dine in|takeout|delivery|like|dislike|helpful|unhelpful|report|share|save/i.test(cleanedName)) {
+              authorName = cleanedName;
               console.log(`[SCRAPER] ✅ Using extracted name: "${authorName}"`);
               break;
             }
           }
         }
         
-        // Advanced fallback: Search for name-like patterns in all text content
+        // Strict fallback: try contributor link text only (no generic scanning)
         if (authorName === 'Anonymous') {
-          const allTextElements = container.querySelectorAll('span, div, a, button, img');
-          for (const el of Array.from(allTextElements) as HTMLElement[]) {
-            let text = (el.textContent || '').trim();
-            if (!text) {
-              const aria = (el.getAttribute('aria-label') || '').trim();
-              const title = (el.getAttribute('title') || '').trim();
-              text = aria || title || '';
-            }
-            if (!text && el.tagName.toLowerCase() === 'img') {
-              const alt = (el.getAttribute('alt') || '').trim();
-              const m = alt.match(/(?:photo of|תמונה של)\s*(.+)/i);
-              text = (m ? m[1] : alt).trim();
-            }
-
-            // Clean common suffixes/prefixes
-            text = text
-              .replace(/\s*Local Guide.*$/i, '')
-              .replace(/\s*מדריך מקומי.*$/i, '')
-              .replace(/\s*·.*$/g, '')
-              .replace(/\s*\|.*$/g, '')
-              .replace(/\s*\d+\s*(reviews?|photos?)?.*$/i, '')
-              .trim();
-
-            // Look for name patterns (2-60 chars, contains letters, not system text)
-            if (text && text.length >= 2 && text.length <= 60 && 
-                /[a-zA-Z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff]/.test(text) &&
-                !/^\d+$|ago|לפני|منذ|star|כוכב|نجمة|review|ביקורת|مراجعة|google|maps|local guide|מדריך מקומי|\d+\s*(review|photo|ביקורת|תמונ)|service|food|atmosphere|dine in|takeout|delivery|like|dislike|helpful|unhelpful|report|share|save/i.test(text) &&
-                /^[A-Za-z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff\s.'-]+$/.test(text)) {
-              const rect = el.getBoundingClientRect ? el.getBoundingClientRect() : ({ top: 0, height: 1 } as any);
-              if (rect && rect.height > 0 && rect.top < (container.getBoundingClientRect().top + 220)) {
-                authorName = text;
-                console.log(`[SCRAPER] ✅ Using fallback-detected name: "${authorName}"`);
-                break;
-              }
+          const contrib = container.querySelector('a[data-original-href*="/contrib/"], a[href*="/contrib/"]') as HTMLElement | null;
+          if (contrib) {
+            const txt = (contrib.textContent || '').trim();
+            if (txt && /\p{L}/u.test(txt)) {
+              authorName = txt;
+              console.log(`[SCRAPER] ✅ Using contributor link text as name: "${authorName}"`);
             }
           }
         }
