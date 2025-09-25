@@ -1,5 +1,6 @@
 import { RawReview, SentimentAnalysis, FakeReviewAnalysis, AnalysisResults, ReviewCitation, SampledReviews } from '@shared/types';
 import { ReviewCitationService } from './citation';
+import { SANITATION_HAZARD_KEYWORDS } from '../utils/hazards.js';
 
 export interface VerdictGeneratorService {
   generateVerdict(
@@ -119,9 +120,9 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     let redFlagScore = 0;
 
     // High mismatch ratio is a red flag (tuned for more conservative mismatch detection)
-    if (mismatchRatio > 0.25) {
+    if (mismatchRatio > 0.22) {
       redFlagScore += 30;
-    } else if (mismatchRatio > 0.12) {
+    } else if (mismatchRatio > 0.10) {
       redFlagScore += 15;
     }
 
@@ -142,9 +143,9 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
 
     // Low confidence in sentiment analysis is a red flag (tuned)
     const avgConfidence = authenticSentiment.reduce((sum, s) => sum + s.confidence, 0) / authenticSentiment.length;
-    if (avgConfidence < 0.55) {
+    if (avgConfidence < 0.5) {
       redFlagScore += 20;
-    } else if (avgConfidence < 0.65) {
+    } else if (avgConfidence < 0.6) {
       redFlagScore += 10;
     }
 
@@ -157,6 +158,18 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     } else if (fakeRatio > 0.15) {
       redFlagScore += 20;
     }
+
+    // Lightweight sanitation hazard bump based on keywords in review texts (shared list)
+    try {
+      const text = authenticReviews.map(r => (r.text || '').toLowerCase()).join('\n');
+      let hits = 0;
+      for (const kw of SANITATION_HAZARD_KEYWORDS) {
+        if (text.includes(kw)) hits++;
+      }
+      if (hits > 0) {
+        redFlagScore += Math.min(20, 5 + hits * 2);
+      }
+    } catch {}
 
     return Math.min(100, redFlagScore);
   }

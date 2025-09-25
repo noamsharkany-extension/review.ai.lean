@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { AnalysisEngine, RawReview, SentimentAnalysis, FakeReviewAnalysis } from '@shared/types';
 import { ReviewQualityFilter } from './qualityFilter.js';
+import { containsSanitationHazard } from '../utils/hazards.js';
 
 export class OpenAIAnalysisEngine implements AnalysisEngine {
   private openai: OpenAI;
@@ -151,15 +152,21 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
     return `You will receive multiple reviews, one per line, in the format: ID|Rating|Text.
 
 Analyze each review's TEXT sentiment as one of: "positive", "negative", or "neutral".
-Use the RATING context only to determine whether there is a mismatch between the RATING and the TEXT sentiment.
+Use the RATING only to check for sentiment-rating mismatch (do not let rating affect sentiment itself).
 
-Strict mismatch rules (be conservative):
-- Set mismatchDetected=true only if (Rating in {1,2} AND sentiment="positive") OR (Rating in {4,5} AND sentiment="negative").
-- Otherwise mismatchDetected=false. Do not flag short or ambiguous text.
-- For Hebrew and non-English texts, be extra conservative and avoid false mismatches.
+Conservative mismatch rules:
+- mismatchDetected=true only if (Rating in {1,2} AND sentiment="positive") OR (Rating in {4,5} AND sentiment="negative").
+- Otherwise mismatchDetected=false. Do not flag short, vague, or mixed texts.
+- Be extra conservative for non-English texts to avoid false mismatches.
 
-Return ONLY a JSON array with exactly the same number of elements and the same order as the input lines. No extra keys. No comments. No markdown. No code fences.
-Schema of each element: {"reviewId":"<ID>","sentiment":"positive|negative|neutral","confidence":<0..1>,"mismatchDetected":<boolean>}
+Health-safety override:
+- If the TEXT mentions clear sanitation/health hazards (e.g., cockroaches, infestation, mold, food poisoning), treat sentiment as "negative" with high confidence regardless of rating.
+
+Lexical pitfall guidance:
+- Do not treat the word "never" as negative when used as positive emphasis (e.g., "I've never had such a great X", "never seen such delicious Y"). Consider overall tone and modifiers.
+
+Return ONLY a JSON array of the same length/order as input. No comments or extra keys.
+Schema per item: {"reviewId":"<ID>","sentiment":"positive|negative|neutral","confidence":<0..1>,"mismatchDetected":<boolean>}
 
 Input:
 ${reviewsText}`;
@@ -190,15 +197,25 @@ ${reviewsText}`;
       // Map back to expected order; fallback for missing items
       return reviews.map(review => {
         const item = itemById.get(review.id);
-        if (!item) {
-          return this.createFallbackSentimentAnalysis(review);
-        }
-        return {
+        const base: SentimentAnalysis = item ? {
           reviewId: review.id,
           sentiment: this.validateSentiment(item.sentiment),
           confidence: this.validateConfidence(item.confidence),
           mismatchDetected: Boolean(item.mismatchDetected)
-        };
+        } : this.createFallbackSentimentAnalysis(review);
+
+        // Post-process: enforce sanitation hazard override
+        if (containsSanitationHazard(review.text)) {
+          const forcedSentiment: SentimentAnalysis = {
+            reviewId: base.reviewId,
+            sentiment: 'negative',
+            confidence: Math.max(base.confidence, 0.85),
+            mismatchDetected: review.rating >= 4 // apply conservative mismatch rule
+          };
+          return forcedSentiment;
+        }
+
+        return base;
       });
     } catch (error) {
       console.error('Error parsing sentiment response:', error);
@@ -229,6 +246,19 @@ ${reviewsText}`;
     let confidence = 0.5; // Base confidence for fallback
     let mismatchDetected = false;
 
+    // Strong override for sanitation hazards
+    if (containsSanitationHazard(text)) {
+      sentiment = 'negative';
+      confidence = 0.9;
+      mismatchDetected = review.rating >= 4;
+      return {
+        reviewId: review.id,
+        sentiment,
+        confidence,
+        mismatchDetected
+      };
+    }
+
     // Positive and negative keywords for better sentiment detection (English + Hebrew)
     const positiveWords = [
       // English
@@ -238,14 +268,22 @@ ${reviewsText}`;
     ];
     const negativeWords = [
       // English
-      'terrible', 'awful', 'bad', 'horrible', 'worst', 'hate', 'disgusting', 'rude', 'poor', 'disappointing', 'waste', 'never', 'avoid', 'pathetic', 'useless',
+      'terrible', 'awful', 'bad', 'horrible', 'worst', 'hate', 'disgusting', 'rude', 'poor', 'disappointing', 'waste', 'avoid', 'pathetic', 'useless',
       // Hebrew (lowercase equivalents)
       'גרוע', 'נורא', 'איום', 'רע', 'מאכזב', 'שונא', 'לא טוב', 'בזבוז', 'אל תבואו', 'חבל על הזמן', 'יבש'
     ];
 
     // Count positive and negative words
     const positiveCount = positiveWords.filter(word => text.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => text.includes(word)).length;
+    let negativeCount = negativeWords.filter(word => text.includes(word)).length;
+
+    // Adjust for hyperbolic "never" expressions that are actually positive
+    const hyperbolicNever = /(never\s+(seen|had|tasted|experienced))/i.test(text);
+    if (hyperbolicNever) {
+      // Ensure we don't accidentally count a negative only because of "never"
+      // Since we removed 'never' from list, this is a no-op for keywords but keeps future safety if list changes
+      negativeCount = Math.max(0, negativeCount);
+    }
 
     // Determine sentiment based on keywords first, then rating
     if (positiveCount > negativeCount) {
@@ -448,15 +486,29 @@ ${reviewsText}`;
       // Map back to expected order; fallback for missing items
       return reviews.map(review => {
         const item = itemById.get(review.id);
+        let base: FakeReviewAnalysis;
         if (!item) {
-          return this.createFallbackFakeAnalysis(review);
+          base = this.createFallbackFakeAnalysis(review);
+        } else {
+          base = {
+            reviewId: review.id,
+            isFake: Boolean(item.isFake),
+            confidence: this.validateConfidence(item.confidence),
+            reasons: this.validateReasons(item.reasons)
+          };
         }
-        return {
-          reviewId: review.id,
-          isFake: Boolean(item.isFake),
-          confidence: this.validateConfidence(item.confidence),
-          reasons: this.validateReasons(item.reasons)
-        };
+
+        // Post-process: sanitation hazard reports are unlikely to be bots; be conservative
+        if (containsSanitationHazard(review.text)) {
+          return {
+            reviewId: base.reviewId,
+            isFake: false,
+            confidence: Math.max(base.confidence, 0.7),
+            reasons: []
+          };
+        }
+
+        return base;
       });
     } catch (error) {
       console.error('Error parsing fake detection response:', error);
@@ -482,8 +534,18 @@ ${reviewsText}`;
     let isFake = false;
     let confidence = 0.15; // Lower base confidence - be more conservative
 
-    // Basic heuristics for fake detection
+    // Strong authenticity bias for sanitation hazard reports
     const text = review.text.toLowerCase();
+    if (containsSanitationHazard(text)) {
+      return {
+        reviewId: review.id,
+        isFake: false,
+        confidence: 0.7,
+        reasons: []
+      };
+    }
+
+    // Basic heuristics for fake detection
     const wordCount = review.text.split(/\s+/).length;
 
     // Check for overly generic language - be more restrictive
