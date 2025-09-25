@@ -67,10 +67,8 @@ export function validateGoogleMapsUrl(url: string): boolean {
       return true;
     }
     
-    // Pattern 5: /maps/@coordinates URLs
-    if (pathname.includes('/maps/@') && pathname.match(/@-?\d+\.\d+,-?\d+\.\d+/)) {
-      return true;
-    }
+    // Note: Do NOT accept bare /maps/@<coordinates> URLs as valid review pages.
+    // These center the map without a specific place context and typically don't expose reviews.
 
     return false;
   } catch (error) {

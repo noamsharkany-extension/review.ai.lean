@@ -30,7 +30,7 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     const authenticSentiment = this.filterAuthenticSentiment(sentimentAnalysis, fakeAnalysis);
     
     // Calculate verdict scores based on authentic reviews only
-    const verdict = this.calculateVerdictScores(authenticReviews, authenticSentiment);
+    const verdict = this.calculateVerdictScores(authenticReviews, authenticSentiment, fakeAnalysis);
     
     // Calculate analysis metrics including fake review ratio
     const analysis = this.calculateAnalysisMetrics(sentimentAnalysis, fakeAnalysis);
@@ -80,7 +80,8 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
 
   private calculateVerdictScores(
     authenticReviews: RawReview[], 
-    authenticSentiment: SentimentAnalysis[]
+    authenticSentiment: SentimentAnalysis[],
+    fakeAnalysis: FakeReviewAnalysis[]
   ): { overallScore: number; trustworthiness: number; redFlags: number } {
     if (authenticReviews.length === 0) {
       return {
@@ -100,7 +101,7 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     const trustworthiness = Math.round((1 - mismatchRatio) * 100);
 
     // Calculate red flags based on various factors
-    const redFlags = this.calculateRedFlags(authenticReviews, authenticSentiment, mismatchRatio);
+    const redFlags = this.calculateRedFlags(authenticReviews, authenticSentiment, mismatchRatio, fakeAnalysis);
 
     return {
       overallScore: Math.max(0, Math.min(100, overallScore)),
@@ -112,15 +113,16 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
   private calculateRedFlags(
     authenticReviews: RawReview[], 
     authenticSentiment: SentimentAnalysis[],
-    mismatchRatio: number
+    mismatchRatio: number,
+    fakeAnalysis: FakeReviewAnalysis[]
   ): number {
     let redFlagScore = 0;
 
-    // High mismatch ratio is a red flag
-    if (mismatchRatio > 0.3) {
-      redFlagScore += 40;
-    } else if (mismatchRatio > 0.15) {
-      redFlagScore += 20;
+    // High mismatch ratio is a red flag (tuned for more conservative mismatch detection)
+    if (mismatchRatio > 0.25) {
+      redFlagScore += 30;
+    } else if (mismatchRatio > 0.12) {
+      redFlagScore += 15;
     }
 
     // Extreme rating distribution can be a red flag
@@ -138,12 +140,22 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
       redFlagScore += 15;
     }
 
-    // Low confidence in sentiment analysis is a red flag
+    // Low confidence in sentiment analysis is a red flag (tuned)
     const avgConfidence = authenticSentiment.reduce((sum, s) => sum + s.confidence, 0) / authenticSentiment.length;
-    if (avgConfidence < 0.6) {
+    if (avgConfidence < 0.55) {
       redFlagScore += 20;
-    } else if (avgConfidence < 0.7) {
+    } else if (avgConfidence < 0.65) {
       redFlagScore += 10;
+    }
+
+    // Presence of suspected fake reviews among sampled data is a red flag (conservative weighting)
+    const suspectedFakeCount = fakeAnalysis.filter(a => a.isFake).length;
+    const totalConsidered = authenticReviews.length + suspectedFakeCount;
+    const fakeRatio = totalConsidered > 0 ? suspectedFakeCount / totalConsidered : 0;
+    if (fakeRatio > 0.3) {
+      redFlagScore += 35;
+    } else if (fakeRatio > 0.15) {
+      redFlagScore += 20;
     }
 
     return Math.min(100, redFlagScore);

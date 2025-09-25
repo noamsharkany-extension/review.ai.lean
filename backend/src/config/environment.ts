@@ -12,6 +12,8 @@ const envSchema = z.object({
   
   // OpenAI Configuration
   OPENAI_API_KEY: z.string().min(1, 'OpenAI API key is required'),
+  OPENAI_MODEL: z.string().default('gpt-5'),
+  USE_FALLBACK_ANALYSIS: z.string().optional(),
   
   // Database Configuration
   DATABASE_URL: z.string().default('sqlite:./data/reviews.db'),

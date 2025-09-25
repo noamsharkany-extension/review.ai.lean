@@ -1,8 +1,10 @@
 import OpenAI from 'openai';
 import { AnalysisEngine, RawReview, SentimentAnalysis, FakeReviewAnalysis } from '@shared/types';
+import { ReviewQualityFilter } from './qualityFilter.js';
 
 export class OpenAIAnalysisEngine implements AnalysisEngine {
   private openai: OpenAI;
+  private modelName: string;
 
   constructor() {
     if (!process.env.OPENAI_API_KEY) {
@@ -12,6 +14,7 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+    this.modelName = process.env.OPENAI_MODEL || 'gpt-5';
   }
 
   async analyzeSentiment(reviews: RawReview[]): Promise<SentimentAnalysis[]> {
@@ -22,6 +25,13 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
     }
 
     console.log(`🧠 Starting optimized sentiment analysis for ${reviews.length} reviews`);
+
+    // Apply quality filtering to avoid sending low-value content to the model
+    const { gptReviews, skippedReviews, stats } = ReviewQualityFilter.filterForGPTAnalysis(reviews);
+    console.log(
+      `📊 Quality filtering results: total=${stats.total}, sentToGPT=${stats.sentToGpt}, ` +
+      `skippedEmpty=${stats.skippedEmpty}, skippedEmojiOnly=${stats.skippedEmojiOnly}`
+    );
     
     // Optimized batch processing with parallel execution
     const batchSize = 12; // Increased from 2 to 12 for cost efficiency
@@ -58,8 +68,16 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
       }
     }
 
-    console.log(`🎉 Sentiment analysis complete: ${results.length} reviews analyzed`);
-    return results;
+    // Add fallback analyses for skipped reviews
+    const skippedResults = skippedReviews.map(r => this.createFallbackSentimentAnalysis(r));
+
+    // Combine by original order using reviewId mapping
+    const byId = new Map<string, SentimentAnalysis>();
+    for (const r of [...results, ...skippedResults]) byId.set(r.reviewId, r);
+    const combined: SentimentAnalysis[] = reviews.map(r => byId.get(r.id) || this.createFallbackSentimentAnalysis(r));
+
+    console.log(`🎉 Sentiment analysis complete: ${combined.length} reviews analyzed (${results.length} via OpenAI, ${skippedResults.length} fallback)`);
+    return combined;
   }
 
   private async processSentimentBatch(reviews: RawReview[]): Promise<SentimentAnalysis[]> {
@@ -71,18 +89,18 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
         const prompt = this.buildSentimentPrompt(reviews);
         
         const response = await this.openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: this.modelName,
           messages: [
             {
               role: 'system',
-              content: 'You are an expert sentiment analyzer. Analyze the sentiment of reviews and detect mismatches between star ratings and text sentiment. Return only valid JSON.'
+              content: 'You are an expert sentiment analyzer. Analyze the sentiment of reviews and detect mismatches between star ratings and text sentiment. Return ONLY valid JSON with no prose, no markdown, no code fences.'
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          temperature: 0.1, // Low temperature for consistent results
+          temperature: 0,
           max_tokens: 2000,
         });
 
@@ -128,17 +146,23 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
   }
 
   private buildSentimentPrompt(reviews: RawReview[]): string {
-    const reviewsText = reviews.map(r => 
-      `${r.id}|${r.rating}|${r.text}`
-    ).join('\n');
+    const reviewsText = reviews.map(r => `${r.id}|${r.rating}|${r.text}` ).join('\n');
 
-    return `Analyze sentiment and detect rating mismatches. Format: ID|Rating|Text
+    return `You will receive multiple reviews, one per line, in the format: ID|Rating|Text.
 
-${reviewsText}
+Analyze each review's TEXT sentiment as one of: "positive", "negative", or "neutral".
+Use the RATING context only to determine whether there is a mismatch between the RATING and the TEXT sentiment.
 
-Return JSON: [{"reviewId":"id","sentiment":"positive|negative|neutral","confidence":0.85,"mismatchDetected":false}]
+Strict mismatch rules (be conservative):
+- Set mismatchDetected=true only if (Rating in {1,2} AND sentiment="positive") OR (Rating in {4,5} AND sentiment="negative").
+- Otherwise mismatchDetected=false. Do not flag short or ambiguous text.
+- For Hebrew and non-English texts, be extra conservative and avoid false mismatches.
 
-Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 4-5★ with clearly negative text. Be conservative with Hebrew text analysis.`;
+Return ONLY a JSON array with exactly the same number of elements and the same order as the input lines. No extra keys. No comments. No markdown. No code fences.
+Schema of each element: {"reviewId":"<ID>","sentiment":"positive|negative|neutral","confidence":<0..1>,"mismatchDetected":<boolean>}
+
+Input:
+${reviewsText}`;
   }
 
   private parseSentimentResponse(content: string, reviews: RawReview[]): SentimentAnalysis[] {
@@ -155,13 +179,20 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
         throw new Error('Response is not an array');
       }
 
-      // Validate and map results
-      return parsed.map((item, index) => {
-        const review = reviews[index];
-        if (!review) {
-          throw new Error(`No review found for index ${index}`);
+      // Build map from items by reviewId for robust alignment
+      const itemById = new Map<string, any>();
+      for (const item of parsed) {
+        if (item && typeof item.reviewId === 'string') {
+          itemById.set(String(item.reviewId), item);
         }
+      }
 
+      // Map back to expected order; fallback for missing items
+      return reviews.map(review => {
+        const item = itemById.get(review.id);
+        if (!item) {
+          return this.createFallbackSentimentAnalysis(review);
+        }
         return {
           reviewId: review.id,
           sentiment: this.validateSentiment(item.sentiment),
@@ -256,6 +287,13 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
     }
 
     console.log(`🕵️ Starting optimized fake review detection for ${reviews.length} reviews`);
+
+    // Apply quality filtering to avoid sending low-value content to the model
+    const { gptReviews, skippedReviews, stats } = ReviewQualityFilter.filterForGPTAnalysis(reviews);
+    console.log(
+      `📊 Quality filtering results: total=${stats.total}, sentToGPT=${stats.sentToGpt}, ` +
+      `skippedEmpty=${stats.skippedEmpty}, skippedEmojiOnly=${stats.skippedEmojiOnly}`
+    );
     
     // Optimized batch processing with parallel execution
     const batchSize = 6; // Increased from 1 to 6 for cost efficiency (smaller than sentiment due to longer prompts)
@@ -292,8 +330,16 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
       }
     }
 
-    console.log(`🎉 Fake review detection complete: ${results.length} reviews analyzed`);
-    return results;
+    // Add fallback analyses for skipped reviews
+    const skippedResults = skippedReviews.map(r => this.createFallbackFakeAnalysis(r));
+
+    // Combine by original order using reviewId mapping
+    const byId = new Map<string, FakeReviewAnalysis>();
+    for (const r of [...results, ...skippedResults]) byId.set(r.reviewId, r);
+    const combined: FakeReviewAnalysis[] = reviews.map(r => byId.get(r.id) || this.createFallbackFakeAnalysis(r));
+
+    console.log(`🎉 Fake review detection complete: ${combined.length} reviews analyzed (${results.length} via OpenAI, ${skippedResults.length} fallback)`);
+    return combined;
   }
 
   private async processFakeDetectionBatch(reviews: RawReview[]): Promise<FakeReviewAnalysis[]> {
@@ -305,18 +351,18 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
         const prompt = this.buildFakeDetectionPrompt(reviews);
         
         const response = await this.openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: this.modelName,
           messages: [
             {
               role: 'system',
-              content: 'You are an expert at detecting fake, bot-generated, or suspicious reviews. Analyze language patterns, inconsistencies, and authenticity markers. Return only valid JSON.'
+              content: 'You are an expert at detecting fake, bot-generated, or suspicious reviews. Analyze language patterns, inconsistencies, and authenticity markers. Return ONLY valid JSON with no prose, no markdown, no code fences.'
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          temperature: 0.1, // Low temperature for consistent results
+          temperature: 0,
           max_tokens: 3000,
         });
 
@@ -360,20 +406,21 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
   }
 
   private buildFakeDetectionPrompt(reviews: RawReview[]): string {
-    const reviewsText = reviews.map(r => 
-      `${r.id}|${r.author}|${r.rating}|${r.text}`
-    ).join('\n');
+    const reviewsText = reviews.map(r => `${r.id}|${r.author}|${r.rating}|${r.text}` ).join('\n');
 
-    return `Detect fake reviews. Format: ID|Author|Rating|Text
+    return `You will receive multiple reviews, one per line, in the format: ID|Author|Rating|Text.
 
-${reviewsText}
+Identify reviews that appear fake/bot-generated/suspicious using linguistic and behavioral cues: generic language with no specifics, repetitive/promotional tone, copy-paste patterns, unnatural phrasing, extreme sentiment with no details. Do not penalize brevity alone or language differences.
 
-Check: Generic language, no specifics, promotional tone, unnatural patterns, extreme sentiment.
-Be especially careful with non-English text - different languages may have different natural patterns.
+Return ONLY a JSON array with exactly the same number of elements and the same order as the input lines. No extra keys. No comments. No markdown. No code fences.
+Schema of each element: {"reviewId":"<ID>","isFake":<boolean>,"confidence":<0..1>,"reasons":["string", ...]}
+Constraints:
+- Be very conservative: flag only obviously fake reviews with clear signals.
+- For Hebrew and non-English texts, be extra conservative.
+- Keep up to 3 short reasons focused on concrete signals when isFake=true; use [] when false.
 
-Return JSON: [{"reviewId":"id","isFake":false,"confidence":0.7,"reasons":[]}]
-
-Be very conservative - flag only obviously fake reviews. Avoid flagging reviews just for being brief or in different languages.`;
+Input:
+${reviewsText}`;
   }
 
   private parseFakeDetectionResponse(content: string, reviews: RawReview[]): FakeReviewAnalysis[] {
@@ -390,13 +437,20 @@ Be very conservative - flag only obviously fake reviews. Avoid flagging reviews 
         throw new Error('Response is not an array');
       }
 
-      // Validate and map results
-      return parsed.map((item, index) => {
-        const review = reviews[index];
-        if (!review) {
-          throw new Error(`No review found for index ${index}`);
+      // Build map from items by reviewId for robust alignment
+      const itemById = new Map<string, any>();
+      for (const item of parsed) {
+        if (item && typeof item.reviewId === 'string') {
+          itemById.set(String(item.reviewId), item);
         }
+      }
 
+      // Map back to expected order; fallback for missing items
+      return reviews.map(review => {
+        const item = itemById.get(review.id);
+        if (!item) {
+          return this.createFallbackFakeAnalysis(review);
+        }
         return {
           reviewId: review.id,
           isFake: Boolean(item.isFake),
