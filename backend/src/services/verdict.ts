@@ -171,7 +171,7 @@ export class ReviewVerdictGenerator implements VerdictGeneratorService {
     return {
       fakeReviewRatio: Math.round(fakeReviewRatio * 100) / 100, // Round to 2 decimal places
       sentimentMismatchRatio: Math.round(sentimentMismatchRatio * 100) / 100,
-      confidenceScore: Math.round(confidenceScore * 100) / 100
+      confidenceScore: Math.min(100, Math.round(confidenceScore * 100) / 100) // Cap at 100%
     };
   }
 

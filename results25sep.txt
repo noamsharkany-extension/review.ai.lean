@@ -1,0 +1,637 @@
+Review.ai
+Smart Review Analyzer
+Analyze Google Reviews with AI
+Get trustworthy insights from Google Reviews with intelligent sampling, sentiment analysis, and fake review detection powered by OpenAI.
+
+Enter Google URL with Reviews
+https://www.google.com/maps/place/Jadis+et+Gourmande/@48.0758392,7.3559582,17z/data=!3m2!4b1!5s0x479165e66094fb65:0x7ed9ef5bcce7dedf!4m6!3m5!1s0x479165e667ffb10d:0xb8830cfe711be5b!8m2!3d48.0758392!4d7.3585331!16s%2Fg%2F1ts1r4gq?entry=ttu&g_ep=EgoyMDI1MDcyMy4wIKXMDSoASAFQAw%3D%3D
+Analyze Reviews
+Example URLs:
+• Google Maps: https://maps.google.com/place/...
+• Google Search: https://www.google.com/search?q=restaurant+reviews
+• Any Google page showing business reviews
+Analysis Complete
+Analyzed 263 reviews with 105% confidence
+
+81%
+Overall Score
+Analysis Verdict
+Overall Impression
+81%
+Based on sentiment analysis and review authenticity
+
+Trustworthiness
+65%
+Reliability of reviews and business reputation
+
+Red Flags
+70%
+Potential issues detected in reviews
+
+Analysis Overview
+Total Reviews
+263
+All analyzed
+
+Fake Reviews
+76.0%
+Detected by AI analysis
+
+Sentiment Mismatches
+52.0%
+Rating vs text sentiment
+
+Confidence Score
+105%
+Analysis accuracy
+
+Trust Assessment
+Low Trustworthiness
+Exercise caution. This business shows signs of unreliable reviews or potential manipulation.
+
+Quality Indicators:
+High fake review rate detected
+High analysis confidence
+Multiple red flags present
+Review Citations (114)
+Click any review to see detailed analysis
+Lucie M.
+an hour ago
+Potentially Fake
+Sentiment Mismatch
+I'd never seen such a thick meringue on a rhubarb tart! The place is popular, so it's busy and a little noisy, but the decor and the beauty of the pastries quickly make up for it!
+
+Anonymous
+a month ago
+The food is a matter of luck: some are very good, others are cold salads with questionable flavor, especially for those accustomed to Italian cuisine. Wonderful cakes. Friendly service and a beautiful interior.
+
+Anonymous
+a month ago
+The croissants and pain au chocolat are really good, almost the same quality as in Paris, and the service is full of ❤️! Thank you
+
+Meal type
+a month ago
+A nice surprise... good food and friendly service
+
+Anonymous
+a month ago
+We came by chance and were really not disappointed. The service is top notch, as is the smile of the staff. The food is delicious. The setting is typical of Alsace. We will be back.
+
+Anonymous
+a month ago
+Very well located, in the heart of the city, with particularly pleasant staff. The dishes were generous, tasty, and of high quality, suitable for both adults and children. …
+
+Meal type
+a month ago
+Super good I was very well received, I recommend it
+
+Anonymous
+a month ago
+Very well located in the old town, a very friendly welcome, and local dishes. I think it's also a bit like the local shopkeepers' canteen. I wanted to try the liver dumplings, and I didn't regret my choice—excellent!
+
+Anonymous
+a month ago
+We settled into this restaurant at the end of June for lunch. The terrace is pleasant and shaded, the service friendly, the food a bit expensive in terms of quality/price, everything was fine until our visit to the restroom. "Visit the …
+
+Anonymous
+a month ago
+Very good local cuisine, very kind owners. I highly recommend it.
+
+Anonymous
+a month ago
+Even if we understand that a "children's menu" may be designed for younger children, categorically refusing an adult to order it remains absurd. A customer should be able to choose what they want from the menu, especially if they are paying …
+
+Anonymous
+a month ago
+Potentially Fake
+Unfortunately, our experience was quite disappointing. We stopped to ask if the restaurant was open and if there was a table available. The waitress responded with repeated 'Bonjour, bonjour, bonjour, bonjour,' and continued speaking in …
+
+Anonymous
+a month ago
+Potentially Fake
+Unfortunately , our experience was quite disappointing. We stopped to ask if the place was open and if a table was available. The waitress responded with repeated 'Bonjour, bonjour, bonjour,' continuing to speak French without trying to …
+
+Meal type
+a month ago
+Sentiment Mismatch
+Everything is homemade, well done!
+
+Anonymous
+a month ago
+Potentially Fake
+Sentiment Mismatch
+On August 6th, during our visit to Colmar, we attempted to have a meal at this restaurant. I initially informed a female staff member that our party consisted of six people. Shortly after, another friend from our group also mentioned to her …
+
+Anonymous
+Edited a month ago
+Potentially Fake
+On August 6th, when we visited Colmar, we wanted to dine at this restaurant. First, I told the female employee that there were six of us. Later, another friend from our group also informed her that we were six people. At that point, the …
+
+Anonymous
+a month ago
+Sentiment Mismatch
+The dishes are generous and delicious! Friendly welcome and fast service despite the crowds. We had a great time, and the price is very, very reasonable.
+
+Victor Schander
+a month ago
+Potentially Fake
+Sentiment Mismatch
+SUPER rude personel. A no go.
+
+Anonymous
+a month ago
+Hello, We enjoyed the Jadis salad. It was delicious and very generous. …
+
+Anonymous
+a month ago
+Potentially Fake
+Breakfast is served until 11:00. From 10:45, the lady told us that we couldn't order anything anymore. First of all, we were made to feel completely unwelcome. Furthermore, this woman prefers an empty terrace to a full one. She's …
+
+Anonymous
+a month ago
+Potentially Fake
+Terrible service, the woman with the bun seemed eager to see us leave. We stood for five minutes in front of the sign that said we had to wait until someone arrived. Once someone did arrive, we were given a very unfriendly woman as a …
+
+Anonymous
+a month ago
+Potentially Fake
+Very unfriendly and unpleasant staff. More concerned with managing opening hours and tidying up the terrace than welcoming customers in a friendly manner.
+
+Meal type
+a month ago
+Potentially Fake
+Very very good piesMeal typeLunch… More
+
+Anonymous
+a month ago
+An iced tea and a slice of pie to die for. The service was very welcoming with a beautiful terrace. I recommend it.
+
+Anonymous
+2 months ago
+Discovered by chance and we don't regret it at all, special mention for the delicious slices of pie
+
+Philippe Pleimelding
+2 months ago
+SuperPrice per person€10–20… More
+
+Anonymous
+2 months ago
+Quite busy in the early afternoon like most restaurants in the summer, but not too much of a wait for a table. The food wasn't too bad and the service was friendly.
+
+Anonymous
+3 months ago
+Potentially Fake
+Sentiment Mismatch
+Reservation made for a group of 6 people almost 10 days before the date. We had asked for a table on the terrace. We were seated inside, the table against the counter with the added bonus of people at the end of the table. It was a …
+
+Anonymous
+3 months ago
+Potentially Fake
+Sentiment Mismatch
+An excellent restaurant, very good atmosphere and delicious dishes, impeccable welcome and service.
+
+Anonymous
+4 months ago
+Potentially Fake
+Sentiment Mismatch
+A beautiful day in Colmar, sat at a table for 4 outside in the sun, but was told to move to a table for 2, which there were no tables in the sun. Just walked away will never go to this establishment. Poor service!
+
+Meal type
+4 months ago
+Potentially Fake
+Sentiment Mismatch
+Very good cafe au lait, salty plate was amazing!!!
+
+Meal type
+a month ago
+Sentiment Mismatch
+Even if we understand that a "children's menu" may be designed for younger children, categorically refusing an adult to order it remains absurd. A customer should be able to choose what they want from the menu, especially if they are paying for it. In many countries, we give the consumer freedom, here they prefer to impose unnecessary rules that spoil the experience. It's a shame to lose customers for so little. This country disgusts me.
+
+Meal type
+a month ago
+Potentially Fake
+Unfortunately , our experience was quite disappointing. We stopped to ask if the place was open and if a table was available. The waitress responded with repeated 'Bonjour, bonjour, bonjour,' continuing to speak French without trying to understand us. Her tone was rude, and she looked at us in an annoyed way before leaving us standing at the entrance without any further assistance. We didn’t feel welcome at all.
+
+Meal type
+a month ago
+Meal typeOtherPrice per person€10–20Food: 5Service: 4Atmosphere: 3Wait timeNo waitSeating typeIndoor dining area
+
+Anonymous
+4 months ago
+Very well located, very pleasant staff. The dishes are very tasty and the price is correct. Sufficiently large choice on the menu + table with suggestions of the day. …
+
+Anonymous
+4 months ago
+Potentially Fake
+The manager is unsavory. Everywhere around it was crowded. I told myself that I would sit quietly where it was empty without wondering why it was empty. I quickly understood.
+
+Anonymous
+4 months ago
+Potentially Fake
+Exceptionally rude. Made reservations before. They had us wait by the floor for 20 minutes before telling us the kitchen is closed and denying we had called in a reservation even after I showed the waitress their phone number on my phone and proof that I had called in a reservation. This is just not how you treat guests.
+
+Anonymous
+4 months ago
+Interesting tour and welcoming staff
+
+Anonymous
+5 months ago
+Excellent snack with a white tea and a nice portion of an excellent damson crumble, in an authentic and warm setting, and served by a very pleasant waiter. Perfect moment between friends, regulars of the place; a great discovery for me.
+
+Anonymous
+Edited 5 months ago
+Sentiment Mismatch
+What a pleasure both in terms of its quality and its location
+
+Anonymous
+6 months ago
+Potentially Fake
+Sentiment Mismatch
+Charming chalet atmosphere with multitude of niches and various objects (sled. Skis, samovar ladders, etc.)
+
+Anonymous
+6 months ago
+Potentially Fake
+Sentiment Mismatch
+We had the best desserts and caffe ı would definitely come here again 🌺 …
+
+Meal type
+a month ago
+Potentially Fake
+Sentiment Mismatch
+Breakfast is served until 11:00. From 10:45, the lady told us that we couldn't order anything anymore. First of all, we were made to feel completely unwelcome. Furthermore, this woman prefers an empty terrace to a full one. She's preoccupied with opening hours and telling people they can't sit anymore instead of encouraging a good atmosphere. The food was okay, but we only received our sandwich with a napkin and no plate.
+
+Anonymous
+6 months ago
+Potentially Fake
+Unfriendly and Discriminatory Service – Avoid! I recently visited Jadis & gourmande and my experience was extremely …
+
+Anonymous
+6 months ago
+Potentially Fake
+Very friendly waitress, fast service, and the meal was excellent and very tasty! The children's meal was very well served, and thank you for offering vegetables! …
+
+Anonymous
+7 months ago
+Generous and delicious, a delight
+
+Anonymous
+7 months ago
+Top quality!Food: 5Service:… More
+
+Anonymous
+7 months ago
+Very nice view and cheesecake! Loved it! Cuppucino is also very good!
+
+Anonymous
+7 months ago
+We arrived just as the hot chocolate hour began. A beautiful place in keeping with Colmar. The waitress offered us a bad vibe, a far cry from the restaurant's positive energy.
+
+Anonymous
+2 years ago
+Potentially Fake
+DO NOT EAT HERE IF YOU HAVE A DOG OR SMALL CHILDREN We were waiting to be seated at this cafe for some breakfast with our 8 month old dachshund puppy when the cafe owners dog (wired dachshund), who was off the lead, came over to us and violently attacked our sweet boy completely unprovoked. Their dog has left our dog with permanent damage to his nostril and above his lip which was pouring with blood at the time. The owners of the cafe didn’t even tell us it was their dog originally and, despite me hysterically crying, neither of them offered us an apology and even had the audacity to tell us ‘dogs will be dogs’ when we went back to get their details and came as no shock to the owners which suggests this dog may have done it before and by no doubt will absolutely do it again. Even once my husband has picked up our puppy, their dog was at our feet trying to get to him. If you have a small child or dog I would not risk eating here, the dog was still off lead when we later returned for their information. When we asked who owned the dog, the owner told me he didn’t speak English and disappeared (which he certainly did as we then had a very clear conversation over the fact I would be reporting the attack to colmar city hall) This dog should not be allowed on the premises. My fear is that another dog or child will be next, you’ve been warned - enter at your own risk. We got off lucky but the next person might not be. The owners are the problem. If you dog is not friendly how can you possibly let it roam freely around guests, children and dogs?
+
+Meal type
+a year ago
+Potentially Fake
+Beautiful place but very bad behaviour from the staff especially from the older lady .. we went there early in the morning during Christmas and I really wanted to catch a seat in front of the window to take some beautiful photos of the view outside etc for my blog for Colmar.. when we reached there the front seats were taken but we sat in the second row waiting for someone to leave and change seats. First of all they didn’t come to take our order even though we were right next to the bar , and when after a long time , they finally brought the order , the table in front became available so we took our coffees and changed . They came to us and even though we had already sat in the other table with our stuff , coats, bags etc, they forced us to move back to our previous seats !! This is the first time this happened to me .. I understand that they may don’t want to carry our food and drinks in some restaurants and change seats but in this case we had just received our order and we carried it by ourselves and anyway we were already in the new seats . It was very rude to ask as move back again Anyway we didn’t say anything even though we felt embarrassed in front of everyone . Then when we finally wanted to leave , I asked for the bill about 3 times as we had to go and they keep laughing and talking with other costumers so I went to the cashier in order to pay as we had to leave quickly and guess what .. SHE ASKED ME FOR THE SECOND TIME to go back to my table because they won’t let me pay on the cashier , only at the waiter on my table The worst experience in the whole Colmar and Strasbourg . 👎👎👎
+
+Anonymous
+2 years ago
+I had a reservation. I am a single older woman. As I have discovered in other places, if you are by yourself you are put in the worse seats away from the sunny windows and best seats. It was obvious I was not a valued customer. Just because I am older and by myself it does not mean I should not have a choice seat. I advise others to avoid these restaurants. Shame on you. And, the steak was not good. Way too tough.
+
+Anonymous
+3 years ago
+Potentially Fake
+Absolutely disgusting place. The old lady there with the fake smile is rude with everyone. …
+
+Anonymous
+a year ago
+Potentially Fake
+Very poor service. I'm intolerant to lactose. Asked for a oat milk coffee. The lady with braids served me an ordinary milk coffee. When I pointed it out and said a person who is intolerant can feel sick after drinking milk, she reacted very …
+
+Anonymous
+a year ago
+Potentially Fake
+We tried to have dessert and a coffee. They just didn't want to serve us because they were serving full lunch only (we were 4 people so it wasn't going to be a 5€ bill). …
+
+Anonymous
+a year ago
+Potentially Fake
+We just had the worst experience in this restaurant. After reading the reviews I see that it’s not their first time violently attacking customers. My girlfriend went inside the restaurant to ask if we can have the table outside rather than …
+
+Anonymous
+9 months ago
+Not a good experience, we went there for breakfast and they cannot handle a full restaurant, we waited for our breakfast a long time and they brought the meals bit by bit, the only quality was the ambience. Rude employees!
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Never visit this place especially with kids. They are not welcome there! We have traveled all over the world but this place is my biggest disappointment. The owner/manager repeatedly pushed me and my pregnant friend out and wouldn't …
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+The worts service in Colmar. Do not come here for coffee or lunch. The staff is very impolite, rude, and annoying. They make you feel uncomfortable with their attitude. The waitress did not let me finish the coffee. She asked two times if I …
+
+Anonymous
+2 years ago
+Potentially Fake
+Nice place but not good hospitality for non- french spoken. If you cant speak french, I’m not recommend.
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+The service is very rude and it seems that foreigners are mainly targeted by their bad mood. I saw another group of foreigners who have been treated in the same way like my group. …
+
+Response from the owner
+Edited a year ago
+Potentially Fake
+I stayed there 10 minutes sitting outside. But they just cleaned up my table when I went to the toilet without a word. I haven't even paid yet. And I was in the the toilet like 2~3 minutes......Im not sure its just culture or a mistake or because I was a solo Asian.
+
+Anonymous
+6 years ago
+Potentially Fake
+Sentiment Mismatch
+So rude. Obviously this establishment doesn’t care for tourist. We went in for morning coffee and before we had a chance to ask a question the waitress (very short blonde hair) turned to me and said “just wait! I see you!!!” In a harsh …
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Don't even think about visiting this place in Colmar. Very rude owner, arrogant, aggressive. Children are not welcome, customers too. They shout and push the customers. The owner and old lady, my be his mother spoiled our vacation.
+
+Anonymous
+7 years ago
+Potentially Fake
+Sentiment Mismatch
+The service is horrible and hostile. The lady servicing us made us wait ages to serve, and her attitude was incredibly hostile. My niece was holding the sugar container to look at it and she snatched it violently from her hands as if she …
+
+Anonymous
+7 months ago
+Went there at 11am They were closed Didn’t even bother to come tell us …
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Rude people is an understatement... lets expel customers (even babies) that did not see their stop sign that says they should wait outside in the cold and rain while there are plenty of places inside
+
+Anonymous
+6 years ago
+My friend and I were sight-seeing the beautiful city of Colmar and stopped by this caffe for a coffee and dessert. We entered the establishment and this blonde waitress greeted us in French. Seeing than neither of us spoke French, we told …
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+If you are a non European citizen you are not welcomed here! We were harshly expelled from this place by the waitress with short blonde hair under the justification that our vaccine certificate is not valid here, although …
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+Very bad experience. We were waiting for the table at 4.00pm and the restaurant closes at 6 pm. The staff was so rude, they yelled “the kitchen is closing” to us. We can feel they are very racists as they didn’t do the same to other people who were waiting there at the same time.
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Food is delicious, but the service of few waitresses was very bad. One waitress (an old lady) was extremely rude and racist.
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Terrible restaurant. A violent team. They violently attacked my daughter and made her cry. Look, there were many such cases in the past
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+She treat me so bad for asking a salad with tomato (because it is not the season) that frankly I hope that no one has to deal with a such an ugly situation where you are just simply asking for something to eat.
+
+Anonymous
+5 years ago
+Potentially Fake
+Sentiment Mismatch
+Very unfriendly waitress. We were with 2, one of us didn’t feel like eating but wanted only a drink. She didn’t want to serve us and ask us to leave. It is strange that you’re not allowed to have a drink as there were free tables available.
+
+Anonymous
+4 years ago
+Potentially Fake
+Sentiment Mismatch
+Over rated. Food was not delicious at all compared to other similar restaurants. Service was awful. Staff very rude. It's better to go to other local restaurants. NOT RECOMMENDED!
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Never visiting again! One among the oldest staff there was extremely rude and racist. Regret visiting the place big time!
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Poor Service: One among the oldest staff was super rude and seemed racist. Never going again!
+
+Meal type
+a year ago
+Potentially Fake
+Sentiment Mismatch
+The worts service in Colmar. Do not come here for coffee or lunch. The staff is very impolite, rude, and annoying. They make you feel uncomfortable with their attitude. The waitress did not let me finish the coffee. She asked two times if I had finished so she could take the cup. Children are not welcome. They give you the look if one of the kids speaks or laughs a little bit louder. There is no music, the coffee tastes terrible.
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+It looked so nice. However, the service personal was very unfriendly. I DONT recommend it.
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+Just let us stand there and didn't tell us that they could not help us with a table. Very unfriendly.
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+The old women at the door, was very rude. Dont acept our spanish vaccinaton passport
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+No service, arrogant waitress. Not a place for a breakfast in here.
+
+Response from the owner
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+If you are a foreigner I really please you don’t try to wait for the line , because you are always be the next and next one will not be you ! So DON’T WASTE YOUR TIME !
+
+Response from the owner
+a year ago
+Potentially Fake
+worst restaurant! You can get poisoned here!
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+The waitress very-bad in with us We are leaving directly
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+Waiters are too arrogant. Deffinetly not suggested.
+
+Anonymous
+5 years ago
+Potentially Fake
+Sentiment Mismatch
+Food is reaaaaally no good.. just watery and completely unflowered... bähhhh
+
+Anonymous
+6 years ago
+Potentially Fake
+Sentiment Mismatch
+Coffee is absolutely terrible, one of the worst I have had in my life.
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+Staff with bad attitude, make you feel unwelcome
+
+Justyna Jurkowska
+2 years ago
+Sentiment Mismatch
+Service rude and arrogant. I do not recommend.
+
+Response from the owner
+9 months ago
+Potentially Fake
+Sentiment Mismatch
+15 minutes before closing we (the couple) very politely asked to be seated at a table for four. The waitress's answer: she will decide where we sit. And she simply showed us the door. Her impudence and commanding tone simply discouraged us. …
+
+Anonymous
+8 months ago
+Potentially Fake
+Sentiment Mismatch
+Beware of scams! On the table, a small slate reads "30cl mulled wine €4.20." We order two. We are served a small 20cl glass. We make a nice little remark at the end of the meal. Without any qualms, the waitress brings us the bill without change; I find that really inflated. Do we have to be unpleasant?
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+We booked a table in advance for five people, the place was packed, so we waited patiently outside for them to prepare the table for us. The table they reserved for us was inside and a table outside had just become available and it was very …
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Bad company policy: 4 out of 6 people eat main courses, while 2 only want dessert. The boss says it's not possible; dessert is only served after the main course. For the 2 who don't eat, we have to pay a flat fee of 6 euros each, even though we ordered desserts.
+
+Anonymous
+a year ago
+Sentiment Mismatch
+I booked a table by phone on Saturday 2nd at 12.23 with a very kind gentleman who made the reservation for a friend going to the Christmas market. Because of the snow, the driver of his bus informed her that he would be between 10 and 15 …
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+Out of three visits to this superb establishment (a shame), three long waits, and two reprimands from the staff... Simply because there are three staff members present: one who makes drinks, one …
+
+Response from the owner
+2 years ago
+Coming for a drink, a welcome that leaves something to be desired. The staff seemed very overwhelmed to me without it being crowded. Once at the table, we saw other people sitting down and being served before us. After a good fifteen minutes without anyone cleaning the table or taking our order, we decided to go elsewhere.
+
+Response from the owner
+Edited 3 years ago
+Sentiment Mismatch
+Today, I went out with my family (four people) without a reservation. We waited 30 minutes in front of the main entrance. The employee at the main entrance showed no respect for the queue and repeatedly let people in behind us without a …
+
+Anonymous
+2 years ago
+Sentiment Mismatch
+We had dinner on December 2, 2022 following the many positive reviews (4 adults and 1 7-month-old baby). We had our child in the stroller but unfortunately the stroller was prohibited in the restaurant even if we could fold it and we had to …
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+We can only agree with the racist comments. After being ignored by four waiters behind the bar, and not wanting to claim a large table, we sat down at a small table and pulled …
+
+Anonymous
+a year ago
+Sentiment Mismatch
+We went into this restaurant because the atmosphere seemed nice. It was fine until we started eating, but the problem started when we asked the busy waitress for the bill. …
+
+Anonymous
+a year ago
+Sentiment Mismatch
+The attention is rude and unpleasant. The waitress practically told us to leave when my daughter told her she was vegan. It is curious that in a city that lives off tourism, they serve in this way. I recommend not going
+
+Response from the owner
+2 years ago
+Sentiment Mismatch
+The waitress's treatment was horrible. It was an unheard-of lack of respect; nothing like this had ever happened to us before. While I was paying, my wife went inside to get out of the heat (we were on the …
+
+Anonymous
+7 years ago
+Potentially Fake
+Sentiment Mismatch
+If the meringue tarts are good and high, they do not live up to the unpleasant attitude of the staff! People are greeted with a grimace and placed on top of each other at tables. No napkins or sugar offered and beware of those who would …
+
+Meal type
+a year ago
+Potentially Fake
+worst restaurant! You can get poisoned here!
+
+Krista Breaux
+9 months ago
+Came for lunch with a group of 7 and really enjoyed ourselves. The food was good but not great, but we were looking for Alsatian food and a cozy winter vibe (we were there for the Christmas market) and this place was perfect. The service was also top notch. Our server was warm and friendly. Best thing we ordered was the osso buco (was on the "specials" chalkboard)!
+
+Meal type
+9 months ago
+Visited Colmar for the first time. While searching for a place to have breakfast, we saw Jadis et Gourmande, a place with an amazing Christmas decoration!! The place is cozy and well decorated, you can feel the Christmas vibes wherever you look. The staff is very friendly and the breakfast was delicious. If you’re going to Colmar, I highly recommend to try this magical place!🎄
+
+Meal type
+8 months ago
+Great service, great food. Love everything we ordered. Excellent Alsatian cuisine for those who want to try.
+
+Anonymous
+6 years ago
+Lovely atmosphere. There are teddy bears of all shapes and sizes in every corner which is quite charming. The food and service was good; recommend the goat cheese salad. The desserts looked amazing! The wait staff spoke German and English in addition to French, however, only French menus were available.
+
+Anonymous
+6 years ago
+Came upon this gorgeous cafe after wondering around the Colmar Christmas markets. Our hands and feet were freezing and this place was so cozy and warm !! We took a seat by the window and the service was so quick and friendly. We had tea and coffee served in gorgeous cups and a slice of the most delicious blueberry pie I’ve ever tasted !!! The cafe itself has quaint decor inside and from outside looks so traditional, would highly recommend a visit :)
+
+Anonymous
+3 years ago
+Sentiment Mismatch
+This place is so cosy you never want to leave. My husband and I shared apfelstrudel and oh my, it was to die for! The hotel we stayed at served the usual breakfast but instead we decided to go back to Jadis et Gourmande and enjoyed eggs and …
+
+Response from the owner
+2 years ago
+Tasty coffee and boulangerie (did I spell it right?). Nice staff, and they speak English!
+
+Anonymous
+2 years ago
+Lovely place, amazing food, but long queue at lunch hours.
+
+Meal type
+a year ago
+Lovely breakfast and very welcoming atmosphere!
+
+Show Less
+Debug: Session State

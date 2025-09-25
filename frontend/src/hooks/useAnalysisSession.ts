@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { AnalysisSession, AnalysisResults, AnalysisProgress } from '../../../shared/types';
+import { AnalysisSession } from '../../../shared/types';
 import { apiClient, ApiError } from '../services/apiClient';
 
 export interface AnalysisSessionState {
@@ -85,6 +85,15 @@ export const useAnalysisSession = (): UseAnalysisSessionReturn => {
 
     setState(prev => ({ ...prev, isPolling: true }));
 
+    // Normalize date fields returned from the API (they arrive as strings)
+    const normalizeAnalysisSession = (raw: AnalysisSession): AnalysisSession => {
+      return {
+        ...raw,
+        createdAt: new Date(raw.createdAt as unknown as string),
+        completedAt: raw.completedAt ? new Date(raw.completedAt as unknown as string) : undefined,
+      };
+    };
+
     const poll = async () => {
       try {
         // Check cache first
@@ -100,18 +109,20 @@ export const useAnalysisSession = (): UseAnalysisSessionReturn => {
         }
 
         const session = await apiClient.getAnalysisStatus(sessionId);
+        const normalized = normalizeAnalysisSession(session);
         
         // Update cache
-        analysisCache.set(sessionId, session);
+        analysisCache.set(sessionId, normalized);
 
         setState(prev => ({ 
           ...prev, 
-          session,
-          error: undefined 
+          session: normalized,
+          error: undefined,
+          isLoading: normalized.status === 'pending' || normalized.status === 'scraping' || normalized.status === 'analyzing'
         }));
 
         // Stop polling if analysis is complete or failed
-        if (session.status === 'complete' || session.status === 'error') {
+        if (normalized.status === 'complete' || normalized.status === 'error') {
           stopPolling();
         }
       } catch (error) {
@@ -150,15 +161,17 @@ export const useAnalysisSession = (): UseAnalysisSessionReturn => {
       // Start polling for updates
       startPolling(response.sessionId);
 
+      // Don't set isLoading to false here - let the polling handle the state
+      // The loading state will be managed by the session status
+
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         isLoading: false,
         error: error as ApiError 
       }));
-    } finally {
-      setState(prev => ({ ...prev, isLoading: false }));
     }
+    // Remove the finally block that was setting isLoading to false
   }, [startPolling]);
 
   // Retry a failed analysis
@@ -181,15 +194,16 @@ export const useAnalysisSession = (): UseAnalysisSessionReturn => {
       analysisCache.clear();
       startPolling(state.session.id);
 
+      // Don't set isLoading to false here - let the polling handle the state
+
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
         isLoading: false,
         error: error as ApiError 
       }));
-    } finally {
-      setState(prev => ({ ...prev, isLoading: false }));
     }
+    // Remove the finally block that was setting isLoading to false
   }, [state.session?.id, startPolling]);
 
   // Manually refresh session status
@@ -198,11 +212,16 @@ export const useAnalysisSession = (): UseAnalysisSessionReturn => {
 
     try {
       const session = await apiClient.getAnalysisStatus(currentSessionIdRef.current);
-      analysisCache.set(currentSessionIdRef.current, session);
+      const normalized: AnalysisSession = {
+        ...session,
+        createdAt: new Date(session.createdAt as unknown as string),
+        completedAt: session.completedAt ? new Date(session.completedAt as unknown as string) : undefined,
+      };
+      analysisCache.set(currentSessionIdRef.current, normalized);
       
       setState(prev => ({ 
         ...prev, 
-        session,
+        session: normalized,
         error: undefined 
       }));
     } catch (error) {

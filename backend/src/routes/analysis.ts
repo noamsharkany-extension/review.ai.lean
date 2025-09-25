@@ -4,9 +4,25 @@ import { validateGoogleMapsUrl } from '../utils/urlValidator.js';
 import { AnalyzeRequest, AnalyzeResponse, AnalysisStatusResponse } from '@shared/types';
 import { analysisRateLimit, retryRateLimit } from '../middleware/rateLimiter.js';
 import { cacheAnalysisResults, cacheUrlValidation } from '../middleware/cache.js';
+import { DatabaseService } from '../services/database.js';
 
 const router = Router();
-const orchestrator = new ReviewAnalysisOrchestrator();
+
+// Create orchestrator function that accepts database service
+export function createOrchestrator(databaseService?: DatabaseService): ReviewAnalysisOrchestrator {
+  return new ReviewAnalysisOrchestrator(databaseService);
+}
+
+// Default orchestrator instance (will be updated by server.ts)
+let orchestratorInstance = new ReviewAnalysisOrchestrator();
+
+// Function to update the orchestrator instance
+export function setOrchestrator(newOrchestrator: ReviewAnalysisOrchestrator): void {
+  orchestratorInstance = newOrchestrator;
+}
+
+// Export the orchestrator instance
+export const orchestrator = orchestratorInstance;
 
 // POST /api/analyze - Initiate analysis
 router.post('/analyze', analysisRateLimit, cacheUrlValidation(), async (req: Request<{}, AnalyzeResponse, AnalyzeRequest>, res: Response<AnalyzeResponse>) => {
@@ -86,7 +102,7 @@ router.post('/analyze', analysisRateLimit, cacheUrlValidation(), async (req: Req
 });
 
 // GET /api/analysis/:id - Get analysis status and results
-router.get('/analysis/:id', cacheAnalysisResults(), (req: Request<{ id: string }>, res: Response<AnalysisStatusResponse>) => {
+router.get('/analysis/:id', cacheAnalysisResults(), async (req: Request<{ id: string }>, res: Response<AnalysisStatusResponse>) => {
   try {
     const { id } = req.params;
 
@@ -98,7 +114,7 @@ router.get('/analysis/:id', cacheAnalysisResults(), (req: Request<{ id: string }
       } as any);
     }
 
-    const session = orchestrator.getAnalysisStatus(id);
+    const session = await orchestrator.getAnalysisStatus(id);
 
     if (!session) {
       return res.status(404).json({
@@ -132,7 +148,7 @@ router.post('/analysis/:id/retry', retryRateLimit, async (req: Request<{ id: str
       });
     }
 
-    const session = orchestrator.getAnalysisStatus(id);
+    const session = await orchestrator.getAnalysisStatus(id);
     if (!session) {
       return res.status(404).json({
         error: 'Analysis session not found',
@@ -193,4 +209,4 @@ router.get('/sessions', (req: Request, res: Response) => {
   }
 });
 
-export { router as analysisRouter, orchestrator };
+export { router as analysisRouter };

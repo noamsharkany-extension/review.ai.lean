@@ -233,11 +233,11 @@ Mismatch rules: Only flag clear mismatches - 1-2★ with clearly positive text, 
     }
 
     // Enhanced mismatch detection with Hebrew consideration
-    // Only flag clear mismatches - be more conservative
-    if ((review.rating <= 2 && sentiment === 'positive' && positiveCount >= 2) || 
-        (review.rating >= 4 && sentiment === 'negative' && negativeCount >= 2)) {
+    // Only flag very clear mismatches - be extremely conservative
+    if ((review.rating <= 1 && sentiment === 'positive' && positiveCount >= 3) || 
+        (review.rating >= 5 && sentiment === 'negative' && negativeCount >= 3)) {
       mismatchDetected = true;
-      confidence = Math.min(confidence, 0.7); // Increased confidence threshold
+      confidence = Math.min(confidence, 0.8); // Very high confidence threshold for mismatches
     }
 
     return {
@@ -473,6 +473,13 @@ Be very conservative - flag only obviously fake reviews. Avoid flagging reviews 
         isFake = false; // Don't flag Hebrew reviews with low confidence
         reasons.length = 0; // Clear the reasons array
       }
+    }
+
+    // Only flag as fake if confidence is above minimum threshold
+    const minConfidenceThreshold = 0.3; // Require at least 30% confidence to flag as fake
+    if (confidence < minConfidenceThreshold) {
+      isFake = false;
+      reasons.length = 0; // Clear reasons if not confident enough
     }
 
     return {

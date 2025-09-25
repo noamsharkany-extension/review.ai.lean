@@ -1,20 +1,22 @@
 import React from 'react'
-import { AnalysisResults } from '../../../shared/types'
+import { AnalysisResults, AnalysisSession } from '../../../shared/types'
 import { VerdictScore } from './VerdictScore'
 import { MetricCard } from './MetricCard'
 import { CitationsSection } from './CitationsSection'
 import { TrustIndicator } from './TrustIndicator'
-import { ResultsSkeleton, LoadingSpinner } from './LoadingStates'
+import { LoadingSpinner } from './LoadingStates'
 
 interface ResultsAreaProps {
   results?: AnalysisResults
   isLoading?: boolean
+  session?: AnalysisSession
   error?: string
 }
 
 export const ResultsArea: React.FC<ResultsAreaProps> = ({ 
   results, 
-  isLoading = false, 
+  isLoading = false,
+  session,
   error 
 }) => {
   if (error) {
@@ -41,7 +43,37 @@ export const ResultsArea: React.FC<ResultsAreaProps> = ({
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center justify-center">
             <LoadingSpinner size="lg" className="mr-3 text-blue-600" />
-            <span className="text-lg text-gray-600">Preparing analysis...</span>
+            <span className="text-lg text-gray-600">
+              {session?.status === 'pending' && 'Starting analysis...'}
+              {session?.status === 'scraping' && 'Scraping reviews...'}
+              {session?.status === 'analyzing' && 'Analyzing reviews...'}
+              {!session?.status && 'Preparing analysis...'}
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle case where analysis is marked complete but results are missing
+  if (session?.status === 'complete' && !results) {
+    return (
+      <div className="w-full max-w-4xl mx-auto mt-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <div className="flex items-center">
+            <svg className="w-6 h-6 text-yellow-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <h3 className="text-lg font-medium text-yellow-800">Analysis Complete - Loading Results</h3>
+              <p className="text-yellow-700 mt-1">
+                Your analysis has finished but we're still loading the results. This should only take a moment...
+              </p>
+              <div className="mt-3">
+                <LoadingSpinner size="sm" className="inline mr-2 text-yellow-600" />
+                <span className="text-sm text-yellow-600">Loading results...</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -75,7 +107,7 @@ export const ResultsArea: React.FC<ResultsAreaProps> = ({
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">{Math.round(results.verdict.overallScore * 100)}%</div>
+            <div className="text-3xl font-bold">{Math.round(results.verdict.overallScore)}%</div>
             <div className="text-blue-100 text-sm">Overall Score</div>
           </div>
         </div>

@@ -47,7 +47,7 @@ export default defineConfig({
         ws: true,
         changeOrigin: true,
         secure: false,
-        timeout: 10000,
+        timeout: 60000,
         configure: (proxy, options) => {
           // Override the default error handler to suppress EPIPE errors
           const originalEmit = proxy.emit;
@@ -85,6 +85,10 @@ export default defineConfig({
                 console.warn('WebSocket socket error:', err.code);
               }
             });
+            // Keep-alive to prevent idle timeouts in dev
+            try {
+              socket.setKeepAlive?.(true, 15000);
+            } catch {}
             
             // Handle proxy request errors with suppression
             proxyReq.on('error', (err) => {

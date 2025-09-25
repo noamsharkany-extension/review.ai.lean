@@ -6,13 +6,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { createServer } from 'http';
-import { analysisRouter, orchestrator } from './routes/analysis.js';
+import { analysisRouter, createOrchestrator, setOrchestrator } from './routes/analysis.js';
 import { ProgressWebSocketServer } from './websocket/progressSocket.js';
 import { generalRateLimit } from './middleware/rateLimiter.js';
 import { cacheManager, closeCacheConnections } from './middleware/cache.js';
-// Database imports commented out due to type issues
-// import { DatabaseService } from './services/database.js';
-// import { closeDatabaseConnection } from './database/connection.js';
+// Database imports
+import { DatabaseService } from './services/database.js';
+import { closeDatabaseConnection } from './database/connection.js';
 import { productionConfig, createHealthCheck, productionErrorHandler, createGracefulShutdown } from './config/production.js';
 
 const app = express();
@@ -20,13 +20,18 @@ const server = createServer(app);
 const PORT = process.env.PORT || 3001;
 
 // Initialize database service (with error handling)
-let dbService: any = null;
-// Commented out due to type issues
-// try {
-//   dbService = new DatabaseService();
-// } catch (error) {
-//   console.warn('Database service initialization failed:', error);
-// }
+let dbService: DatabaseService | null = null;
+try {
+  dbService = new DatabaseService();
+  console.log('Database service initialized successfully');
+} catch (error) {
+  console.warn('Database service initialization failed:', error);
+  console.log('Continuing without database - results will only be stored in memory');
+}
+
+// Initialize orchestrator with database service
+const orchestrator = createOrchestrator(dbService || undefined);
+setOrchestrator(orchestrator);
 
 // Middleware
 app.use(helmet(productionConfig.security.helmet));

@@ -588,51 +588,15 @@ export class ReviewSortNavigationService {
 
   /**
    * Attempt navigation by manipulating URL parameters
+   * DISABLED: This method causes Google Maps to redirect to default coordinates
    */
   private async attemptUrlManipulation(page: Page, sortingOption: SortingOption): Promise<boolean> {
-    this.debugLog('Attempting URL manipulation navigation...');
-
-    try {
-      const currentUrl = page.url();
-      const url = new URL(currentUrl);
-
-      // Define URL parameter mappings for different sort types
-      const sortParams = {
-        recent: ['sort=newest', 'sort=recent', 'orderby=date', 'sort_by=date'],
-        worst: ['sort=lowest', 'sort=worst', 'orderby=rating_asc', 'sort_by=rating_low'],
-        best: ['sort=highest', 'sort=best', 'orderby=rating_desc', 'sort_by=rating_high']
-      };
-
-      const paramsToTry = sortParams[sortingOption.type] || [];
-
-      for (const paramString of paramsToTry) {
-        try {
-          const [key, value] = paramString.split('=');
-          url.searchParams.set(key, value);
-          
-          const newUrl = url.toString();
-          this.debugLog(`Trying URL: ${newUrl}`);
-
-          await page.goto(newUrl, { waitUntil: 'networkidle0', timeout: 10000 });
-          
-          // Verify that the sort was applied
-          const sortApplied = await this.verifySortApplication(page, sortingOption.type);
-          
-          if (sortApplied) {
-            this.debugLog(`Successfully applied sort via URL manipulation: ${paramString}`);
-            return true;
-          }
-
-        } catch (error) {
-          this.debugLog(`URL manipulation failed for ${paramString}: ${error}`);
-          continue;
-        }
-      }
-
-    } catch (error) {
-      this.debugLog(`URL manipulation method failed: ${error}`);
-    }
-
+    this.debugLog('URL manipulation navigation disabled to prevent unwanted redirects to default coordinates');
+    
+    // URL manipulation is disabled because it causes Google Maps to redirect to:
+    // https://www.google.com/maps/place//@37.0625,-95.677068,4z/data=!3m1!4b1?hl=en&entry=ttu&g_ep=EgoyMDI1MDkyMS4wIKXMDSoASAFQAw%3D%3D
+    // This happens when URL parameters are modified and Google Maps doesn't recognize the new format
+    
     return false;
   }
 

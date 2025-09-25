@@ -15,9 +15,9 @@ export const TrustIndicator: React.FC<TrustIndicatorProps> = ({
   fakeReviewRatio,
   confidenceScore
 }) => {
-  // Calculate overall trust level
+  // Calculate overall trust level (scores are percentages 0-100)
   const calculateTrustLevel = () => {
-    const avgScore = (overallScore + trustworthiness + (1 - redFlags)) / 3
+    const avgScore = (overallScore + trustworthiness + (100 - redFlags)) / 3 / 100 // Convert to 0-1 scale
     const penaltyForFakes = Math.max(0, fakeReviewRatio * 0.5)
     const confidenceBonus = confidenceScore * 0.2
     

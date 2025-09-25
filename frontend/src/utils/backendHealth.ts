@@ -10,10 +10,15 @@ export interface BackendHealthStatus {
 
 export async function checkBackendHealth(): Promise<BackendHealthStatus> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    
     const response = await fetch('/api/health', {
       method: 'GET',
-      timeout: 3000,
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
     return {
       isHealthy: response.ok,
@@ -39,7 +44,8 @@ export async function checkBackendHealth(): Promise<BackendHealthStatus> {
 }
 
 export function isDevelopmentEnvironment(): boolean {
-  return window.location.hostname === 'localhost' && window.location.port === '5173';
+  // Frontend dev server uses port 5174 (see package.json and vite.config)
+  return window.location.hostname === 'localhost' && window.location.port === '5174';
 }
 
 export function getBackendUrl(): string {
@@ -54,8 +60,8 @@ export function getBackendUrl(): string {
 
 export function getWebSocketUrl(): string {
   if (isDevelopmentEnvironment()) {
-    // Use Vite proxy in development
-    return `ws://localhost:5173/ws/progress`;
+    // Use Vite proxy in development (port 5174)
+    return `ws://localhost:5174/ws/progress`;
   }
   
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

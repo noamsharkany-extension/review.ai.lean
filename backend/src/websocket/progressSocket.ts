@@ -13,6 +13,7 @@ declare module 'ws' {
 export class ProgressWebSocketServer {
   private wss: WebSocketServer;
   private clients: Map<string, Set<WebSocket>> = new Map();
+  private keepAliveInterval: NodeJS.Timeout | null = null;
 
   constructor(server: Server, orchestrator: ReviewAnalysisOrchestrator) {
     this.wss = new WebSocketServer({ 
@@ -25,6 +26,7 @@ export class ProgressWebSocketServer {
 
     this.setupWebSocketServer();
     this.setupOrchestratorListeners(orchestrator);
+    this.startKeepAlive();
   }
 
   private setupWebSocketServer(): void {
@@ -91,17 +93,25 @@ export class ProgressWebSocketServer {
       }
     });
 
-    // Enhanced heartbeat with better error handling
+    // Enhanced heartbeat with better error handling and longer timeout
     const heartbeat = setInterval(() => {
       this.wss.clients.forEach((ws: any) => {
-        if (ws.isAlive === false) {
-          console.log('Terminating dead WebSocket connection');
+        // Only terminate if connection has been unresponsive for multiple cycles
+        if (ws.isAlive === false && ws.missedPings >= 3) {
+          console.log('Terminating dead WebSocket connection after multiple missed pings');
           try {
             ws.terminate();
           } catch (error) {
             // Ignore termination errors
           }
           return;
+        }
+        
+        // Track missed pings
+        if (ws.isAlive === false) {
+          ws.missedPings = (ws.missedPings || 0) + 1;
+        } else {
+          ws.missedPings = 0;
         }
         
         ws.isAlive = false;
@@ -114,7 +124,7 @@ export class ProgressWebSocketServer {
           ws.isAlive = false;
         }
       });
-    }, 30000); // Check every 30 seconds
+    }, 60000); // Check every 60 seconds (increased from 30)
 
     this.wss.on('close', () => {
       clearInterval(heartbeat);
@@ -319,8 +329,33 @@ export class ProgressWebSocketServer {
     };
   }
 
+  // Start keep-alive mechanism to prevent idle disconnections
+  private startKeepAlive(): void {
+    this.keepAliveInterval = setInterval(() => {
+      // Send keep-alive to all connected clients
+      this.wss.clients.forEach((ws: any) => {
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            this.sendMessage(ws, {
+              type: 'keepalive',
+              sessionId: '',
+              data: { timestamp: Date.now() }
+            });
+          } catch (error) {
+            // Ignore keep-alive errors
+          }
+        }
+      });
+    }, 30000); // Send keep-alive every 30 seconds
+  }
+
   // Graceful shutdown
   public async close(): Promise<void> {
+    if (this.keepAliveInterval) {
+      clearInterval(this.keepAliveInterval);
+      this.keepAliveInterval = null;
+    }
+    
     return new Promise((resolve) => {
       this.wss.close(() => {
         console.log('WebSocket server closed');

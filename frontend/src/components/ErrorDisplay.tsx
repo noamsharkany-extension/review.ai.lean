@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface ErrorInfo {
-  type: 'scraping' | 'api' | 'network' | 'validation' | 'timeout' | 'unknown';
+  type: 'scraping' | 'api' | 'network' | 'validation' | 'timeout' | 'not_found' | 'invalid_state' | 'unknown';
   message: string;
   details?: string;
   retryable: boolean;
@@ -171,7 +171,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 // Helper function to create ErrorInfo from different error sources
 export const createErrorInfo = (
   error: unknown,
-  context: 'scraping' | 'api' | 'network' | 'validation' = 'unknown',
+  context: 'scraping' | 'api' | 'network' | 'validation' = 'api',
   sessionId?: string
 ): ErrorInfo => {
   if (error instanceof Error) {
@@ -179,8 +179,8 @@ export const createErrorInfo = (
     let type: ErrorInfo['type'] = context;
     let retryable = true;
 
-    // Override with message-based detection only if context is 'unknown'
-    if (context === 'unknown') {
+    // Override with message-based detection only if context is 'api'
+    if (context === 'api') {
       if (error.message.includes('validation') || error.message.includes('invalid')) {
         type = 'validation';
         retryable = false;

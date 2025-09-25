@@ -1,0 +1,974 @@
+Review.ai
+Smart Review Analyzer
+Analyze Google Reviews with AI
+Get trustworthy insights from Google Reviews with intelligent sampling, sentiment analysis, and fake review detection powered by OpenAI.
+
+Enter Google URL with Reviews
+https://www.google.com/maps/place/Fu+Sushi/@32.0944673,34.7741713,17z/data=!4m8!3m7!1s0x151d4bf5069206ff:0x8de56f3e396b2108!8m2!3d32.0944673!4d34.7767462!9m1!1b1!16s%2Fg%2F1tmd99hz?entry=ttu&g_ep=EgoyMDI1MDgyNS4wIKXMDSoASAFQAw%3D%3D
+Analyze Reviews
+Example URLs:
+• Google Maps: https://maps.google.com/place/...
+• Google Search: https://www.google.com/search?q=restaurant+reviews
+• Any Google page showing business reviews
+Analysis Complete
+Analyzed 280 reviews with 84% confidence
+
+7600%
+Overall Score
+Analysis Verdict
+Overall Impression
+7600%
+Based on sentiment analysis and review authenticity
+
+Trustworthiness
+8800%
+Reliability of reviews and business reputation
+
+Red Flags
+3000%
+Potential issues detected in reviews
+
+Analysis Overview
+Total Reviews
+280
+All analyzed
+
+Fake Reviews
+43.0%
+Detected by AI analysis
+
+Sentiment Mismatches
+14.0%
+Rating vs text sentiment
+
+Confidence Score
+84%
+Analysis accuracy
+
+Trust Assessment
+Highly Trustworthy
+This business appears to have authentic, reliable reviews. You can trust the overall sentiment.
+
+Quality Indicators:
+High fake review rate detected
+Multiple red flags present
+Review Citations (170)
+Click any review to see detailed analysis
+Irina Barinshteyn
+an hour ago
+Sentiment Mismatch
+Good food, excellent service except for the loud music that spoils the atmosphere and the ability to have a comfortable conversation.
+
+Full Review
+Good food, excellent service except for the loud music that spoils the atmosphere and the ability to have a comfortable conversation.
+
+Sentiment Analysis
+Detected Sentiment:
+Negative
+Confidence:
+9000%
+⚠️ Rating doesn't match text sentiment
+Authenticity Check
+Authenticity:
+Likely Authentic
+Confidence:
+8000%
+View Original Review
+Anonymous
+an hour ago
+Potentially Fake
+ServiceDine inMeal typeLunchPrice per person₪100–150Food: 5Service: 5Atmosphere: 5Group sizeSuitable for all group sizes
+
+Anonymous
+5 days ago
+Potentially Fake
+ServiceDine inMeal typeDinnerPrice per person₪150–200Food: 4Service: 4Atmosphere: 3Group sizeNot sure
+
+Anonymous
+6 days ago
+Most of the dishes were very tasty. The sushi was very weak.
+
+Anonymous
+6 days ago
+Reasonably sized portions for the price, delicious food. Small but beautiful and well-designed restaurant.
+
+Anonymous
+a week ago
+Very tasty place, good service, fun atmosphere, really worth going for dinner
+
+Anonymous
+a week ago
+The place is very nice, especially inside. Outside it is very noisy from the street and the music. We had a great waitress outside!!! (Thursday evening 4.9)
+
+Anonymous
+2 weeks ago
+Amazing place with the best service and food in town! Highly recommend ❤️🙏🏻 …
+
+Anonymous
+2 weeks ago
+It was good and nice, excellent service.
+
+Anonymous
+Edited 2 weeks ago
+Sentiment Mismatch
+Not cheap, but the food, place and service are high quality
+
+Anonymous
+3 weeks ago
+Potentially Fake
+tastyFood: 5Service: 5… More
+
+Anonymous
+3 weeks ago
+Potentially Fake
+niceServiceTake out… More
+
+Marcelo Dombiak
+4 weeks ago
+Ok, not more than that
+
+Anonymous
+4 weeks ago
+Oh my God ! We went there for late lunch that ended at dinner! On a busy street this nice place serves a high quality made sushi with great flavors that will blow your mind.
+
+Anonymous
+4 weeks ago
+Overall a good experience, sky-high prices but delicious
+
+Anonymous
+4 weeks ago
+Potentially Fake
+I ate with my partner at Pho, every dish was amazing (as a die-hard meat lover, I didn't think I would be so excited about the taste of wakame salad). We ordered sashimi starters, skewers and wakame salad, we shared a wok that I …
+
+Full Review
+I ate with my partner at Pho, every dish was amazing (as a die-hard meat lover, I didn't think I would be so excited about the taste of wakame salad). We ordered sashimi starters, skewers and wakame salad, we shared a wok that I …
+
+Sentiment Analysis
+Detected Sentiment:
+Positive
+Confidence:
+9200%
+Authenticity Check
+Authenticity:
+Potentially Fake
+Confidence:
+7000%
+Analysis Notes:
+Generic language
+Promotional tone
+Extreme sentiment
+View Original Review
+Anonymous
+a month ago
+Potentially Fake
+The hostess's service was outstanding. On a hot evening, she left a family with three children waiting outside for no reason, in a very rude manner.
+
+Anonymous
+a month ago
+A relatively expensive place, 80 shekels for a wok, no air conditioning, I don't recommend coming in the summer, but the food is good.
+
+Anonymous
+a month ago
+They had a few mistakes but they made up for it and it was delicious.
+
+Anonymous
+a month ago
+Wow. The food is fresh and you can feel it, delicious, the service is pleasant, kind and nice🩷 Highly recommended🩷 …
+
+Anonymous
+2 weeks ago
+Potentially Fake
+ServiceDine inMeal typeDinnerPrice per person₪200–250Food: 5Service: 4Atmosphere: 5Group sizeNot sure
+
+Anonymous
+3 weeks ago
+Potentially Fake
+Sentiment Mismatch
+tastyFood: 5Service: 5Atmosphere: 5
+
+Full Review
+tastyFood: 5Service: 5Atmosphere: 5
+
+Sentiment Analysis
+Detected Sentiment:
+Positive
+Confidence:
+8500%
+⚠️ Rating doesn't match text sentiment
+Authenticity Check
+Authenticity:
+Potentially Fake
+Confidence:
+7000%
+Analysis Notes:
+Generic language
+Promotional tone
+Unnatural patterns
+View Original Review
+Anonymous
+a month ago
+Potentially Fake
+It was perfect! Really delicious Excellent service, great waitress Thank you very much :)
+
+Anonymous
+a month ago
+Potentially Fake
+Sentiment Mismatch
+Food with amazing ingredients. The restaurant has a lot of food there. Reasonable price for excellent quality.
+
+Anonymous
+2 months ago
+Potentially Fake
+Sentiment Mismatch
+Wow, how delicious it is there! Flavors, raw materials, creative and wonderful dishes. We had crazy Tom Yum, shrimp gyoza with a surprising filling and truffle soy sauce, and incredibly perfect red tuna sushi. In the afternoon there is also a business discount, which was nice to find on the bill. Wonderful and pleasant service
+
+Full Review
+Wow, how delicious it is there! Flavors, raw materials, creative and wonderful dishes. We had crazy Tom Yum, shrimp gyoza with a surprising filling and truffle soy sauce, and incredibly perfect red tuna sushi. In the afternoon there is also a business discount, which was nice to find on the bill. Wonderful and pleasant service
+
+Sentiment Analysis
+Detected Sentiment:
+Positive
+Confidence:
+9200%
+⚠️ Rating doesn't match text sentiment
+Authenticity Check
+Authenticity:
+Potentially Fake
+Confidence:
+9000%
+Analysis Notes:
+Generic language
+Promotional tone
+Extreme sentiment
+View Original Review
+Anonymous
+2 months ago
+Potentially Fake
+Delicious and varied food. Excellent service.
+
+Daniel Rogoff
+2 months ago
+Sentiment Mismatch
+Great place for dinner. Can recommend.
+
+Itzhak Sean Kaploun
+2 months ago
+One of the best Asian restaurants in TA
+
+Anonymous
+2 months ago
+Potentially Fake
+Do not order from here on Wolt. Food took double the predicted time to arrive, and arrived cold and partially inedible.
+
+Anonymous
+2 months ago
+Potentially Fake
+Seven of us arrived on a Friday afternoon at Mokadim, the restaurant was empty but they refused to seat us inside, claiming that there was a reserved table. We sat outside for an hour and a half with flies and when we got up we saw the …
+
+Full Review
+Seven of us arrived on a Friday afternoon at Mokadim, the restaurant was empty but they refused to seat us inside, claiming that there was a reserved table. We sat outside for an hour and a half with flies and when we got up we saw the …
+
+Sentiment Analysis
+Detected Sentiment:
+Negative
+Confidence:
+8000%
+Authenticity Check
+Authenticity:
+Potentially Fake
+Confidence:
+8000%
+Analysis Notes:
+Generic language
+Negative experience described in detail
+View Original Review
+Anonymous
+2 months ago
+The dishes are special, delicious and excellent. What a waste of time. An excellent restaurant.
+
+Anonymous
+2 months ago
+Very tasty food, pleasant atmosphere and excellent service ❣️
+
+Anonymous
+2 months ago
+Potentially Fake
+Initially i was really excited to come because i had been there once before so i anticipated the same experience. There chicken ramen is good. The rudeness of this one manager with light brown hair was so rude and made me never wanted to …
+
+Full Review
+Initially i was really excited to come because i had been there once before so i anticipated the same experience. There chicken ramen is good. The rudeness of this one manager with light brown hair was so rude and made me never wanted to …
+
+Sentiment Analysis
+Detected Sentiment:
+Positive
+Confidence:
+9000%
+Authenticity Check
+Authenticity:
+Potentially Fake
+Confidence:
+8000%
+Analysis Notes:
+Generic language
+Promotional tone
+Extreme negative sentiment
+View Original Review
+Anonymous
+3 months ago
+Potentially Fake
+Excellent food as always, service was excellent!
+
+Anonymous
+3 months ago
+Potentially Fake
+Sentiment Mismatch
+Excellent restaurant in Dizengoff. The takeaway branch on the next street is shocking - humiliating, argumentative and childish service and simply beyond all criticism. My neighbors, a regular diner, sometimes order takeaway, I ordered a …
+
+Full Review
+Excellent restaurant in Dizengoff. The takeaway branch on the next street is shocking - humiliating, argumentative and childish service and simply beyond all criticism. My neighbors, a regular diner, sometimes order takeaway, I ordered a …
+
+Sentiment Analysis
+Detected Sentiment:
+Negative
+Confidence:
+9500%
+⚠️ Rating doesn't match text sentiment
+Authenticity Check
+Authenticity:
+Potentially Fake
+Confidence:
+9000%
+Analysis Notes:
+Generic language
+Extreme sentiment
+View Original Review
+Anonymous
+3 months ago
+Potentially Fake
+I eat here quite a bit and also order a lot on TA and it's always delicious and fresh. The best sushi in town.
+
+Anonymous
+3 months ago
+Potentially Fake
+Horrible service. I do not recommend anyone to enter this restaurant or order from it for any money in the world! We placed an order and they replaced our dishes. The service we received was …
+
+Anonymous
+a month ago
+ServiceDine inMeal typeLunchPrice per person₪200–250Food: 5Service: 5Atmosphere: 5Group size3-4 people
+
+Anonymous
+a month ago
+ServiceDine inMeal typeDinnerPrice per person₪350–400Food: 5Service: 5Atmosphere: 5
+
+Anonymous
+3 months ago
+Let's start with Spoiler, a wonderful Thai restaurant. We came as a couple for dinner and sat outside. …
+
+Anonymous
+3 months ago
+Potentially Fake
+After dining there, all I can think is that their name is probably short for Pak Yu.
+
+Anonymous
+Edited 3 months ago
+Potentially Fake
+The least successful restaurant in the entire chain. The same dishes, only made at a mediocre or lower level. Disappointing
+
+Anonymous
+4 months ago
+Sentiment Mismatch
+Delicious delicious delicious The seaweed salad, the agadashi, the gyoza was interesting, the green Thai tofu was really delicious and the cocktail was awesome!! Thai Martini
+
+Anonymous
+4 months ago
+Sentiment Mismatch
+Overall, a nice place. Unfortunately, we were disappointed with the food we ordered last time. It was very mediocre and the price was not cheap. Sitting in the place, the food is much tastier. But in my opinion, a high-level place should also know how to control food delivery at a high level or not offer the service.
+
+Full Review
+Overall, a nice place. Unfortunately, we were disappointed with the food we ordered last time. It was very mediocre and the price was not cheap. Sitting in the place, the food is much tastier. But in my opinion, a high-level place should also know how to control food delivery at a high level or not offer the service.
+
+Sentiment Analysis
+Detected Sentiment:
+Negative
+Confidence:
+9000%
+⚠️ Rating doesn't match text sentiment
+Authenticity Check
+Authenticity:
+Likely Authentic
+Confidence:
+6000%
+View Original Review
+Anonymous
+a month ago
+Sentiment Mismatch
+ServiceDine inMeal typeLunchPrice per person₪120–140Food: 4Service: 4Atmosphere: 4Group size3-4 people
+
+Anonymous
+Edited a month ago
+Sentiment Mismatch
+Best Sushi in Tel Aviv !!
+
+Anonymous
+5 months ago
+Potentially Fake
+The service was exceptional. Everything arrived in a short time, they were so nice, every request was answered positively, and the best sushi in the world!
+
+Anonymous
+5 months ago
+Potentially Fake
+Excellent food great service
+
+Anonymous
+2 years ago
+Potentially Fake
+!If I could I will give this place a 0 star !! We arrived to the restaurant had a reservation under my friend , the unpleasant hostess send us to the end of the restaurant not showing us where my friend sits . We was wondering at the restaurant trying to look where to go to find our friend . Food arrived we ordered a lots of starter one of them was the chicken bun we find pice of metal inside!!! So this did not add to our experience from the beginning. Food very average i ordered the fish in red curry was very bland!!! Not good !!! And expensive for nothing!!! Do yourself a favor spend your money in a different restaurant in Tel Aviv and there is so good restaurants in! that city !!! but definitely not this one !!!one word disappointment!!!!
+
+Anonymous
+2 years ago
+Potentially Fake
+They offer outside seats. This option is as close as you can to sit in hell. 0 options to cool yourself. I could not finish my dish due to the extreme heat. The staff kept promising they will boost the air conditioning but did nothing about that and the poor air conditioner seemed like it is just not working.
+
+Alex Berber
+Edited 7 years ago
+Potentially Fake
+Bad place. Dont go here. Very bad service.
+
+Anonymous
+6 years ago
+Potentially Fake
+Horrible. Took 3 dishes. The tom yum soup which was bland (Even the mediocre Japanica does it better), the Ramen was exceptionally spicy to the point it was uneatable. The crunchy sushi was ok but no more (and costs twice as much as sushis in other sushi places). The waiters did not care that I barely ate my food and just suggested to take it away instead of asking me if everything was alright. All in all, bad service and pretty bad food. Would not return. Would not return.
+
+Anonymous
+10 years ago
+Potentially Fake
+We experienced it as a tourist trap. The waiters were busy checking Instagram. The bar smelled like a toilet. The menu cards were wet and weary. Finally left without ordering.
+
+Anonymous
+2 years ago
+Potentially Fake
+Terrible experience. Left waiting in the cold for over 1h with a baby while other people with no reservation walked in and sat. Don’t waste your time with the terrible people running this place.
+
+Anonymous
+5 years ago
+Potentially Fake
+I ordered tofu and I received tufo with chicken I’m vegetarian . I called the restaurant they are denying even that I sent them a video they are saying it was only tufo . Beware of this place it’s a shame to treat customer like that . Do your self a favor and find another place to eat .
+
+Anonymous
+3 years ago
+Potentially Fake
+Got a food poisoning after eating at this place, and my stomach hurts even though it’s been 3 days. The worst part is restaurant’s indifference to the situation.Would not recommend this place.
+
+Anonymous
+2 years ago
+Potentially Fake
+Wow really low level of food. Only teenagers eat there and the adults that do have no appreciation for Asian cuisine
+
+Anonymous
+3 years ago
+For a special suchi for 64 nis , this is the smallest sushi I have seen! Shame to charge so much and get mini sushi
+
+Bayazid Siroj (Bayaz)
+a year ago
+Potentially Fake
+food here is made form Palestinian children
+
+Anonymous
+Edited 6 years ago
+Sentiment Mismatch
+Takes ages for the food to reach the table. People never get their food at the same time, so you find yourself waiting for someone else's food.. The food isn't that great either.
+
+Anonymous
+a year ago
+Potentially Fake
+I only like noodles I hate sushi and all the noodles suck or not kosher or pos
+
+Anonymous
+3 years ago
+Personal advice: AVOID this restaurant. In my opinion, you have MUCH better options, especially for those expensive prices.
+
+Yosi Govezensky
+6 years ago
+Small plates and expensive. The beef was low quality.
+
+Ward Abbass
+7 years ago
+Bad value for money, too much expensive
+
+Vitaly Shmalovsky
+8 years ago
+expensive and bad food
+
+Anonymous
+3 years ago
+I heard a lot of good reviews and decided to order home delivery, the delivery arrived quickly but unfortunately the expectation was as great as the disappointment. …
+
+Anonymous
+5 years ago
+One of the restaurants of the Kiso group, Pho, excellent Asian food, it is recommended to book in advance several hours before arrival, very good service, quality and fresh food, traditional Asian dishes, a very rich menu …
+
+Anonymous
+3 years ago
+Potentially Fake
+I received a delivery that I have ordered several times.. simply horrible. A roll for 68 shekels… There was barely any fish or vegetables, let alone the rice. Chips were put on top.. I really appreciate that they put them at all.. The rolls …
+
+Anonymous
+Edited 2 years ago
+I am a vegetarian/vegan and received a dish with chicken instead of tofu. I live abroad and am staying with family, outside of Tel Aviv. My dinner was completely ruined. I called the restaurant and asked for appropriate compensation. The …
+
+Anonymous
+a year ago
+We ordered 2 sashimi rolls, 1 salmon sashimi, 1 red tuna sashimi and 1 bass sashimi Total 295 shekels before delivery and tip for the delivery person …
+
+Anonymous
+9 months ago
+We ordered delivery. We took the cashew tofu for the child, which was written as non-spicy and was described as having regular peppers (no hot pepper was specified). In fact, this particular dish we ordered for the child was spicy. When we …
+
+Anonymous
+9 months ago
+Potentially Fake
+Sentiment Mismatch
+It doesn't seem reasonable to me to charge 98 NIS for a "combination" that comes in a 10 cm by 5 cm box. Soup for 44 NIS and came in about 150 ml in a tiny box (the salt next to it is the small salt). Embarrassing and I won't order again.
+
+Anonymous
+9 months ago
+I ordered a delivery that arrived late when there was no indication of this. They use the phrase "there are things that are not listed" They say the problem is with Walt and that they are documents with the customer, …
+
+Anonymous
+a year ago
+Potentially Fake
+Really really really not I ordered delivery - the corn soup was reduced to a sample and not as tasty as it was. …
+
+Anonymous
+11 months ago
+Potentially Fake
+Sushi sucks, one of the most disgusting, don't go near it. Not fresh salmon, black avocado, insanely expensive.
+
+Anonymous
+2 years ago
+Potentially Fake
+A disgrace to the delivery system. I placed an order, the delivery man arrived and didn't bother to pick up the phone (claims to have, never received a call) and decided to leave my delivery at …
+
+Anonymous
+a year ago
+Potentially Fake
+On the face of sushi and the face of customer service. They don't take responsibility for dishes that come out bad. I recommend staying away.
+
+Anonymous
+3 years ago
+Potentially Fake
+I came with the family, and by chance I find out that the "chef" decided to add Paul to spicy fish, where half the menu was canceled for us instead. It's just a disgrace that they don't inform. A classy restaurant that we used to go to as …
+
+Anonymous
+2 years ago
+Potentially Fake
+The bartender ruined the entire restaurant experience. The whole time it seemed like she was doing us a favor and waiting for us to leave as soon as possible. Very unpleasant. After I paid the bill, she had the nerve to demand an additional tip.
+
+Anonymous
+3 years ago
+Potentially Fake
+I was a regular and satisfied customer at Pho. We chose to celebrate my mother's birthday there yesterday, and it dawned on us that last month they decided to add pol to the spicy tuna and spicy salmon, and it turns out that about 70% of …
+
+Anonymous
+a year ago
+I ordered food over NIS 800 The food was mostly really tasty but unfortunately 2 dishes that I ordered (the same) were really spoiled, the smell that came out of the dish was shocking and …
+
+Anonymous
+5 years ago
+I ordered the Pad Si Yu Chicken dish. I received a dish that was extremely sweet and does not deserve to be called a main dish - not tasty and very unhealthy. When I asked to change the dish - the restaurant refused. It turned out that the service experience I received was also disappointing and disrespectful. rope!
+
+Anonymous
+3 years ago
+The food arrived quickly. And that's the only good thing I can say about this experience. A carrot salad that I used to really like and that's why I ordered it, arrived horribly dry. Obviously it wasn't made that day. …
+
+Anonymous
+4 years ago
+We came to celebrate a birthday, they seated us very close to the speakers. The music was loud, not to mention the terrible playlist. Since we came to a restaurant, not a dance club, and we wanted to have a conversation, which was not …
+
+Anonymous
+4 years ago
+We ordered yesterday for the whole family, the delivery arrived and one dish was missing (Tiger), when we called we apologized and said they would send it specially and it would arrive within 20 minutes, some started eating some did not. …
+
+Anonymous
+3 years ago
+I booked a table a week(!) in advance for 20:00 inside the restaurant (not outside) to celebrate my mother's birthday. We were early and arrived at 19:30 at the restaurant. We stood outside and waited more than an hour until we were seated …
+
+Anonymous
+2 years ago
+Sentiment Mismatch
+Despite asking and clarifying countless times which dishes were vegan, I chose a dish suggested by the waitress, and again made sure it was vegan It was only after I ate that I noticed that there were pieces of egg in the …
+
+Anonymous
+4 years ago
+Not talking about the food right now, but about the restaurant. My mom made a self-pickup order on Friday night, and only after she paid did it say it would take 50 (!!) minutes for it to be ready. And it wasn't listed, I …
+
+Anonymous
+3 years ago
+Great food but less strong in deliveries. We ordered an hour and almost 40 minutes ago, there is no voice and no season and no estimated arrival …
+
+Anonymous
+5 years ago
+There were three adults and a small child in the evening, something spontaneous. We didn't enjoy it at all. Very sorry. The sushi was served at the wrong temperature/the rice was too hot. Both types of rolls were dry, with fish that seemed …
+
+Anonymous
+2 years ago
+I ordered 2 stir-fries from Walt - we paid dearly and expected the quality, but it was just not good... Unfortunately, in addition to that, my husband and I had terrible stomach pains after the food, something didn't feel right to us from …
+
+Anonymous
+2 years ago
+We arrived at the restaurant knowing that there were several gluten-free dishes, they changed all the dishes so that instead of having a selection of dishes for those sensitive to gluten, there was *only one dish*. Sucks.
+
+Anonymous
+3 years ago
+Potentially Fake
+Horrible service. I recommend not ordering food from this restaurant. After an hour and a half of waiting, we received the food and it turns out that a dish was missing. They didn't bother to contact us and try to exchange it for another dish. Premium prices with a level of service that is the best in the market.
+
+Anonymous
+3 years ago
+Today at six o'clock in the evening I came to eat at the restaurant, I sat on the balcony at first and then when I looked around I saw children and I asked if they were checking for a green note, the waitress said only inside. When I asked …
+
+Anonymous
+4 years ago
+Potentially Fake
+Very tasty food. Unpleasant atmosphere. Loud music without the possibility to speak. After the first request, the volume was not lowered. When we asked again, the manager came and argued in an embarrassing and disrespectful manner. Even the …
+
+Anonymous
+4 years ago
+We ordered a delivery for 400 NIS. We were told that we would receive the delivery in an hour. After 55 minutes, we called, and were told that the delivery person would be here in five minutes. We waited and waited, and after an hour and a …
+
+Anonymous
+6 years ago
+In one word, reasonable, in two words, I won't be back. I called at noon to make a reservation and was told that most of the tables were not reserved and I could come. We arrived at eight, entered at eight thirty. …
+
+Anonymous
+4 years ago
+Potentially Fake
+Usually the experience from the restaurant is positive, this time not: They both forgot a dish and the delivery man broke a large mirror that was at the entrance to the building and ran away without taking responsibility or helping …
+
+Anonymous
+4 years ago
+Potentially Fake
+Sentiment Mismatch
+Condescending service without any flexibility or discretion! A really unpleasant and frustrating experience with the restaurant's delivery …
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+Disrespectful service, long wait, not recommended at all. Very expensive and do not justify the price in either the service or the product.
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+It was very disappointing, we waited over an hour for the table, the hostess forgot us, sushi falls apart, the wok dish arrived cold, not worth the price.
+
+Anonymous
+3 years ago
+Potentially Fake
+Sentiment Mismatch
+Do not order in any way through Walt. Israeli pork for its own sake by sending ridiculous amounts compared to how a restaurant is served, …
+
+Anonymous
+8 years ago
+Potentially Fake
+Sentiment Mismatch
+I heard a lot about the restaurant and unfortunately after a New Year's Eve dinner I learned that the place is simply mediocre in every way and without any justification for the high prices. Except for a beautiful "wrap" for the sushi menu …
+
+Anonymous
+2 years ago
+Sentiment Mismatch
+I ordered food for work for NIS 240 that will last me two days. Lots of delicious dishes for an exorbitant price. It wasn't even enough for a day.
+
+Anonymous
+9 years ago
+Potentially Fake
+Sentiment Mismatch
+We were shocked by the attitude and service at Pho. My friend and I were sitting in the restaurant, and after about two hours Shirley, the AHMS, came up to us and simply demanded that we leave the restaurant, claiming that "we were limited …
+
+Anonymous
+a year ago
+Potentially Fake
+Sentiment Mismatch
+Cold and condescending service. Plain and simple food, unnecessarily expensive. We will not return to the restaurant again. Do not recommend
+
+Anonymous
+2 years ago
+Sentiment Mismatch
+This is what you will receive with an order of 115 NIS
+
+Anonymous
+2 years ago
+Sentiment Mismatch
+The service was great, but the food was mediocre, not suitable for Tel Avivians.
+
+Anonymous
+7 years ago
+Potentially Fake
+Sentiment Mismatch
+Sushi is not tasty and very expensive. No value for the money paid. I will not go back there again. Too many decorations on the serving plate, apparently for Instagram or something like that and less investment in taste, a really huge menu that also does not show professionalism ... in short, not recommended.
+
+Anonymous
+2 years ago
+Potentially Fake
+Sentiment Mismatch
+Astronomical prices for really small portions. 62 NIS for a small soup!!!!! Simply excessive. I will not buy from them again!!!!
+
+Anonymous
+7 months ago
+Sentiment Mismatch
+We ordered delivery and it was not tasty
+
+Anonymous
+4 years ago
+Potentially Fake
+I ordered from the restaurant when I arrived to pick up the soup it was cold I asked if it could be heated and I received a negative response instead of an order of 330 NIS and they can't heat up my soup …
+
+Anonymous
+6 years ago
+We came here knowing that it was the same owners as the legendary Kiso in Kiryat Ono and unfortunately we were wrong in a big way. The portions are tasteless and small in size, but of course not in price! Very disappointing.
+
+Anonymous
+6 years ago
+Potentially Fake
+I was recommended this restaurant and went on my birthday. The waitress was disgusting. I asked for no tuna and it came with tuna. I asked for a cocktail and it came at the end of the meal. The business sushi dish was not tasty, who knows what. What about regular sushi....
+
+Anonymous
+2 years ago
+I was less impressed with the type of food, but overall it's an okay restaurant. Anyone who wants to is welcome to try it.
+
+Anonymous
+9 years ago
+Potentially Fake
+Very dirty place. We cleaned the table and chairs ourselves with cloths. The dishes are also dirty, we asked to change a glass and they brought us the same dirty glass. …
+
+Anonymous
+7 years ago
+Potentially Fake
+The difficult experience that started on the phone, they answered twice, asked me to wait for something to be checked and just hung up, but a good friend recommended it to me so I didn't give up, I took my wife for a pampering evening, I …
+
+Anonymous
+6 years ago
+Potentially Fake
+The delivery portions are clearly not recommended!!! They are small and really don't justify the price... they don't taste good either, on top of that... it just sucks
+
+Anonymous
+2 years ago
+Potentially Fake
+Not the most pleasant place. long wait Excessive prices and the food? reasonable.
+
+Anonymous
+5 years ago
+Potentially Fake
+I took my girlfriend on a date I got food poisoning and when I reported it to the restaurant they came with an insulting attitude towards me
+
+Lara Yasinev
+a month ago
+This Asian restaurant near my has been my favorite for years in the neighborhood. I always order the same thing 😁 chicken curry and Japanese green tea and it’s absolutely delicious every single time. The atmosphere is welcoming and warm
+
+Anonymous
+5 years ago
+It is really not that easy to find good sushi in Israel. There are a lot, but most of them are mediocre at best. Fu Sushi is one of the rare gems in Tel Aviv. Great sushi selection with amaZong fresh fish . Don't miss the purple rain!
+
+Anonymous
+6 years ago
+Potentially Fake
+Wow we had a great time (pricey but worth it) Make sure to always sit on the bar, much better atmosphere free shots from time to time and very friendly and responsive staff. All the dishes (but the asian kiss dessert were amazing), the shrimps popcorn is just to die for. All the sushi wss great, it just melts in your mouth. Thank you! We will come here again and again and again.
+
+Anonymous
+5 years ago
+Potentially Fake
+This is just great! Everything was superb... we were 2, and ordered a bit of everything, enjoying every bit of our dinner. The service was good and super quick. One of the nicest Japanese restaurants in TLV.
+
+Anonymous
+5 years ago
+What a terrific high class sushi restaurant! The place is beautifully decorated, very cool seating inside and on the street (in a closed space though). Service is great and friendly, and very helpful. Lovely for couples or groups. And the …
+
+Anonymous
+3 years ago
+Really nice place for sushi! The food is good, the fish are fresh. The pricing is fair, given that it's good sushi. The service is wonderful, and the location is really nice.
+
+Anonymous
+2 years ago
+One of the best sushi in Tel Aviv Delicious meals Tasty Ramen and Gioza The Sushi - just see the photos
+
+Anonymous
+2 years ago
+A really beautiful place and delicious food, the staff were very caring. We were given a choice of where to sit, and despite the heat and open doors, there was a pleasant prahlad inside. …
+
+Anonymous
+Edited 5 years ago
+Best sushi place in TLV. Fresh ingredients and a variety of sushi choices. Service was great and it is good value for money.
+
+Anonymous
+5 months ago
+Potentially Fake
+Are there many times already. The menu is very diverse and can cater for every need. The food is delicious and every one is friendly
+
+Anonymous
+5 years ago
+One of the best Asian restaurants! Sushi was delicious and the dessert was seriously the best thing I’ve ever had!!! …
+
+Anonymous
+6 years ago
+Really good place to eat sushi in tel aviv. Prices are a little higher than average but it worth it.
+
+Anonymous
+Edited 5 years ago
+This is the BEST sushi for deliveries, and one of the best sushi places in Tel Aviv in general. Great atmosphere, fresh ingredients and awesome food!
+
+Anonymous
+Edited 8 years ago
+Amazing sushi!!! Good wine and cocktails too. Their best cocktail is the Fu Flower. So yummy and definitely one of my favorite places to eat sushi.
+
+Anonymous
+3 years ago
+I do not have enough words to describe how amazing this place is. Beautiful design, great vibes, and tasty food. Highly recommend! Don’t miss it 🤗 …
+
+Anonymous
+2 years ago
+Super recommend Might be the best sushi I've ever had Service is impeccable …
+
+Anonymous
+2 years ago
+Everything from the salad to the dumplings and the curry was delicious! Also the service is super friendly and attentive.
+
+Anonymous
+4 years ago
+Food was extremly tasty and came out pretty fast. Nice atmosphere and high quality service. One of the best Sushi resturants in my opinion.
+
+Anonymous
+2 years ago
+Great food, both the sushi and the rest, great drinks, young, chill and fun atmosphere, highly recommended!
+
+Ralph Lilit Hagemeier
+Edited 3 years ago
+Real good sushi, noodle dishes. Asian fusion par excellence.
+
+Anonymous
+6 years ago
+best sushi ive had in tel aviv! Really took care of my weird allergies and waitstaff was really friendly
+
+Anonymous
+5 years ago
+Really enjoyed the sushi! Ordered a bunch of dishes for take away, the service was great and really friendly. Definitely recommend, everything was delicious👌🏼 …
+
+Anonymous
+5 years ago
+Great sushi. I had a good cocktail (Tokyo) and the second one was too sweet (Thai). Service was excellent and fun atmosphere. We had a really good time!
+
+Anonymous
+4 years ago
+Great variety of sushi rolls, allquite fresh and tasty. The drinks menu looked interesting, too, The best sushi I had in TLV, and will go back for sure.
+
+Anonymous
+5 years ago
+Potentially Fake
+One of the best restaurants I have ever been to. The sushi, and even the desserts are overwhelmingly great.
+
+Anonymous
+a year ago
+Potentially Fake
+We booked here following a recommendation from a very good friend. So, on a warm summer’s evening we decided, rather last minute, to book a table …
+
+Israel Revah
+7 years ago
+Wow. tasttty! Delicious
+
+Anonymous
+2 years ago
+Good food, good service, we waited a little bit but worth the food!
+
+Anonymous
+5 years ago
+One of the best sushi places in TLV. The sushi is FRESH. They have many, many tasty vegan options, including an amazing dessert. It’s on the expensive side, but worth it!
+
+Anonymous
+Edited 7 years ago
+Sushi is fresh, my new favourite. It is a bit more expensive than usual though.
+
+Anonymous
+a year ago
+Some of the best sushi in Tel Aviv. The atmosphere is quiet, calming, and beautiful, making it perfect for a date or special occasion. The sushi here is some of the freshest and most creative I’ve ever had. I recommend the Crunch and Sakura …
+
+Anonymous
+5 years ago
+What to say besides that it was perfect? Excellent sushi, drinks and service. Cozy intimidate atmosfere, even by the bar.
+
+Anonymous
+Edited 3 years ago
+The food is absolutely amazing! Maybe the best Japanese food I ever ate 🍣🍜 …
+
+Felipe Abramovitch
+5 years ago
+Definitely one of the best sushi places in Israel.
+
+Anonymous
+Edited 4 years ago
+Trendy restaurant in downtown tel Aviv not far from the port. Foodies delicious and a chef seems to be a professional who knows what he's doing. …
+
+Tamara Awadieh
+6 years ago
+Potentially Fake
+Fresh fish, delicious and special sushi, great service.
+
+Yuval Efrat
+6 years ago
+Sentiment Mismatch
+Great food, fast and efficient service!
+
+Anonymous
+5 years ago
+A cosy place in Tel Aviv. Serves large selection of Asian food. Efficient service and delicious dishes. Will certainly pay them another visit.
+
+Anonymous
+5 years ago
+One of the best places to eat sushi in Israel and other dishes too, I've tried countless dishes at this place and never got disappointed. Although it's a bit of an expensive place, it's worth every shekel!
+
+Ksenia Miami
+5 years ago
+Great place of sushi,very friendly stuff! Menu on both languages
+
+Anonymous
+4 years ago
+Potentially Fake
+The best shusi I ate in Tel-Aviv. The takeaway is not as good as sitting in the restaurant. Normally there is a long queue, so reserve a place in advance.
+
+Diego Mikhaloff
+8 years ago
+Very tasty sushi, nice cocktails and everything is fresh.
+
+Anonymous
+8 years ago
+Sushi bar place. Food is good but price is not cheap as per other sushi bars in israel. Atmosphere and service is very good. Reservations are recommended as weekends can be quite crowded
+
+Amotz Koskas
+6 years ago
+One of the best ramen soup. Expensive but worth it
+
+Anonymous
+2 years ago
+Potentially Fake
+Absolutely delicious high quality sushi with a great atmosphere! Highly recommend: lychee martini, squares, salmon nigiri, crunch roll, out of control roll, spicy salmon sushi sandwich, spicy tuna sushi sandwich, crispy cabbage salad, and shrimp gyoza
+
+Anonymous
+8 years ago
+The variety of pasta is great. Curry sauce is delicious. Prices are reasonable. Portions are usually OK, depending on how famished you are. Same as other locations on this chain.
+
+Anonymous
+12 years ago
+This place was a pleasant surprise. I love sushi and usually find myself at Onami but fu sushi tasted damn good. I think the way i described it was 'onami focuses on the quality of the fish while fu sushi focuses on the combination of tastes'. Both are good and are at the top in their own right.
+
+Anonymous
+5 years ago
+Sushi & sashimi are authentic and delicious, served properly except for missing the dish to mix soy sauce with wasabi which was provided on request. Service was very good. Note; from over 20 years experience doing business in Japan, it is …
+
+Anonymous
+Edited 6 years ago
+Always a good place for lunch. Nice service. Quiet atmosphere. Lunch deals are okay. Normal prices rather high. Great sushi combinations that are special and nice to look at.
+
+Marina Oberman
+3 years ago
+Amazing as always! Best sushi in town
+
+Show Less

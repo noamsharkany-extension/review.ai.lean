@@ -12,10 +12,11 @@ import { GoogleReviewScraperService } from './scraper.js';
 import { IntelligentSamplingEngine } from './sampling.js';
 import { OpenAIAnalysisEngine } from './analysis.js';
 import { ReviewVerdictGenerator } from './verdict.js';
+import { DatabaseService } from './database.js';
 
 export interface AnalysisOrchestrationService {
   startAnalysis(googleUrl: string): Promise<string>;
-  getAnalysisStatus(sessionId: string): AnalysisSession | null;
+  getAnalysisStatus(sessionId: string): Promise<AnalysisSession | null>;
   retryFailedStep(sessionId: string): Promise<void>;
   on(event: 'progress' | 'complete' | 'error', listener: (sessionId: string, data: any) => void): void;
 }
@@ -26,9 +27,12 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
   private samplingEngine: IntelligentSamplingEngine;
   private analysisEngine: OpenAIAnalysisEngine;
   private verdictGenerator: ReviewVerdictGenerator;
+  private databaseService: DatabaseService | null;
 
-  constructor() {
+  constructor(databaseService?: DatabaseService) {
     super();
+    this.databaseService = databaseService || null;
+    
     // Pass progress callback to scraper for detailed logging
     this.scraper = new GoogleReviewScraperService((message: string) => {
       // Find the current session and emit detailed progress
@@ -65,6 +69,15 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
 
     this.sessions.set(sessionId, session);
     
+    // Save session to database if available
+    if (this.databaseService) {
+      try {
+        await this.databaseService.createSession(session);
+      } catch (error) {
+        console.warn('Failed to save session to database:', error);
+      }
+    }
+    
     // Start the analysis process asynchronously
     this.runAnalysisWorkflow(sessionId).catch(error => {
       this.handleAnalysisError(sessionId, error);
@@ -73,8 +86,28 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
     return sessionId;
   }
 
-  getAnalysisStatus(sessionId: string): AnalysisSession | null {
-    return this.sessions.get(sessionId) || null;
+  async getAnalysisStatus(sessionId: string): Promise<AnalysisSession | null> {
+    // Check memory first
+    const memorySession = this.sessions.get(sessionId);
+    if (memorySession) {
+      return memorySession;
+    }
+
+    // If not in memory and we have database service, try to load from database
+    if (this.databaseService) {
+      try {
+        const dbSession = await this.databaseService.getSession(sessionId);
+        if (dbSession) {
+          // Restore to memory for faster subsequent access
+          this.sessions.set(sessionId, dbSession);
+          return dbSession;
+        }
+      } catch (error) {
+        console.warn('Failed to load session from database:', error);
+      }
+    }
+
+    return null;
   }
 
   async retryFailedStep(sessionId: string): Promise<void> {
@@ -174,7 +207,7 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
             fakeAnalysis = await this.executeFakeDetectionPhase(sessionId, sampledReviews.reviews);
           }
           const results = await this.executeVerdictPhase(sessionId, reviews, sampledReviews, sentimentAnalysis, fakeAnalysis);
-          this.completeAnalysis(sessionId, results);
+          await this.completeAnalysis(sessionId, results);
           break;
       }
     } catch (error) {
@@ -205,7 +238,7 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
       const results = await this.executeVerdictPhase(sessionId, reviews, sampledReviews, sentimentAnalysis, fakeAnalysis);
       
       // Complete the analysis
-      this.completeAnalysis(sessionId, results);
+      await this.completeAnalysis(sessionId, results);
 
     } catch (error) {
       this.handleAnalysisError(sessionId, error);
@@ -429,7 +462,7 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
     this.emit('progress', sessionId, progress);
   }
 
-  private completeAnalysis(sessionId: string, results: AnalysisResults): void {
+  private async completeAnalysis(sessionId: string, results: AnalysisResults): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) return;
 
@@ -443,6 +476,20 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
     };
 
     this.sessions.set(sessionId, session);
+
+    // Save results to database if available
+    if (this.databaseService) {
+      try {
+        await this.databaseService.saveResults(sessionId, results);
+        await this.databaseService.updateSession(sessionId, {
+          status: 'complete',
+          completedAt: new Date(),
+          progress: session.progress
+        });
+      } catch (error) {
+        console.warn('Failed to save results to database:', error);
+      }
+    }
 
     // Emit completion event
     this.emit('complete', sessionId, results);

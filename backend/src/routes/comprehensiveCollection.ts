@@ -415,7 +415,7 @@ async function startComprehensiveCollection(
   activeSessions.set(sessionId, session);
   
   // Start collection asynchronously
-  const collectionPromise = comprehensiveService.collectComprehensiveReviews(googleUrl, config)
+  const collectionPromise = comprehensiveService.collectComprehensiveReviews(googleUrl, sessionId, config)
     .then((result) => {
       // Update session with success
       const session = activeSessions.get(sessionId);

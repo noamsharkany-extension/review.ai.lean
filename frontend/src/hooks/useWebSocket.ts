@@ -33,14 +33,27 @@ export const useWebSocket = (
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
-  const maxReconnectAttempts = 5;
+  // Reconnect indefinitely with capped backoff
+  const maxReconnectDelayMs = 10000;
   const subscribedSessionsRef = useRef<Set<string>>(new Set());
+  const manualCloseRef = useRef(false);
 
   const connect = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
+    // Clear any pending reconnect timers
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
+    // Avoid duplicate connections
+    if (
+      wsRef.current &&
+      (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)
+    ) {
       return;
     }
 
+    manualCloseRef.current = false;
     setState(prev => ({ 
       ...prev, 
       isConnecting: true, 
@@ -124,6 +137,15 @@ export const useWebSocket = (
               // Handle connection status messages
               console.log('WebSocket status:', message.type, message.data);
               break;
+            case 'keepalive':
+              // Reset connection state on keep-alive to prevent false disconnections
+              setState(prev => ({ 
+                ...prev, 
+                isConnected: true, 
+                error: null 
+              }));
+              reconnectAttemptsRef.current = 0;
+              break;
             default:
               console.warn('Unknown WebSocket message type:', message.type);
           }
@@ -144,26 +166,24 @@ export const useWebSocket = (
           isConnecting: false 
         }));
 
-        // Attempt to reconnect if it wasn't a clean close
-        if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 10000);
-          console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`);
-          
-          setState(prev => ({ 
-            ...prev, 
-            error: `Connection lost. Reconnecting in ${Math.ceil(delay/1000)}s... (${reconnectAttemptsRef.current + 1}/${maxReconnectAttempts})`
-          }));
-          
-          reconnectTimeoutRef.current = setTimeout(() => {
-            reconnectAttemptsRef.current++;
-            connect();
-          }, delay);
-        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          setState(prev => ({ 
-            ...prev, 
-            error: 'Connection lost after multiple attempts. Please refresh the page to reconnect.' 
-          }));
+        // Don't auto-reconnect if we intentionally closed the socket
+        if (manualCloseRef.current) {
+          return;
         }
+
+        // Always attempt to reconnect (indefinitely) with capped backoff
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), maxReconnectDelayMs);
+        console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1})`);
+
+        setState(prev => ({ 
+          ...prev, 
+          error: `Connection lost. Reconnecting in ${Math.ceil(delay/1000)}s... (attempt ${reconnectAttemptsRef.current + 1})`
+        }));
+
+        reconnectTimeoutRef.current = setTimeout(() => {
+          reconnectAttemptsRef.current++;
+          connect();
+        }, delay);
       };
 
       wsRef.current.onerror = (error) => {
@@ -175,7 +195,7 @@ export const useWebSocket = (
         
         if (isDevelopment && reconnectAttemptsRef.current === 0) {
           errorMessage = 'Backend server not running. Please start with: npm run dev';
-        } else if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+        } else {
           errorMessage = 'Connection error. Attempting to reconnect...';
         }
         
@@ -202,6 +222,7 @@ export const useWebSocket = (
       reconnectTimeoutRef.current = null;
     }
 
+    manualCloseRef.current = true;
     if (wsRef.current) {
       wsRef.current.close(1000, 'Component unmounting');
       wsRef.current = null;
@@ -241,10 +262,19 @@ export const useWebSocket = (
   }, []);
 
   const reconnect = useCallback(() => {
-    disconnect();
+    // Force a reconnect cycle without marking as manual close
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
     reconnectAttemptsRef.current = 0;
+    try {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.close(4000, 'Manual reconnect');
+      }
+    } catch {}
     setTimeout(connect, 100);
-  }, [connect, disconnect]);
+  }, [connect]);
 
   useEffect(() => {
     connect();

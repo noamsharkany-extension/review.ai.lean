@@ -2,7 +2,6 @@ import {
   AnalyzeRequest, 
   AnalyzeResponse, 
   AnalysisStatusResponse, 
-  AnalysisResults,
   AnalysisSession 
 } from '../../../shared/types';
 
@@ -24,7 +23,7 @@ export class ReviewAnalyzerApiClient {
 
   private getDefaultBaseUrl(): string {
     // In development, use localhost:3001, in production use relative URLs
-    if (import.meta.env.DEV) {
+    if ((import.meta as any).env?.DEV) {
       return 'http://localhost:3001/api';
     }
     return '/api';

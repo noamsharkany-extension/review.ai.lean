@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 import { Pool } from 'pg';
-import { readFileSync } from 'fs';
+import { readFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -186,8 +186,6 @@ export function createDatabaseConnection(): DatabaseConnection {
   } else if (databaseUrl.startsWith('sqlite:')) {
     const dbPath = databaseUrl.replace('sqlite:', '');
     // Ensure data directory exists
-    const { mkdirSync } = require('fs');
-    const { dirname } = require('path');
     mkdirSync(dirname(dbPath), { recursive: true });
     return new SQLiteConnection(dbPath);
   } else {

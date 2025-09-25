@@ -129,10 +129,10 @@ export class ReviewCitationService implements CitationService {
       analysisBreakdown: {
         totalAnalyzed,
         fakeReviewCount: fakeReviews.length,
-        fakeReviewRatio: totalAnalyzed > 0 ? Math.round((fakeReviews.length / totalAnalyzed) * 10000) / 100 : 0, // 2 decimal places
+        fakeReviewRatio: totalAnalyzed > 0 ? Math.round((fakeReviews.length / totalAnalyzed) * 10000) / 10000 : 0, // Decimal (0-1) with 4 decimal places
         sentimentMismatchCount: sentimentMismatches.length,
-        sentimentMismatchRatio: totalAnalyzed > 0 ? Math.round((sentimentMismatches.length / totalAnalyzed) * 10000) / 100 : 0,
-        averageConfidenceScore: Math.round(averageConfidenceScore * 10000) / 100
+        sentimentMismatchRatio: totalAnalyzed > 0 ? Math.round((sentimentMismatches.length / totalAnalyzed) * 10000) / 10000 : 0, // Decimal (0-1) with 4 decimal places
+        averageConfidenceScore: Math.round(averageConfidenceScore * 100) / 100 // Keep as decimal (0-1)
       },
       qualityMetrics: {
         citationAccuracy: this.calculateCitationAccuracy(sentimentAnalysis, fakeAnalysis),
@@ -165,12 +165,12 @@ export class ReviewCitationService implements CitationService {
       sentiment: {
         ...sentiment,
         // Ensure confidence is properly rounded
-        confidence: Math.round(sentiment.confidence * 10000) / 100
+        confidence: Math.round(sentiment.confidence * 100) / 100 // Keep as decimal (0-1)
       },
       fakeAnalysis: {
         ...fakeAnalysis,
         // Ensure confidence is properly rounded
-        confidence: Math.round(fakeAnalysis.confidence * 10000) / 100,
+        confidence: Math.round(fakeAnalysis.confidence * 100) / 100, // Keep as decimal (0-1)
         // Ensure reasons are properly formatted
         reasons: fakeAnalysis.reasons.map(reason => reason.trim()).filter(reason => reason.length > 0)
       }
@@ -213,7 +213,7 @@ export class ReviewCitationService implements CitationService {
     // Combine completeness and confidence for overall accuracy score
     const accuracyScore = (completenessRatio * 0.7) + (avgConfidence * 0.3);
     
-    return Math.round(accuracyScore * 10000) / 100; // 2 decimal places
+    return Math.round(accuracyScore * 100) / 100; // Keep as decimal (0-1)
   }
 
   private calculateAnalysisCompleteness(
@@ -230,7 +230,7 @@ export class ReviewCitationService implements CitationService {
     
     const completeAnalysis = sentimentAnalysis.filter(s => fakeIds.has(s.reviewId)).length;
     
-    return Math.round((completeAnalysis / totalReviews) * 10000) / 100; // 2 decimal places
+    return Math.round((completeAnalysis / totalReviews) * 100) / 100; // Keep as decimal (0-1)
   }
 
   private async validateSingleLink(reviewId: string, url: string): Promise<LinkValidationResult> {

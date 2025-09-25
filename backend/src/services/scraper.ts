@@ -387,68 +387,64 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
-   * Strategy B: Efficient selective filtering (newest → lowest → highest, then fill gaps)
+   * Strategy B: Efficient selective filtering (ensure 100 per category)
    */
   private async extractWithSelectiveFiltering(page: Page): Promise<any[]> {
-    this.log('🎯 Using efficient selective filtering strategy: newest → lowest → highest → fill gaps');
-    
-    const reviewCollections = {
-      newest: [] as any[],
-      lowest: [] as any[],
-      highest: [] as any[]
+    this.log('🎯 Using selective filtering strategy with strict 100-per-category guarantee');
+
+    // Helper to collect and top-up a category to target count, deduping within the category only
+    const collectCategory = async (type: 'newest' | 'lowest' | 'highest', target: number): Promise<any[]> => {
+      // Initial batch
+      let categoryReviews = await this.collectReviewsBySort(page, type, target);
+      // Tag with sortType for downstream categorization
+      categoryReviews = categoryReviews.map(r => ({ ...r, sortType: type }));
+
+      // Dedup within category
+      let deduped = this.reviewDeduplicationService.deduplicateReviews(categoryReviews).uniqueReviews;
+
+      // Top-up attempts if we have less than target
+      let attempts = 0;
+      while (deduped.length < target && attempts < 3) {
+        this.log(`🔄 ${type} top-up attempt ${attempts + 1}: currently ${deduped.length}/${target}`);
+        const nextBatch = await this.collectReviewsBySort(page, type, target);
+        const taggedNext = nextBatch.map(r => ({ ...r, sortType: type }));
+        const combined = [...deduped, ...taggedNext];
+        const result = this.reviewDeduplicationService.deduplicateReviews(combined);
+        // If no growth, break early to avoid infinite loops
+        if (result.uniqueReviews.length === deduped.length) {
+          break;
+        }
+        deduped = result.uniqueReviews;
+        attempts++;
+      }
+
+      // Cap to target
+      if (deduped.length > target) {
+        deduped = deduped.slice(0, target);
+      }
+
+      this.log(`✅ ${type} category collected: ${deduped.length}/${target}`);
+      return deduped;
     };
-    
-    // Step 1: Collect NEWEST reviews (single scroll, extract, move on)
-    this.log('🕐 Step 1: Collecting NEWEST reviews with single scroll...');
-    reviewCollections.newest = await this.collectReviewsBySort(page, 'newest', 100);
-    this.log(`✅ Collected ${reviewCollections.newest.length} newest reviews`);
-    
-    // Step 2: Collect LOWEST rated reviews (scroll up, change sort, single scroll, extract)
-    this.log('⭐ Step 2: Collecting LOWEST rated reviews with single scroll...');
-    reviewCollections.lowest = await this.collectReviewsBySort(page, 'lowest', 100);
-    this.log(`✅ Collected ${reviewCollections.lowest.length} lowest rated reviews`);
-    
-    // Step 3: Collect HIGHEST rated reviews (scroll up, change sort, single scroll, extract)
-    this.log('🌟 Step 3: Collecting HIGHEST rated reviews with single scroll...');
-    reviewCollections.highest = await this.collectReviewsBySort(page, 'highest', 100);
-    this.log(`✅ Collected ${reviewCollections.highest.length} highest rated reviews`);
-    
-    // Step 4: Combine and deduplicate
-    this.log('🔍 Step 4: Combining and deduplicating all reviews...');
-    const allCombinedReviews = [
-      ...reviewCollections.newest.map(r => ({ ...r, sortType: 'newest' })),
-      ...reviewCollections.lowest.map(r => ({ ...r, sortType: 'lowest' })),
-      ...reviewCollections.highest.map(r => ({ ...r, sortType: 'highest' }))
-    ];
-    
-    const deduplicationResult = this.reviewDeduplicationService.deduplicateReviews(allCombinedReviews);
-    let uniqueReviews = deduplicationResult.uniqueReviews;
-    
-    this.log(`📊 After deduplication: ${uniqueReviews.length} unique reviews from ${allCombinedReviews.length} total`);
-    
-    // Step 5: Fill gaps if needed (target ~200-250 reviews for large sites)
-    const targetTotal = 200;
-    if (uniqueReviews.length < targetTotal) {
-      const needed = targetTotal - uniqueReviews.length;
-      this.log(`📈 Step 5: Need ${needed} more reviews, collecting additional newest reviews...`);
-      
-      // Go back to newest and collect more to fill the gap
-      const additionalReviews = await this.collectReviewsBySort(page, 'newest', needed + 50); // Get extra to account for duplicates
-      const combinedWithAdditional = [...uniqueReviews, ...additionalReviews.map(r => ({ ...r, sortType: 'newest-fill' }))];
-      const finalDeduplication = this.reviewDeduplicationService.deduplicateReviews(combinedWithAdditional);
-      uniqueReviews = finalDeduplication.uniqueReviews.slice(0, targetTotal);
-      
-      this.log(`✅ After filling gaps: ${uniqueReviews.length} total reviews`);
-    }
-    
-    this.log(`✅ Strategy B complete - Efficient approach:`);
-    this.log(`   - Newest: ${reviewCollections.newest.length}`);
-    this.log(`   - Lowest: ${reviewCollections.lowest.length}`);
-    this.log(`   - Highest: ${reviewCollections.highest.length}`);
-    this.log(`   - Final unique: ${uniqueReviews.length} reviews`);
-    this.log(`   - Duplicates removed: ${deduplicationResult.duplicateCount}`);
-    
-    return uniqueReviews;
+
+    // Collect each category independently to ensure targets are met
+    const newest = await collectCategory('newest', 100);
+    const lowest = await collectCategory('lowest', 100);
+    const highest = await collectCategory('highest', 100);
+
+    // Return concatenated results without cross-category deduplication
+    const combined = [...newest, ...lowest, ...highest];
+
+    // Log diagnostics including a cross-category uniqueness metric (diagnostic only)
+    const crossCategoryUnique = this.reviewDeduplicationService.deduplicateReviews(combined).uniqueReviews.length;
+    this.log('✅ Strategy B complete - 100 per category ensured');
+    this.log(`   - Newest: ${newest.length}`);
+    this.log(`   - Lowest: ${lowest.length}`);
+    this.log(`   - Highest: ${highest.length}`);
+    this.log(`   - Combined (with cross-category duplicates): ${combined.length}`);
+    this.log(`   - Cross-category unique (diagnostic): ${crossCategoryUnique}`);
+
+    return combined;
   }
 
   /**
@@ -969,78 +965,95 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           reviewText = bestText;
         }
         
-        // Google Maps author extraction using the correct structure
+        // Enhanced Google Maps author extraction with modern selectors
         let authorName = 'Anonymous';
         
         console.log(`[SCRAPER] DEBUG: Starting author extraction for container ${i + 1}`);
-        console.log(`[SCRAPER] DEBUG: Container HTML snippet:`, container.outerHTML?.substring(0, 300) + '...');
         
-        // Primary method: Look for the specific Google Maps name structure
-        // <div class="d4r55 fontTitleMedium">Name</div>
-        const nameElement = container.querySelector('.d4r55.fontTitleMedium');
-        console.log(`[SCRAPER] DEBUG: nameElement found: ${!!nameElement}`);
-        if (nameElement) {
-          const extractedName = nameElement.textContent?.trim() || '';
-          console.log(`[SCRAPER] Found name element with class d4r55 fontTitleMedium: "${extractedName}"`);
-          
-          if (extractedName.length >= 2 && extractedName.length <= 50) {
-            authorName = extractedName;
-            console.log(`[SCRAPER] ✅ Using extracted name: "${authorName}"`);
-          }
-        } else {
-          console.log(`[SCRAPER] No .d4r55.fontTitleMedium element found, trying fallback methods`);
-          
-          // Debug: Let's see what classes are actually in this container
-          const allDivs = container.querySelectorAll('div');
-          console.log(`[SCRAPER] DEBUG: Found ${allDivs.length} divs in container`);
-          let foundD4r55 = false;
-          for (let j = 0; j < Math.min(allDivs.length, 5); j++) {
-            const div = allDivs[j];
-            const className = div.className;
-            const text = div.textContent?.trim().substring(0, 50) || '';
-            console.log(`[SCRAPER] DEBUG: Div ${j + 1} classes: "${className}", text: "${text}"`);
-            if (className.includes('d4r55')) {
-              foundD4r55 = true;
-              console.log(`[SCRAPER] DEBUG: FOUND d4r55 class in div ${j + 1}!`);
-            }
-          }
-          console.log(`[SCRAPER] DEBUG: Any d4r55 classes found: ${foundD4r55}`);
-          
-          // Fallback: Look for other name patterns in the button structure
-          const buttonElement = container.querySelector('button[jsaction*="reviewerLink"]');
-          console.log(`[SCRAPER] DEBUG: buttonElement found: ${!!buttonElement}`);
-          if (buttonElement) {
-            const nameDiv = buttonElement.querySelector('div.d4r55') || buttonElement.querySelector('[class*="d4r55"]');
-            if (nameDiv) {
-              const fallbackName = nameDiv.textContent?.trim() || '';
-              console.log(`[SCRAPER] Found fallback name in button: "${fallbackName}"`);
-              
-              if (fallbackName.length >= 2 && fallbackName.length <= 50) {
-                authorName = fallbackName;
-                console.log(`[SCRAPER] ✅ Using fallback name: "${authorName}"`);
-              }
+        // Modern Google Maps author name selectors (2024+) - prioritize actual names over UI elements
+        const authorSelectors = [
+          'button[jsaction*="reviewerLink"] .d4r55',   // Button context - most reliable
+          '[data-value*="reviewer"] div',              // Data attribute based
+          '[aria-label*="reviewer"] div',              // Accessibility based
+          '.d4r55.fontTitleMedium',                    // Primary modern selector
+          'div[class*="fontTitleMedium"]',             // Font style based
+          'div[class*="fontBodyMedium"]:first-child',  // First body medium element
+          'span[class*="fontBodyMedium"]:first-child', // Span variant
+          '.d4r55',                                    // Fallback d4r55 class
+          'div[jsaction] span:first-child',            // JS action context
+          'div:first-child span:first-child',          // Structural fallback
+          'a[data-original-href*="/contrib/"] .d4r55',
+          'a[data-original-href*="/contrib/"]',
+          'img[alt*="Photo of" i]',
+          'img[alt*="תמונה של"]'
+        ];
+        
+        // Try each selector in order of preference
+        for (const selector of authorSelectors) {
+          const nameElement = container.querySelector(selector) as HTMLElement | null;
+          if (nameElement) {
+            let extractedName = '';
+            const tag = nameElement.tagName.toLowerCase();
+            if (tag === 'img') {
+              const alt = nameElement.getAttribute('alt') || '';
+              const m = alt.match(/(?:photo of|תמונה של)\s*(.+)/i);
+              extractedName = (m ? m[1] : alt).trim();
             } else {
-              console.log(`[SCRAPER] DEBUG: No d4r55 div found in button`);
+              extractedName = (nameElement.textContent || '').trim();
+              if (!extractedName) {
+                const aria = (nameElement.getAttribute('aria-label') || '').trim();
+                const title = (nameElement.getAttribute('title') || '').trim();
+                extractedName = aria || title || '';
+              }
+            }
+            console.log(`[SCRAPER] Found name with selector "${selector}": "${extractedName}"`);
+            
+            // Validate the extracted name (inline validation)
+            if (extractedName && extractedName.length >= 2 && extractedName.length <= 60 && 
+                /[a-zA-Z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff]/.test(extractedName) &&
+                !/^\d+$|ago|לפני|منذ|star|כוכב|نجمة|review|ביקורת|مراجعة|google|maps|local guide|מדריך מקומי|\d+\s*(review|photo|ביקורת|תמונ)|service|food|atmosphere|dine in|takeout|delivery|like|dislike|helpful|unhelpful|report|share|save/i.test(extractedName) &&
+                /^[A-Za-z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff\s.'-]+$/.test(extractedName)) {
+              authorName = extractedName;
+              console.log(`[SCRAPER] ✅ Using extracted name: "${authorName}"`);
+              break;
             }
           }
-          
-          // Final fallback: Look for any div with d4r55 class
-          if (authorName === 'Anonymous') {
-            const d4r55Elements = container.querySelectorAll('.d4r55');
-            console.log(`[SCRAPER] DEBUG: Found ${d4r55Elements.length} elements with d4r55 class`);
-            for (const el of d4r55Elements) {
-              const candidateName = el.textContent?.trim() || '';
-              console.log(`[SCRAPER] Checking d4r55 element: "${candidateName}"`);
-              
-              // Basic name validation - not too strict this time
-              if (candidateName.length >= 2 && 
-                  candidateName.length <= 50 && 
-                  !candidateName.includes('Local Guide') &&
-                  !candidateName.includes('reviews') &&
-                  !candidateName.includes('photos') &&
-                  !/^\d+$/.test(candidateName)) {
-                authorName = candidateName;
-                console.log(`[SCRAPER] ✅ Using d4r55 fallback name: "${authorName}"`);
+        }
+        
+        // Advanced fallback: Search for name-like patterns in all text content
+        if (authorName === 'Anonymous') {
+          const allTextElements = container.querySelectorAll('span, div, a, button, img');
+          for (const el of Array.from(allTextElements) as HTMLElement[]) {
+            let text = (el.textContent || '').trim();
+            if (!text) {
+              const aria = (el.getAttribute('aria-label') || '').trim();
+              const title = (el.getAttribute('title') || '').trim();
+              text = aria || title || '';
+            }
+            if (!text && el.tagName.toLowerCase() === 'img') {
+              const alt = (el.getAttribute('alt') || '').trim();
+              const m = alt.match(/(?:photo of|תמונה של)\s*(.+)/i);
+              text = (m ? m[1] : alt).trim();
+            }
+
+            // Clean common suffixes/prefixes
+            text = text
+              .replace(/\s*Local Guide.*$/i, '')
+              .replace(/\s*מדריך מקומי.*$/i, '')
+              .replace(/\s*·.*$/g, '')
+              .replace(/\s*\|.*$/g, '')
+              .replace(/\s*\d+\s*(reviews?|photos?)?.*$/i, '')
+              .trim();
+
+            // Look for name patterns (2-60 chars, contains letters, not system text)
+            if (text && text.length >= 2 && text.length <= 60 && 
+                /[a-zA-Z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff]/.test(text) &&
+                !/^\d+$|ago|לפני|منذ|star|כוכב|نجمة|review|ביקורת|مراجعة|google|maps|local guide|מדריך מקומי|\d+\s*(review|photo|ביקורת|תמונ)|service|food|atmosphere|dine in|takeout|delivery|like|dislike|helpful|unhelpful|report|share|save/i.test(text) &&
+                /^[A-Za-z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff\s.'-]+$/.test(text)) {
+              const rect = el.getBoundingClientRect ? el.getBoundingClientRect() : ({ top: 0, height: 1 } as any);
+              if (rect && rect.height > 0 && rect.top < (container.getBoundingClientRect().top + 220)) {
+                authorName = text;
+                console.log(`[SCRAPER] ✅ Using fallback-detected name: "${authorName}"`);
                 break;
               }
             }
@@ -1596,6 +1609,48 @@ export class GoogleReviewScraperService implements ReviewScraperService {
    */
   validateUrl(url: string): boolean {
     return validateGoogleMapsUrl(url);
+  }
+
+  /**
+   * Validate if a text string looks like a valid author name
+   */
+  private isValidAuthorName(name: string): boolean {
+    if (!name || name.length < 2 || name.length > 50) return false;
+    
+    // Must contain at least one letter
+    if (!/[a-zA-Z\u0590-\u05FF\u0600-\u06FF\u4e00-\u9fff]/.test(name)) return false;
+    
+    // Exclude system text patterns
+    const excludePatterns = [
+      /^\d+$/,                           // Only numbers
+      /ago|לפני|منذ/i,                   // Time indicators
+      /star|כוכב|نجمة/i,                // Star ratings
+      /review|ביקורת|مراجعة/i,          // Review text
+      /google|maps/i,                   // Google system text
+      /local guide|מדריך מקומי/i,       // Local guide text
+      /\d+\s*(review|photo|ביקורת|תמונ)/i, // Review/photo counts
+      /service|food|atmosphere/i,       // Review categories
+      /dine in|takeout|delivery/i,      // Service types
+      /meal type|price per person/i,    // Review metadata
+      /group size|suitable for/i,       // Group info
+      /^\$|₪|€|£/,                     // Price symbols
+      /^(mon|tue|wed|thu|fri|sat|sun)/i, // Days of week
+    ];
+    
+    for (const pattern of excludePatterns) {
+      if (pattern.test(name)) return false;
+    }
+    
+    // Additional checks for valid names
+    const trimmedName = name.trim();
+    
+    // Should not be all uppercase (likely system text)
+    if (trimmedName === trimmedName.toUpperCase() && trimmedName.length > 3) return false;
+    
+    // Should not contain special review-related characters
+    if (/[★☆⭐•·…]/.test(trimmedName)) return false;
+    
+    return true;
   }
 
   /**
