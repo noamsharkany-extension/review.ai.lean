@@ -375,31 +375,14 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       const totalReviewCount = await this.detectTotalReviewCount(page);
       this.log(`📊 Detected approximately ${totalReviewCount} total reviews`);
       
-      // Decide strategy to minimize redundant scrolling while meeting targets
-      // If total reviews are reasonably small (≤ 800), do one deep scroll and slice in code.
-      // This avoids re-scrolling for each sort and still achieves 100/category when ≥ 300 total.
-      if (totalReviewCount <= 800) {
-        this.log('🧠 Using single deep-scroll strategy with in-code slicing');
-        const collections = await this.extractOnceAndSliceCategories(page, Math.min(300, totalReviewCount));
+      // Required flow: newest (100), then lowest (100), then highest (100)
+      const newest = await this.collectSinglePassBySort(page, 'newest', 100, totalReviewCount, false);
+      const lowest = await this.collectSinglePassBySort(page, 'lowest', 100, totalReviewCount, true);
+      const highest = await this.collectSinglePassBySort(page, 'highest', 100, totalReviewCount, true);
 
-        // If we achieved 100 per category (or as many as exist if < 300), return concatenated results
-        const combined = [...collections.newest, ...collections.lowest, ...collections.highest];
-        this.log(`🎉 Single deep-scroll produced: newest=${collections.newest.length}, lowest=${collections.lowest.length}, highest=${collections.highest.length}, combined=${combined.length}`);
-
-        // If combined < 300 but totalReviewCount suggests more may exist (parsing missed some), fall back to selective filtering to top-up
-        if (combined.length < 300 && totalReviewCount >= 300) {
-          this.log('⚠️ Deep-scroll produced <300 while total suggests ≥300, topping up via selective filtering');
-          const toppedUp = await this.extractWithSelectiveFiltering(page);
-          return toppedUp;
-        }
-        return combined;
-      }
-
-      // Fallback for very large venues: selective filtering per sort
-      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest');
-      const allUniqueReviews = await this.extractWithSelectiveFiltering(page);
-      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);
-      return allUniqueReviews;
+      const combined = [...newest, ...lowest, ...highest];
+      this.log(`🎉 Final result: newest=${newest.length}, lowest=${lowest.length}, highest=${highest.length}, combined=${combined.length}`);
+      return combined;
       
     } catch (error) {
       this.log(`Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -579,6 +562,18 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     const lowest = [...all].sort((a, b) => (a.rating ?? 0) - (b.rating ?? 0) || this.compareByRecency(a.date, b.date)).slice(0, 100).map(r => ({ ...r, sortType: 'lowest' }));
     const highest = [...all].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || this.compareByRecency(b.date, a.date)).slice(0, 100).map(r => ({ ...r, sortType: 'highest' }));
 
+    // Also click through the additional sort categories (without re-scrolling) to satisfy flow requirements
+    try {
+      this.log('🔀 Clicking Lowest sort (no re-scroll)');
+      await this.applySortFilterQuick(page, 'lowest');
+      await page.waitForTimeout(400);
+      this.log('🔀 Clicking Highest sort (no re-scroll)');
+      await this.applySortFilterQuick(page, 'highest');
+      await page.waitForTimeout(400);
+      // Optionally return to Newest
+      await this.applySortFilterQuick(page, 'newest');
+    } catch {}
+
     return { newest, lowest, highest };
   }
 
@@ -621,6 +616,58 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     return aScore - bScore; // higher score = more recent
   }
 
+  /**
+   * Quick sort application with minimal waits and no enforced scroll-to-top
+   * Used only to toggle categories without incurring heavy latency
+   */
+  private async applySortFilterQuick(page: Page, sortType: 'newest' | 'lowest' | 'highest'): Promise<boolean> {
+    try {
+      const sortApplied = await page.evaluate(async (sortType) => {
+        // Find a likely sort control
+        let sortButton: Element | null = null;
+        const btns = document.querySelectorAll('button, [role="button"], span[role="button"]');
+        for (const b of Array.from(btns)) {
+          const t = (b.textContent || '').toLowerCase();
+          const a = (b.getAttribute('aria-label') || '').toLowerCase();
+          if (t.includes('sort') || a.includes('sort') || t.includes('most relevant') || t.includes('newest') || t.includes('highest') || t.includes('lowest')) {
+            sortButton = b;
+            break;
+          }
+        }
+        if (!sortButton) return false;
+        (sortButton as HTMLElement).click();
+        await new Promise(r => setTimeout(r, 400));
+
+        const targetTexts = {
+          newest: ['Newest', 'Most recent', 'Latest', 'Recent', 'החדשות ביותר'],
+          lowest: ['Lowest rated', 'Lowest rating', 'Lowest', 'Worst rated', 'הדירוג הנמוך ביותר'],
+          highest: ['Highest rated', 'Highest rating', 'Highest', 'Best rated', 'Top rated', 'הדירוג הגבוה ביותר']
+        } as const;
+        const labels = targetTexts[sortType];
+
+        const options = document.querySelectorAll('[role="menuitem"], [role="option"], .VfPpkd-rymPhb-ibnC6b, div, button');
+        for (const opt of Array.from(options)) {
+          const txt = (opt.textContent || '').trim();
+          const aria = (opt.getAttribute('aria-label') || '').trim();
+          if (!txt && !aria) continue;
+          if (labels.some(l => txt === l || txt.includes(l) || aria.includes(l))) {
+            (opt as HTMLElement).click();
+            return true;
+          }
+        }
+        return false;
+      }, sortType);
+
+      if (sortApplied) {
+        await page.waitForTimeout(400);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
   private recencyScore(dateVal: any): number {
     // dateVal may be a string like "5 months ago" or a Date; normalize to a comparable descending score
     try {
@@ -640,6 +687,60 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       return -Infinity;
     } catch {
       return -Infinity;
+    }
+  }
+
+  /**
+   * Per-category single-pass collection:
+   * 1) Scroll to top, apply sort
+   * 2) Scroll down in one targeted loop until at least target containers loaded or stagnation
+   * 3) Bulk expand and extract
+   * 4) Deduplicate within category and slice to target
+   */
+  private async collectSinglePassBySort(
+    page: Page,
+    sortType: 'newest' | 'lowest' | 'highest',
+    target: number,
+    totalReviewCount: number,
+    scrollToTopFirst: boolean = true
+  ): Promise<any[]> {
+    try {
+      if (scrollToTopFirst) {
+        await this.scrollToTopOfReviews(page);
+      }
+      const applied = await this.applySortFilter(page, sortType);
+      if (!applied) {
+        this.log(`⚠️ ${sortType}: sort not applied, proceeding with current order`);
+      }
+      await page.waitForTimeout(800);
+
+      const categoryTarget = Math.min(target, Math.max(100, target));
+      let lastCount = await this.countReviewContainers(page);
+      let stagnant = 0;
+      for (let i = 0; i < 60; i++) {
+        const haveEnough = lastCount >= categoryTarget;
+        if (haveEnough) break;
+        await this.scrollReviewsViewportStep(page);
+        const increased = await this.waitForNewContainersOrTimeout(page, lastCount, 1800);
+        const current = await this.countReviewContainers(page);
+        if (!increased || current === lastCount) {
+          stagnant++;
+          if (stagnant >= 5) break;
+        } else {
+          stagnant = 0;
+        }
+        lastCount = current;
+      }
+
+      await this.clickMoreButtonsOnPage(page);
+      const extracted = await this.extractBasicReviews(page);
+      const tagged = extracted.map(r => ({ ...r, sortType }));
+      const deduped = this.reviewDeduplicationService.deduplicateReviews(tagged).uniqueReviews.slice(0, target);
+      this.log(`✅ ${sortType}: collected ${deduped.length}/${target}`);
+      return deduped;
+    } catch (e) {
+      this.log(`❌ ${sortType}: single-pass collection failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      return [];
     }
   }
 
