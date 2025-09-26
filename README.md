@@ -209,6 +209,37 @@ Open http://localhost:5173 in your browser
    - Watch real-time progress updates
    - Verify results display with citations
 
+#### Quick E2E with OpenAI
+
+Run a full analysis against a real Google Maps URL using your OpenAI API key.
+
+1. Ensure your OpenAI key is available to the backend (either in `backend/.env` or your shell):
+```bash
+export OPENAI_API_KEY=your_openai_api_key
+```
+
+2. Start the backend with OpenAI enabled (no fallback):
+```bash
+cd backend
+npm run dev:openai
+```
+
+3. In a separate terminal, execute the E2E script with your Google Maps URL:
+```bash
+cd backend
+npm run e2e:analyze -- "<your-google-maps-url>"
+```
+
+Optional: if your backend runs on a non-default host/port, add `--host`:
+```bash
+npm run e2e:analyze -- "<your-google-maps-url>" --host http://localhost:3001
+```
+
+Check whether the running backend is using OpenAI or fallback:
+```bash
+curl http://localhost:3001/api/debug/ai-status | jq .
+```
+
 #### 5. Troubleshooting
 
 **Common Issues:**

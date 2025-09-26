@@ -210,3 +210,25 @@ router.get('/sessions', (req: Request, res: Response) => {
 });
 
 export { router as analysisRouter };
+
+// Debug endpoint: report AI engine status (OpenAI vs fallback)
+router.get('/debug/ai-status', (req: Request, res: Response) => {
+  try {
+    const useFallback = process.env.USE_FALLBACK_ANALYSIS === 'true';
+    const keyPresent = typeof process.env.OPENAI_API_KEY === 'string' && process.env.OPENAI_API_KEY.length > 0;
+    const model = process.env.OPENAI_MODEL || 'gpt-5';
+    const environment = process.env.NODE_ENV || 'development';
+
+    return res.json({
+      environment,
+      useFallback,
+      keyPresent,
+      usingOpenAI: keyPresent && !useFallback,
+      model
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+});

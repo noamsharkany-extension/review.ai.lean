@@ -102,7 +102,7 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
             }
           ],
           temperature: 0,
-          max_tokens: 2000,
+          max_completion_tokens: 2000,
         });
 
         const content = response.choices[0]?.message?.content;
@@ -131,6 +131,10 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
             throw new Error(`OpenAI rate limit exceeded. Please wait a few minutes and try again.`);
           }
         } else {
+          // For 400 unsupported parameter or other client errors, do not keep retrying
+          if (error?.status === 400 || /unsupported parameter|max_tokens/i.test(error?.message || '')) {
+            break;
+          }
           // For non-rate-limit errors, don't retry immediately
           if (attempt < maxRetries) {
             console.log(`Non-rate-limit error, retrying attempt ${attempt}/${maxRetries}...`);
@@ -401,7 +405,7 @@ ${reviewsText}`;
             }
           ],
           temperature: 0,
-          max_tokens: 3000,
+          max_completion_tokens: 3000,
         });
 
         const content = response.choices[0]?.message?.content;
@@ -429,6 +433,10 @@ ${reviewsText}`;
             throw new Error(`OpenAI rate limit exceeded during fake review detection. Please wait a few minutes and try again.`);
           }
         } else {
+          // For 400 unsupported parameter or other client errors, do not keep retrying
+          if (error?.status === 400 || /unsupported parameter|max_tokens/i.test(error?.message || '')) {
+            break;
+          }
           if (attempt < maxRetries) {
             console.log(`Non-rate-limit error in fake detection, retrying attempt ${attempt}/${maxRetries}...`);
             await new Promise(resolve => setTimeout(resolve, 2000));

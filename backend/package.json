@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "dev:openai": "NODE_ENV=development USE_FALLBACK_ANALYSIS=false tsx watch src/server.ts",
     "build": "tsc --skipLibCheck && npm run copy-assets",
     "build:prod": "NODE_ENV=production npm run build",
     "copy-assets": "mkdir -p dist/database && cp src/database/schema.sql dist/database/ || true",
@@ -22,7 +23,8 @@
     "perf:profile": "clinic doctor -- node dist/server.js",
     "perf:flame": "clinic flame -- node dist/server.js",
     "perf:bubbleprof": "clinic bubbleprof -- node dist/server.js",
-    "perf:autocannon": "autocannon -c 10 -d 30 http://localhost:3001/api/health"
+    "perf:autocannon": "autocannon -c 10 -d 30 http://localhost:3001/api/health",
+    "e2e:analyze": "tsx scripts/e2e-analyze.ts"
   },
   "dependencies": {
     "better-sqlite3": "^12.2.0",

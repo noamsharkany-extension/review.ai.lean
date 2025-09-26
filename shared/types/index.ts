@@ -95,6 +95,9 @@ export interface AnalysisSession {
   status: 'pending' | 'scraping' | 'analyzing' | 'complete' | 'error';
   progress: AnalysisProgress;
   results?: AnalysisResults;
+  // Optional caches to avoid re-scraping/re-sampling on retries within the same process
+  cachedReviews?: RawReview[];
+  cachedSampledReviews?: SampledReviews;
   error?: {
     message: string;
     type: string;

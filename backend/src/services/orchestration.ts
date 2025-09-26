@@ -252,6 +252,15 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
 
   private async executeScrapingPhase(sessionId: string): Promise<RawReview[]> {
     const session = this.sessions.get(sessionId)!;
+    // Reuse cached reviews if available to avoid re-scraping on retries
+    if (session.cachedReviews && session.cachedReviews.length > 0) {
+      this.updateProgress(sessionId, {
+        phase: 'scraping',
+        progress: 100,
+        message: `Using cached ${session.cachedReviews.length} reviews (skipped scraping)`
+      });
+      return session.cachedReviews;
+    }
     
     this.updateProgress(sessionId, {
       phase: 'scraping',
@@ -289,6 +298,10 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
       throw new Error('No reviews found on this page. Please verify the URL contains reviews and try again.');
     }
 
+    // Cache reviews for future retries in the same session
+    session.cachedReviews = reviews;
+    this.sessions.set(sessionId, session);
+
     this.updateProgress(sessionId, {
       phase: 'scraping',
       progress: 100,
@@ -299,6 +312,19 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
   }
 
   private async executeSamplingPhase(sessionId: string, reviews: RawReview[]): Promise<SampledReviews> {
+    // Reuse cached sampling if available and reviews match length (basic check)
+    const session = this.sessions.get(sessionId)!;
+    if (session.cachedSampledReviews && session.cachedSampledReviews.reviews.length <= reviews.length) {
+      this.updateProgress(sessionId, {
+        phase: 'sampling',
+        progress: 100,
+        message: session.cachedSampledReviews.samplingUsed 
+          ? `Using cached sampling: ${session.cachedSampledReviews.reviews.length} reviews` 
+          : `Using cached sampling: analyzing all ${reviews.length} reviews`
+      });
+      return session.cachedSampledReviews;
+    }
+
     this.updateProgress(sessionId, {
       phase: 'sampling',
       progress: 20,
@@ -306,6 +332,10 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
     });
 
     const sampledReviews = this.samplingEngine.sampleReviews(reviews);
+
+    // Cache sampled result for retries
+    session.cachedSampledReviews = sampledReviews;
+    this.sessions.set(sessionId, session);
 
     this.updateProgress(sessionId, {
       phase: 'sampling',
