@@ -246,6 +246,27 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         this.writeSessionLog(`[BROWSER][${msg.type()}] ${text}`);
       }
     });
+
+    // Lite-mode resource blocking to speed up scraping
+    try {
+      await page.setRequestInterception(true);
+      page.on('request', (req) => {
+        const resourceType = req.resourceType();
+        const url = req.url();
+        // Block heavy/irrelevant resources
+        if (
+          resourceType === 'image' ||
+          resourceType === 'media' ||
+          resourceType === 'font' ||
+          resourceType === 'manifest' ||
+          resourceType === 'stylesheet' && /maps\.googleapis\.com\/maps-api-v3/.test(url) === false ||
+          /doubleclick|googlesyndication|adsystem|adservice|analytics|gtag|facebook|fbevents|optimize|hotjar|segment|intercom/i.test(url)
+        ) {
+          return req.abort();
+        }
+        return req.continue();
+      });
+    } catch {}
   }
 
   private ensureLogsDirectory(): string {
@@ -354,14 +375,30 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       const totalReviewCount = await this.detectTotalReviewCount(page);
       this.log(`📊 Detected approximately ${totalReviewCount} total reviews`);
       
-      let allUniqueReviews: any[];
-      
-      // Always use Strategy B: Selective filtering (like successful commit 4801237)
-      // This ensures we get comprehensive coverage regardless of total review count
-      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest (matching commit 4801237)');
-      allUniqueReviews = await this.extractWithSelectiveFiltering(page);
-      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);      
-      
+      // Decide strategy to minimize redundant scrolling while meeting targets
+      // If total reviews are reasonably small (≤ 800), do one deep scroll and slice in code.
+      // This avoids re-scrolling for each sort and still achieves 100/category when ≥ 300 total.
+      if (totalReviewCount <= 800) {
+        this.log('🧠 Using single deep-scroll strategy with in-code slicing');
+        const collections = await this.extractOnceAndSliceCategories(page, Math.min(300, totalReviewCount));
+
+        // If we achieved 100 per category (or as many as exist if < 300), return concatenated results
+        const combined = [...collections.newest, ...collections.lowest, ...collections.highest];
+        this.log(`🎉 Single deep-scroll produced: newest=${collections.newest.length}, lowest=${collections.lowest.length}, highest=${collections.highest.length}, combined=${combined.length}`);
+
+        // If combined < 300 but totalReviewCount suggests more may exist (parsing missed some), fall back to selective filtering to top-up
+        if (combined.length < 300 && totalReviewCount >= 300) {
+          this.log('⚠️ Deep-scroll produced <300 while total suggests ≥300, topping up via selective filtering');
+          const toppedUp = await this.extractWithSelectiveFiltering(page);
+          return toppedUp;
+        }
+        return combined;
+      }
+
+      // Fallback for very large venues: selective filtering per sort
+      this.log('🎯 Using Strategy B: Selective filtering - 100 newest + 100 lowest + 100 highest');
+      const allUniqueReviews = await this.extractWithSelectiveFiltering(page);
+      this.log(`🎉 Final result: ${allUniqueReviews.length} unique reviews using Strategy B (selective filtering)`);
       return allUniqueReviews;
       
     } catch (error) {
@@ -459,6 +496,151 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     this.log(`✅ Strategy A complete: Efficient single-scroll approach extracted ${uniqueReviews.length} unique reviews`);
     
     return uniqueReviews.map(r => ({ ...r, sortType: 'all' }));
+  }
+
+  /**
+   * Single deep-scroll then slice into newest/lowest/highest without re-scrolling three times
+   * - Expands More buttons in bulk concurrently with scrolling
+   * - Uses dynamic waits to avoid unnecessary sleeps
+   * - Early exits once enough items are loaded for 300 total
+   */
+  private async extractOnceAndSliceCategories(page: Page, desiredTotal: number): Promise<{ newest: any[]; lowest: any[]; highest: any[] }> {
+    // Ensure we are on a known sort (newest is fine; the set of reviews is the same regardless of order)
+    await this.applySortFilter(page, 'newest');
+
+    const targetTotal = Math.min(300, desiredTotal);
+    const maxScrollIterations = 60; // generous upper bound
+    let lastContainerCount = 0;
+    let stagnantRounds = 0;
+
+    // Start background expander inside the page
+    await page.evaluate(() => {
+      try {
+        const w = window as any;
+        if (w.__reviewMoreExpanderInterval) return; // already running
+        w.__reviewMoreExpanderInterval = setInterval(() => {
+          const candidates = Array.from(document.querySelectorAll('button, [role="button"], span.w8nwRe')) as HTMLElement[];
+          let clicked = 0;
+          for (const btn of candidates) {
+            try {
+              const text = (btn.textContent || '').toLowerCase().trim();
+              const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+              const jsnameAttr = (btn.getAttribute('jsname') || '').toLowerCase();
+              const isCandidate = text === 'more' || text === 'show more' || text === 'read more' || text === 'עוד' || aria.includes('more') || aria.includes('עוד') || jsnameAttr === 'gxjvle' || btn.classList.contains('w8nwRe');
+              if (isCandidate && btn.getAttribute('aria-expanded') !== 'true') {
+                const rect = btn.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                  btn.click();
+                  clicked++;
+                  if (clicked > 50) break; // bound per sweep
+                }
+              }
+            } catch {}
+          }
+        }, 400);
+      } catch {}
+    });
+
+    // Deep scroll loop with dynamic waits and early exit when enough are loaded
+    for (let i = 0; i < maxScrollIterations; i++) {
+      await this.scrollReviewsViewportStep(page);
+
+      // Wait until new content appears or short timeout
+      const increased = await this.waitForNewContainersOrTimeout(page, lastContainerCount, 2000);
+      const currentCount = await this.countReviewContainers(page);
+      lastContainerCount = currentCount;
+
+      // Early exit when we have enough for 300 total
+      if (currentCount >= targetTotal) {
+        this.log(`✅ Deep-scroll reached target containers: ${currentCount}/${targetTotal}`);
+        break;
+      }
+
+      // Stagnation detection
+      if (!increased) {
+        stagnantRounds++;
+        if (stagnantRounds >= 5) {
+          this.log(`⚠️ Deep-scroll stagnated after ${stagnantRounds} rounds at ${currentCount} containers`);
+          break;
+        }
+      } else {
+        stagnantRounds = 0;
+      }
+    }
+
+    // One final bulk expansion sweep
+    await this.clickMoreButtonsOnPage(page);
+
+    // Extract all loaded reviews once
+    const all = await this.extractBasicReviews(page);
+
+    // Slice in code for categories
+    const newest = [...all].sort((a, b) => this.compareByRecency(b.date, a.date)).slice(0, 100).map(r => ({ ...r, sortType: 'newest' }));
+    const lowest = [...all].sort((a, b) => (a.rating ?? 0) - (b.rating ?? 0) || this.compareByRecency(a.date, b.date)).slice(0, 100).map(r => ({ ...r, sortType: 'lowest' }));
+    const highest = [...all].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || this.compareByRecency(b.date, a.date)).slice(0, 100).map(r => ({ ...r, sortType: 'highest' }));
+
+    return { newest, lowest, highest };
+  }
+
+  private async scrollReviewsViewportStep(page: Page): Promise<void> {
+    await page.evaluate(async () => {
+      const container = document.querySelector('.m6QErb') || document.querySelector('[role="main"]') || document.querySelector('.section-scrollbox');
+      const el = container as HTMLElement | null;
+      if (el) {
+        const step = Math.floor(el.clientHeight * 0.9) || 600;
+        el.scrollTop = Math.min(el.scrollTop + step, el.scrollHeight);
+      } else {
+        const step = Math.floor(window.innerHeight * 0.9);
+        window.scrollBy(0, step);
+      }
+    });
+  }
+
+  private async countReviewContainers(page: Page): Promise<number> {
+    return await page.evaluate(() => {
+      const rawContainers = document.querySelectorAll('[data-review-id], div[class*="jftiEf"], .section-review-content');
+      return rawContainers.length;
+    });
+  }
+
+  private async waitForNewContainersOrTimeout(page: Page, previousCount: number, timeoutMs: number): Promise<boolean> {
+    try {
+      const increased = await page.waitForFunction((prev) => {
+        const now = document.querySelectorAll('[data-review-id], div[class*="jftiEf"], .section-review-content').length;
+        return now > prev;
+      }, { timeout: timeoutMs }, previousCount);
+      return !!increased;
+    } catch {
+      return false;
+    }
+  }
+
+  private compareByRecency(a: any, b: any): number {
+    const aScore = this.recencyScore(a);
+    const bScore = this.recencyScore(b);
+    return aScore - bScore; // higher score = more recent
+  }
+
+  private recencyScore(dateVal: any): number {
+    // dateVal may be a string like "5 months ago" or a Date; normalize to a comparable descending score
+    try {
+      if (!dateVal) return -Infinity;
+      if (dateVal instanceof Date) return dateVal.getTime();
+      const s = String(dateVal).toLowerCase();
+      const now = Date.now();
+      const rel = s.match(/(\d+)\s*(hour|day|week|month|year)s?\s*ago/);
+      if (rel) {
+        const n = parseInt(rel[1], 10);
+        const unit = rel[2];
+        const ms = unit === 'hour' ? n * 3600000 : unit === 'day' ? n * 86400000 : unit === 'week' ? n * 7 * 86400000 : unit === 'month' ? n * 30 * 86400000 : n * 365 * 86400000;
+        return now - ms;
+      }
+      const abs = Date.parse(s);
+      if (!Number.isNaN(abs)) return abs;
+      return -Infinity;
+    } catch {
+      return -Infinity;
+    }
   }
 
   /**
@@ -881,8 +1063,8 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         
         console.log(`[MORE_BUTTON] Found ${moreButtons.length} More button candidates`);
         
-        // Click the buttons synchronously (simplified approach)
-        for (let i = 0; i < Math.min(moreButtons.length, 10); i++) {
+        // Click all visible candidates this sweep (bounded per sweep)
+        for (let i = 0; i < Math.min(moreButtons.length, 100); i++) {
           const button = moreButtons[i] as HTMLElement;
           try {
             console.log(`[MORE_BUTTON] Clicking button ${i + 1}: "${button.textContent?.trim()}"`);
@@ -911,10 +1093,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         return totalClicked;
       });
       
-      // Add a delay after clicking to allow content to load
+      // Add a short delay after clicking to allow content to load
       if (clicked > 0) {
         this.log(`✅ More button clicking completed: ${clicked} buttons clicked, waiting for content to load...`);
-        await page.waitForTimeout(3000); // Wait for content to load
+        await page.waitForTimeout(1200);
       } else {
         this.log(`ℹ️ No More buttons found to click`);
       }
@@ -979,26 +1161,42 @@ export class GoogleReviewScraperService implements ReviewScraperService {
     const result = await page.evaluate(async () => {
       const reviews = [];
       console.log('[SCRAPER] Simple review extraction starting... - TESTING IF CHANGES WORK!!!');
-      
-      // Prefer stable review card containers over star elements
-      const reviewCards = document.querySelectorAll('[data-review-id], div[class*="jftiEf"], .section-review-content');
-      const starElements = reviewCards.length > 0 
-        ? reviewCards 
-        : document.querySelectorAll('[role="img"][aria-label*="star"], [role="img"][aria-label*="כוכב"], [aria-label*="stars"], [aria-label*="כוכבים"]');
-      console.log(`[SCRAPER] Found ${starElements.length} review containers`);
-      
-      for (let i = 0; i < starElements.length; i++) {
-        const starEl = starElements[i];
-        
-        // Find the review container - prefer known review card, else climb DOM
-        let container = (starEl as HTMLElement).closest('[data-review-id], div[class*="jftiEf"], .section-review-content') || (starEl as HTMLElement).closest('div');
-        for (let level = 0; level < 6 && container; level++) {
-          if (container.querySelector('.d4r55')) break; // author present
-          container = container.parentElement ? container.parentElement.closest('div') : null;
+      // Initialize de-duplication state on the page (persists across evaluate calls)
+      const w = window as any;
+      if (!w.__seenReviewHashes) {
+        w.__seenReviewHashes = {};
+      }
+      if (!w.__dupCounters) {
+        w.__dupCounters = { added: 0, skippedDuplicate: 0 };
+      }
+
+      // Build a unique list of review containers and avoid iterating nested duplicates
+      const rawContainers = Array.from(document.querySelectorAll('[data-review-id], div[class*="jftiEf"], .section-review-content')) as HTMLElement[];
+      let containers: HTMLElement[] = rawContainers;
+      if (containers.length === 0) {
+        const fallbacks = Array.from(document.querySelectorAll('[role="img"][aria-label*="star"], [role="img"][aria-label*="כוכב"], [aria-label*="stars"], [aria-label*="כוכבים"]')) as HTMLElement[];
+        containers = fallbacks.map(el => (el.closest('[data-review-id], div[class*="jftiEf"], .section-review-content') as HTMLElement) || el);
+      }
+      // Deduplicate by element identity
+      const seenEls = new Set<HTMLElement>();
+      const uniqueContainers: HTMLElement[] = [];
+      for (const el of containers) {
+        if (!el) continue;
+        if (seenEls.has(el)) continue;
+        seenEls.add(el);
+        uniqueContainers.push(el);
+      }
+      console.log(`[SCRAPER] Found ${uniqueContainers.length} unique review containers`);
+
+      for (let i = 0; i < uniqueContainers.length; i++) {
+        const container = uniqueContainers[i];
+
+        // Skip if this review container was already processed in previous passes
+        if (container.getAttribute('data-scraped') === '1') {
+          console.log('[SCRAPER] Skipping already processed review container');
+          continue;
         }
-        
-        if (!container) continue;
-        
+
         // Extract rating from within container to avoid mismatches (optional)
         let rating: number | null = null;
         const ratingNodes = container.querySelectorAll('[role="img"][aria-label*="star" i], [aria-label*="star" i], [role="img"][aria-label*="כוכב"], [role="img"][aria-label*="כוכבים"], [aria-label*="כוכבים"]');
@@ -1012,23 +1210,23 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         }
         if (rating === null) { rating = 0; }
         
-        // Expand 'More' within this review card to reveal full text (per-card)
+        // Expand 'More' within this review card to reveal full text (per-card), repeat until no More found (bounded)
         try {
-          const moreWithin = container.querySelectorAll('button, [role="button"], span.w8nwRe');
-          let expanded = false;
-          for (const btnEl of moreWithin) {
-            const btn = btnEl as HTMLElement;
-            const txt = (btn.textContent || '').toLowerCase().trim();
-            const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
-            const jsnameAttr = (btn.getAttribute('jsname') || '').toLowerCase();
-            if (txt === 'more' || txt === 'show more' || txt === 'read more' || txt === 'עוד' ||
-                aria.includes('more') || aria.includes('עוד') || jsnameAttr === 'gxjvle' || btn.classList.contains('w8nwRe')) {
-              try { (btn as HTMLElement).click(); expanded = true; } catch {}
+          for (let round = 0; round < 3; round++) {
+            const moreWithin = Array.from(container.querySelectorAll('button, [role="button"], span.w8nwRe')) as HTMLElement[];
+            let clicks = 0;
+            for (const btn of moreWithin) {
+              const txt = (btn.textContent || '').toLowerCase().trim();
+              const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+              const jsnameAttr = (btn.getAttribute('jsname') || '').toLowerCase();
+              const isCandidate = txt === 'more' || txt === 'show more' || txt === 'read more' || txt === 'עוד' ||
+                                  aria.includes('more') || aria.includes('עוד') || jsnameAttr === 'gxjvle' || btn.classList.contains('w8nwRe');
+              if (isCandidate && btn.getAttribute('aria-expanded') !== 'true') {
+                try { btn.click(); clicks++; } catch {}
+              }
             }
-          }
-          if (expanded) {
-            // eslint-disable-next-line @typescript-eslint/no-implied-eval
-            await new Promise((resolve) => setTimeout(resolve, 300));
+            if (clicks === 0) break;
+            await new Promise(resolve => setTimeout(resolve, 300));
           }
         } catch {}
 
@@ -1211,6 +1409,14 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             hash = hash & hash; // Convert to 32bit integer
           }
           const stableId = `review_${Math.abs(hash)}`;
+
+          // In-page de-duplication: skip if we've already seen this review during this session
+          if ((window as any).__seenReviewHashes[stableId]) {
+            console.log(`[SCRAPER] Duplicate review skipped (stableId=${stableId})`);
+            (window as any).__dupCounters.skippedDuplicate++;
+            continue;
+          }
+          (window as any).__seenReviewHashes[stableId] = true;
           
           const reviewObject = {
             id: stableId,
@@ -1223,13 +1429,19 @@ export class GoogleReviewScraperService implements ReviewScraperService {
           };
           
           reviews.push(reviewObject);
-          
+
           console.log(`[SCRAPER] Added review ${reviews.length}: "${authorName}" - ${rating}★ - Date: "${reviewDate}" - "${reviewText.substring(0, 50)}..."`);
-          
+          (window as any).__dupCounters.added++;
+
+          // Mark the container as processed to prevent re-processing across scroll passes
+          try { container.setAttribute('data-scraped', '1'); } catch {}
+
           // Remove arbitrary limit - let the strategy decide how many reviews to collect
         }
       }
       
+      const w2 = window as any;
+      console.log(`[SCRAPER] Dedup summary: added=${w2.__dupCounters?.added || 0} skippedDuplicate=${w2.__dupCounters?.skippedDuplicate || 0} totalSeen=${Object.keys(w2.__seenReviewHashes || {}).length}`);
       console.log(`[SCRAPER] Extracted ${reviews.length} reviews`);
       
       return reviews;
