@@ -1,4 +1,6 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 import { ReviewScraperService, RawReview } from '@shared/types';
 import { validateGoogleMapsUrl } from '../utils/urlValidator.js';
 import { createReviewId } from '../utils/reviewIdUtils.js';
@@ -22,6 +24,10 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   
   private currentSessionId?: string;
   private sessionStartTime: number = 0;
+  private sessionLogStream?: fs.WriteStream;
+  private sessionLogPath?: string;
+  private sessionUrl?: string;
+  private providedLogFilePath?: string;
 
   // Reliability framework components removed
 
@@ -57,6 +63,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   protected log(message: string): void {
     console.log(`[Scraper] ${message}`);
     this.progressCallback?.(message);
+    this.writeSessionLog(`[Scraper] ${message}`);
   }
 
   private debugLog(message: string): void {
@@ -227,7 +234,73 @@ export class GoogleReviewScraperService implements ReviewScraperService {
 
     page.on('pageerror', (error) => {
       this.debugLog(`Page error: ${error.message}`);
+      this.writeSessionLog(`[BROWSER][pageerror] ${error.message}`);
     });
+
+    // Collect browser console logs without opening DevTools
+    page.on('console', (msg) => {
+      const text = msg.text();
+      if (!text) return;
+      // Only persist our scraper tags or errors to reduce noise
+      if (/(\[SCRAPER\]|\[SCROLL\]|\[MORE_BUTTON\]|\[DEBUG\]|\[DETECT\]|Error|error|\[Scraper-Backend\])/.test(text)) {
+        this.writeSessionLog(`[BROWSER][${msg.type()}] ${text}`);
+      }
+    });
+  }
+
+  private ensureLogsDirectory(): string {
+    const logsDir = '/Users/noamsharkany/review.ai.lean/logs-headless';
+    try {
+      if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true });
+      }
+    } catch {}
+    return logsDir;
+  }
+
+  private sanitizeForFilename(text: string): string {
+    const sanitized = text.replace(/[^a-zA-Z0-9._-]+/g, '_');
+    return sanitized.slice(0, 180);
+  }
+
+  public setSessionContext(sessionId: string, url: string, logFilePath?: string): void {
+    this.currentSessionId = sessionId;
+    this.sessionUrl = url;
+    this.providedLogFilePath = logFilePath;
+  }
+
+  private startSessionLogging(url: string, sessionId?: string): void {
+    try {
+      const logsDir = this.ensureLogsDirectory();
+      const ts = new Date().toISOString().replace(/:/g, '-');
+      const name = this.sanitizeForFilename(url);
+      const fileName = sessionId ? `${name}__${this.sanitizeForFilename(sessionId)}__${ts}.log` : `${name}__${ts}.log`;
+      const fullPath = this.providedLogFilePath || path.join(logsDir, fileName);
+      this.sessionLogStream = fs.createWriteStream(fullPath, { flags: 'a' });
+      this.sessionLogPath = fullPath;
+      this.sessionUrl = url;
+      this.writeSessionLog(`Session logging started for URL: ${url}${sessionId ? ` (sessionId: ${sessionId})` : ''}`);
+    } catch {}
+  }
+
+  private stopSessionLogging(): void {
+    try {
+      if (this.sessionLogStream) {
+        this.writeSessionLog('Session logging finished.');
+        this.sessionLogStream.end();
+      }
+    } catch {}
+    this.sessionLogStream = undefined;
+    this.sessionLogPath = undefined;
+    this.sessionUrl = undefined;
+  }
+
+  private writeSessionLog(line: string): void {
+    if (!this.sessionLogStream) return;
+    const ts = new Date().toISOString();
+    try {
+      this.sessionLogStream.write(`[${ts}] ${line}\n`);
+    } catch {}
   }
 
   private async navigateStreamlined(page: Page, url: string): Promise<void> {
@@ -260,6 +333,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
    * Main scraping method with adaptive strategy based on total review count
    */
   async scrapeReviews(googleUrl: string): Promise<RawReview[]> {
+    this.startSessionLogging(googleUrl, this.currentSessionId);
     this.log('🎯 Starting adaptive review extraction...');
     
     let page: Page | null = null;
@@ -297,6 +371,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       if (page) {
         await page.close();
       }
+      this.stopSessionLogging();
     }
   }
 

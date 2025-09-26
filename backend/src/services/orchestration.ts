@@ -78,6 +78,11 @@ export class ReviewAnalysisOrchestrator extends EventEmitter implements Analysis
       }
     }
     
+    // Wire session context to scraper for per-session headless file logging
+    try {
+      this.scraper.setSessionContext(sessionId, googleUrl);
+    } catch {}
+
     // Start the analysis process asynchronously
     this.runAnalysisWorkflow(sessionId).catch(error => {
       this.handleAnalysisError(sessionId, error);
