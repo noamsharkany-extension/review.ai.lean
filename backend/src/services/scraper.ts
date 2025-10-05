@@ -242,7 +242,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       const text = msg.text();
       if (!text) return;
       // Only persist our scraper tags or errors to reduce noise
-      if (/(\[SCRAPER\]|\[SCROLL\]|\[MORE_BUTTON\]|\[DEBUG\]|\[DETECT\]|Error|error|\[Scraper-Backend\])/.test(text)) {
+      if (/(\[SCRAPER\]|\[SCRAPER-A\]|\[SCROLL\]|\[MORE_BUTTON\]|\[DEBUG\]|\[DETECT\]|Error|error|\[Scraper-Backend\])/.test(text)) {
         this.writeSessionLog(`[BROWSER][${msg.type()}] ${text}`);
       }
     });
@@ -367,21 +367,29 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       
       // Step 1: Click on Reviews tab to access all reviews
       this.log('📋 Step 1: Accessing Reviews tab...');
-      await this.clickReviewsTab(page);
+      const totalReviewCount = await this.clickReviewsTab(page);
       await page.waitForTimeout(2000);
-      
-      // Step 2: Detect total number of reviews available
-      this.log('🔢 Step 2: Detecting total review count...');
-      const totalReviewCount = await this.detectTotalReviewCount(page);
-      this.log(`📊 Detected approximately ${totalReviewCount} total reviews`);
-      
-      // Required flow: newest (100), then lowest (100), then highest (100)
-      const newest = await this.collectSinglePassBySort(page, 'newest', 100, totalReviewCount, false);
-      const lowest = await this.collectSinglePassBySort(page, 'lowest', 100, totalReviewCount, true);
-      const highest = await this.collectSinglePassBySort(page, 'highest', 100, totalReviewCount, true);
 
-      const combined = [...newest, ...lowest, ...highest];
-      this.log(`🎉 Final result: newest=${newest.length}, lowest=${lowest.length}, highest=${highest.length}, combined=${combined.length}`);
+      // Step 2: Choosing strategy for review count
+      this.log(`🔢 Step 2: Choosing strategy for ${totalReviewCount} total reviews`);
+
+      let combined: any[];
+
+      if (totalReviewCount <= 300) {
+        this.log('🎯 Using Strategy A: Single-pass extraction for small venue');
+        // Strategy A: Just scroll and extract all reviews without changing sort
+        combined = await this.collectAllReviewsWithoutSort(page, totalReviewCount);
+        this.log(`🎉 Strategy A result: extracted ${combined.length} reviews`);
+      } else {
+        this.log('🎯 Using Strategy B: Multi-category sampling for large venue (100 from newest, lowest, highest)');
+        // Strategy B: Sample 100 from each category
+        const newest = await this.collectSinglePassBySort(page, 'newest', 100, totalReviewCount, false);
+        const lowest = await this.collectSinglePassBySort(page, 'lowest', 100, totalReviewCount, true);
+        const highest = await this.collectSinglePassBySort(page, 'highest', 100, totalReviewCount, true);
+        combined = [...newest, ...lowest, ...highest];
+        this.log(`🎉 Strategy B result: newest=${newest.length}, lowest=${lowest.length}, highest=${highest.length}, combined=${combined.length}`);
+      }
+
       return combined;
       
     } catch (error) {
@@ -745,6 +753,192 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   }
 
   /**
+   * Strategy A: Collect all reviews without changing sort order
+   * Just scroll through all reviews and extract them
+   */
+  private async collectAllReviewsWithoutSort(page: Page, totalReviewCount: number): Promise<any[]> {
+    try {
+      this.log('📜 Strategy A: Scrolling through all reviews without sort change...');
+
+      // Track actual extracted review count, not container count
+      let lastReviewCount = 0;
+      let stagnant = 0;
+      let scrollRounds = 0;
+      let allReviews: any[] = [];
+
+      this.log(`Starting scroll: target ${totalReviewCount} reviews`);
+
+      for (let i = 0; i < 100; i++) {
+        await this.scrollReviewsViewportStep(page);
+        await page.waitForTimeout(800); // Give time for reviews to load
+
+        // Count review containers to track progress
+        const containerCount = await this.countReviewContainers(page);
+        scrollRounds++;
+
+        if (containerCount === lastReviewCount) {
+          stagnant++;
+          this.log(`Round ${scrollRounds}: No new containers (${containerCount} containers, stagnant: ${stagnant}/15)`);
+          if (stagnant >= 15) {
+            this.log(`⚠️ No new containers after ${stagnant} scroll attempts, stopping`);
+            break;
+          }
+        } else {
+          this.log(`Round ${scrollRounds}: ${lastReviewCount} → ${containerCount} containers (+${containerCount - lastReviewCount})`);
+          stagnant = 0;
+        }
+        lastReviewCount = containerCount;
+      }
+
+      this.log(`✓ Scroll complete: ${scrollRounds} rounds`);
+
+      // Now extract all reviews once (including rating-only reviews for Strategy A)
+      this.log('🔄 Expanding all "More" buttons and extracting reviews (including rating-only)...');
+      await this.clickMoreButtonsOnPage(page);
+      const extracted = await this.extractAllReviewsIncludingRatingOnly(page);
+
+      this.log(`📝 Before deduplication: ${extracted.length} reviews extracted`);
+      const deduped = this.reviewDeduplicationService.deduplicateReviews(extracted).uniqueReviews;
+      this.log(`📝 After deduplication: ${deduped.length} reviews (removed ${extracted.length - deduped.length} duplicates)`);
+
+      this.log(`✅ Strategy A: collected ${deduped.length}/${totalReviewCount} reviews`);
+
+      if (deduped.length < totalReviewCount * 0.8) {
+        this.log(`⚠️ Warning: Only got ${deduped.length} out of ${totalReviewCount} reviews (${Math.round(deduped.length/totalReviewCount*100)}%)`);
+      }
+
+      return deduped;
+    } catch (e) {
+      this.log(`❌ Strategy A failed: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      return [];
+    }
+  }
+
+  /**
+   * Strategy A-specific: Extract ALL reviews from the page - no filters
+   * Gets everything: reviews with text, rating-only, even 1-character comments
+   */
+  private async extractAllReviewsIncludingRatingOnly(page: Page): Promise<any[]> {
+    const allReviews = await page.evaluate(() => {
+      const reviews: any[] = [];
+      const containers = Array.from(document.querySelectorAll('[data-review-id], div[class*="jftiEf"]')) as HTMLElement[];
+
+      console.log(`[SCRAPER-A] Processing ${containers.length} containers for Strategy A (no filters)`);
+
+      let withText = 0;
+      let ratingOnly = 0;
+      let skippedNoRating = 0;
+
+      for (let i = 0; i < containers.length; i++) {
+        const container = containers[i];
+
+        // Extract rating - REQUIRED
+        let rating: number | null = null;
+        const ratingNodes = container.querySelectorAll('[role="img"][aria-label*="star" i], [aria-label*="star" i]');
+        for (const node of Array.from(ratingNodes)) {
+          const label = (node as HTMLElement).getAttribute('aria-label') || '';
+          const m = label.match(/([0-5](?:\.\d)?)\s*star/i);
+          if (m) {
+            rating = Math.round(parseFloat(m[1]));
+            break;
+          }
+        }
+
+        // Skip only if no rating found
+        if (rating === null || rating === 0) {
+          skippedNoRating++;
+          continue;
+        }
+
+        // Extract text - accept ANY length including empty
+        let reviewText = '';
+        const reviewSelectors = ['.MyEned .wiI7pd', '.wiI7pd', '.review-full-text', 'span[jsname="bN97Pc"]'];
+        for (const selector of reviewSelectors) {
+          const reviewEl = container.querySelector(selector);
+          if (reviewEl) {
+            reviewText = (reviewEl.textContent || '').trim();
+            if (reviewText) break;
+          }
+        }
+
+        // Extract author
+        let authorName = 'Anonymous';
+        const authorSelectors = ['.d4r55', 'a[href*="/contrib/"]', 'button[jsaction*="reviewerLink"]'];
+        for (const selector of authorSelectors) {
+          const nameElement = container.querySelector(selector) as HTMLElement | null;
+          if (nameElement) {
+            const extractedName = (nameElement.textContent || '').trim();
+            if (extractedName && extractedName.length >= 1 && extractedName.length <= 80) {
+              authorName = extractedName;
+              break;
+            }
+          }
+        }
+
+        // Extract date
+        let reviewDate = 'Recent';
+        const dateSelectors = ['.rsqaWe', 'span[class*="rsqaWe"]'];
+        for (const selector of dateSelectors) {
+          const dateEl = container.querySelector(selector);
+          if (dateEl) {
+            reviewDate = (dateEl.textContent || '').trim();
+            if (reviewDate) break;
+          }
+        }
+
+        // Track stats
+        if (reviewText.length > 0) {
+          withText++;
+        } else {
+          ratingOnly++;
+        }
+
+        // Create unique ID for deduplication (include position for rating-only reviews)
+        const idContent = reviewText.length > 0
+          ? `${authorName}_${reviewText}_${rating}`
+          : `${authorName}_${rating}_${reviewDate}_${i}`;
+
+        let hash = 0;
+        for (let j = 0; j < idContent.length; j++) {
+          const char = idContent.charCodeAt(j);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
+        }
+        const uniqueId = `review_${Math.abs(hash)}`;
+
+        // Log each review extraction
+        const textPreview = reviewText.length > 50 ? reviewText.substring(0, 50) + '...' : reviewText;
+        const type = reviewText.length > 0 ? 'TEXT' : 'RATING-ONLY';
+        console.log(`[SCRAPER-A] Review ${i + 1}: ${type} | ${rating}★ | ${authorName} | ${reviewDate} | "${textPreview}"`);
+
+        // Add review - NO text length filter
+        const reviewObject = {
+          id: uniqueId,
+          rating: rating,
+          text: reviewText, // Can be empty string
+          author: authorName,
+          date: reviewDate,
+          position: i + 1,
+          extractedAt: new Date().toISOString()
+        };
+
+        reviews.push(reviewObject);
+      }
+
+      console.log(`[SCRAPER-A] Extracted ${reviews.length} reviews: ${withText} with text, ${ratingOnly} rating-only, ${skippedNoRating} skipped (no rating)`);
+      return reviews;
+    });
+
+    this.log(`📊 Strategy A extraction: ${allReviews.length} total reviews extracted`);
+    const withText = allReviews.filter(r => r.text && r.text.length > 0).length;
+    const ratingOnly = allReviews.filter(r => !r.text || r.text.length === 0).length;
+    this.log(`   - ${withText} reviews with text`);
+    this.log(`   - ${ratingOnly} rating-only reviews`);
+
+    return allReviews;
+  }
+
+  /**
    * Strategy B: Efficient selective filtering (ensure 100 per category)
    */
   private async extractWithSelectiveFiltering(page: Page): Promise<any[]> {
@@ -808,27 +1002,27 @@ export class GoogleReviewScraperService implements ReviewScraperService {
   /**
    * Click on the reviews tab using our proven multi-lingual method
    */
-  private async clickReviewsTab(page: Page): Promise<void> {
+  private async clickReviewsTab(page: Page): Promise<number> {
     const reviewsButtonClicked = await page.evaluate(() => {
       const buttons = document.querySelectorAll('button');
       for (const button of buttons) {
         const text = button.textContent?.trim() || '';
         const jsaction = button.getAttribute('jsaction') || '';
-        
+
         // Check for English reviews button first
-        if ((text.includes('reviews') || text.includes('Reviews')) && 
+        if ((text.includes('reviews') || text.includes('Reviews')) &&
             jsaction.includes('moreReviews')) {
           (button as HTMLElement).click();
           return { success: true, text, language: 'english' };
         }
         // Check for Hebrew reviews button
-        if ((text.includes('ביקורות')) && 
+        if ((text.includes('ביקורות')) &&
             jsaction.includes('moreReviews')) {
           (button as HTMLElement).click();
           return { success: true, text, language: 'hebrew' };
         }
         // Also check for numeric patterns (1,863 reviews)
-        if ((text.includes('1,863') || text.includes('1863') || /\d+.*reviews?/i.test(text) || /\d+.*ביקורות/.test(text)) && 
+        if ((text.includes('1,863') || text.includes('1863') || /\d+.*reviews?/i.test(text) || /\d+.*ביקורות/.test(text)) &&
             jsaction.includes('moreReviews')) {
           (button as HTMLElement).click();
           return { success: true, text, language: 'numeric' };
@@ -836,13 +1030,21 @@ export class GoogleReviewScraperService implements ReviewScraperService {
       }
       return { success: false };
     });
-    
+
     if (reviewsButtonClicked.success) {
       this.log(`Reviews panel opened: "${reviewsButtonClicked.text}" (${reviewsButtonClicked.language})`);
+
+      // Extract review count from the button text
+      const numberMatch = reviewsButtonClicked.text.match(/([\d,]+)/);
+      const reviewCount = numberMatch ? parseInt(numberMatch[1].replace(/,/g, '')) : 999;
+      this.log(`📊 Extracted review count: ${reviewCount}`);
+
       // Wait for reviews panel content to fully load (matching working test scripts)
       await page.waitForTimeout(3000);
+      return reviewCount;
     } else {
       this.log('Could not open reviews panel');
+      return 999; // Default to "many" if we can't detect
     }
   }
 
@@ -1500,7 +1702,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
         if (reviewText.length > 10) {
           // Keep dates as they appear in Google Maps (e.g., "5 months ago")
           console.log(`[SCRAPER] Using date as-is from Google Maps: "${reviewDate}" for author "${authorName}"`)
-          
+
           // Create more stable ID based on content
           const contentStr = `${authorName}_${reviewText}_${rating}`.substring(0, 100);
           let hash = 0;
@@ -1518,7 +1720,7 @@ export class GoogleReviewScraperService implements ReviewScraperService {
             continue;
           }
           (window as any).__seenReviewHashes[stableId] = true;
-          
+
           const reviewObject = {
             id: stableId,
             rating: rating,

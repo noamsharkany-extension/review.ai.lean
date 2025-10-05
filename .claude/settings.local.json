@@ -25,7 +25,9 @@
       "Bash(sed:*)",
       "Bash(git log:*)",
       "Bash(npm run scrape-single:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebSearch",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

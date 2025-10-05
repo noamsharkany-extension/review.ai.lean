@@ -101,7 +101,7 @@ export class OpenAIAnalysisEngine implements AnalysisEngine {
               content: prompt
             }
           ],
-          temperature: 0,
+          temperature: 1,
           max_completion_tokens: 2000,
         });
 
@@ -404,7 +404,7 @@ ${reviewsText}`;
               content: prompt
             }
           ],
-          temperature: 0,
+          temperature: 1,
           max_completion_tokens: 3000,
         });
 
